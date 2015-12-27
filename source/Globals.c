@@ -1174,9 +1174,9 @@ void playerAttack(){
 void switchLevel(s8 change){
     currentLevel+=change;
     if(currentLevel > 4) currentLevel = 0; else if(currentLevel < 0) currentLevel = 4;
-    if(currentLevel == 1) sf2d_set_clear_color(RGBA8(0x82, 0x6D, 0x6C, 0xFF));
-    else if(currentLevel > 1) sf2d_set_clear_color(RGBA8(0x66, 0x66, 0x66, 0xFF));
-    else sf2d_set_clear_color(RGBA8(0x00, 0x7F, 0x00, 0xFF));
+    if(currentLevel == 1) sf2d_set_clear_color(0xFF6C6D82); //sf2d_set_clear_color(RGBA8(0x82, 0x6D, 0x6C, 0xFF));
+    else if(currentLevel > 1) sf2d_set_clear_color(0xFF666666); //sf2d_set_clear_color(RGBA8(0x66, 0x66, 0x66, 0xFF));
+    else sf2d_set_clear_color(0xFF007F00); //sf2d_set_clear_color(RGBA8(0x00, 0x7F, 0x00, 0xFF));
 }
 
 bool playerIntersectsEntity(Entity* e){

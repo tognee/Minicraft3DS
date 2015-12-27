@@ -483,10 +483,10 @@ void bakeLight(sf2d_texture* texture, int x, int y, int r) {
 			if (dist <= r * r) {
 				if (dist >= (r - (r / 5)) * (r - (r / 5))) {
 					if ((xd % 2 == 0 && yd % 2 != 0) || (xd % 2 != 0 && yd % 2 == 0)) { // rand() % 4 != 0
-						sf2d_set_pixel(texture, xx, yy, RGBA8(0, 0, 0, 255)); // set transparent pixel
+						sf2d_set_pixel(texture, xx, yy, 0xFF000000); //RGBA8(0, 0, 0, 255)); // set transparent pixel
 					}
 				} else {
-					sf2d_set_pixel(texture, xx, yy, RGBA8(0, 0, 0, 255)); // set transparent pixel
+					sf2d_set_pixel(texture, xx, yy, 0xFF000000); //RGBA8(0, 0, 0, 255)); // set transparent pixel
 				}
 			}
 		}
