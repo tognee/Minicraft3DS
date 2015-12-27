@@ -643,6 +643,9 @@ void renderTile(int i, int x, int y) {
 			age = 5;
 		render16(x, y, 160 + (age << 4), 0, 0);
 		break;
+	case TILE_WOOD_WALL:
+		render16b(x, y, grassTable[checkSurrTiles4(x >> 4, y >> 4, TILE_WOOD_WALL)], 176, 0, woodColor[0]);
+		break;
 	}
 
 }

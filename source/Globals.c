@@ -409,6 +409,7 @@ bool tileIsSolid(int tile, Entity * e){
         case TILE_GEMORE: 
         case TILE_CLOUDCACTUS: 
         case TILE_LAVA: 
+		case TILE_WOOD_WALL: 
         case 255: 
             return true;
         case TILE_WATER:
@@ -549,6 +550,10 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
 				setData(rand()%4,x,y); // determines mirroring.
                 return 1;
             } 
+			else if(item->id == ITEM_WOOD){ 
+                setTile(TILE_WOOD_WALL,x,y); --item->countLevel;
+                return 1;
+            } 
             else if(item->id == TOOL_SHOVEL && playerUseEnergy(4-item->countLevel)){ 
                 if(rand()%5==0)addEntityToList(newItemEntity(newItem(ITEM_SEEDS,1),(x<<4)+8, (y<<4)+8,currentLevel),&eManager);
                 setTile(TILE_DIRT,x,y); 
@@ -570,6 +575,10 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 setTile(TILE_FARM,x,y);
                 return 1;
             }   
+			else if(item->id == ITEM_WOOD){ 
+                setTile(TILE_WOOD_WALL,x,y); --item->countLevel;
+                return 1;
+            } 
             else if(item->id == TOOL_SHOVEL && playerUseEnergy(4-item->countLevel)){ 
                 addEntityToList(newItemEntity(newItem(ITEM_DIRT,1), (x<<4)+8, (y<<4)+8, currentLevel), &eManager);
                 setTile(TILE_HOLE,x,y); 
@@ -635,6 +644,11 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                     addItemsToWorld(newItem(ITEM_WHEAT,1),(x<<4)+8,(y<<4)+8,count);
 				    setTile(TILE_DIRT,x,y);
                 }
+            } break;
+		case TILE_WOOD_WALL:
+            if(item->id == TOOL_AXE && playerUseEnergy(4-item->countLevel)){
+                playerHurtTile(tile, x, y, (rand()%10) + (item->countLevel) * 5 + 10, player.p.dir);
+                return 1;
             } break;
     }
     return 0;
@@ -1137,6 +1151,16 @@ void playerHurtTile(int tile, int xt, int yt, int damage, int dir){
 			setTile(TILE_GRASS,xt,yt);
 			addEntityToList(newItemEntity(newItem(ITEM_FLOWER,1), (xt<<4)+8,(yt<<4)+8, currentLevel), &eManager);
             break;
+		case TILE_WOOD_WALL:
+            sprintf(hurtText, "%d", damage);
+            addEntityToList(newTextParticleEntity(hurtText,0xFF0000FF,xt<<4,yt<<4,currentLevel), &eManager);
+            addEntityToList(newSmashParticleEntity(xt<<4,yt<<4,currentLevel), &eManager);
+            setData(getData(xt,yt)+damage,xt,yt);
+            if(getData(xt,yt) > 20){
+                 setTile(TILE_DIRT,xt,yt);
+                 addItemsToWorld(newItem(ITEM_WOOD,1),(xt<<4)+8,(yt<<4)+8,1);
+            }
+        break;
     }
     
 }
@@ -1456,4 +1480,7 @@ void reloadColors() {
 	rockColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 1)); 
 	rockColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 2)); 
 	rockColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 3)); 
+	
+	woodColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 22, 0)); 
+	woodColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 22, 1)); 
 }

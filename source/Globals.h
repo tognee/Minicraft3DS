@@ -48,6 +48,7 @@
 #define TILE_HARDROCK 19
 #define TILE_CLOUDCACTUS 20
 #define TILE_HOLE 21
+#define TILE_WOOD_WALL 22
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
@@ -83,6 +84,7 @@ u32 sandColor[2];
 u32 waterColor[2];
 u32 lavaColor[2];
 u32 rockColor[4];
+u32 woodColor[2];
 
 char currentFileName[256];
 extern u8 currentMenu;
