@@ -422,25 +422,25 @@ bool tileIsSolid(int tile, Entity * e){
 /* For minimap */
 u32 getTileColor(int tile){
     switch(tile){
-        case TILE_WATER: return 0xFF0000FF;
-        case TILE_LAVA: return 0xFFFF0000;
-        case TILE_DIRT: return 0xFF826D6C;
-        case TILE_ROCK: return 0xFF7F7F7F;
-        case TILE_HARDROCK: return 0xFF5F5F7F;
-        case TILE_GRASS: return 0xFF00FF00;
-        case TILE_TREE: return 0xFF007F00;
-        case TILE_SAND: return 0xFFFFFF00;
-        case TILE_CACTUS: return 0xFF009F00;
-        case TILE_FLOWER: return 0xFF3FFF00;
-        case TILE_IRONORE: return 0xFFDC9696;
-        case TILE_GOLDORE: return 0xFFE5E89A;
-        case TILE_GEMORE: return 0xFFDF98DE;
+        case TILE_WATER: return 0x0000FFFF;
+        case TILE_LAVA: return 0xFF0000FF;
+        case TILE_DIRT: return 0x826D6CFF;
+        case TILE_ROCK: return 0x7F7F7FFF;
+        case TILE_HARDROCK: return 0x5F5F7FFF;
+        case TILE_GRASS: return 0x00FF00FF;
+        case TILE_TREE: return 0x007F00FF;
+        case TILE_SAND: return 0xFFFF00FF;
+        case TILE_CACTUS: return 0x009F00FF;
+        case TILE_FLOWER: return 0x3FFF00FF;
+        case TILE_IRONORE: return 0xDC9696FF;
+        case TILE_GOLDORE: return 0xE5E89AFF;
+        case TILE_GEMORE: return 0xDF98DEFF;
         case TILE_CLOUD: return 0xFFFFFFFF;
-        case TILE_CLOUDCACTUS: return 0xFFAFAFAF;
-        case TILE_STAIRS_DOWN: return 0xFF9F9F9F;
-        case TILE_STAIRS_UP: return 0xFF9F9F9F;
-        case TILE_HOLE: return 0xFF383838;
-        default: return 0xFF111111;
+        case TILE_CLOUDCACTUS: return 0xAFAFAFFF;
+        case TILE_STAIRS_DOWN: return 0x9F9F9FFF;
+        case TILE_STAIRS_UP: return 0x9F9F9FFF;
+        case TILE_HOLE: return 0x383838FF;
+        default: return 0x111111FF;
     }
 }
 
