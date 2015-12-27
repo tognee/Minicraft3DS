@@ -907,8 +907,8 @@ void renderEntity(Entity* e, int x, int y) {
 		if (e->entityItem.age >= 520)
 			if (e->entityItem.age / 6 % 2 == 0)
 				return;
-		renderItemIcon2(e->entityItem.item.id, e->entityItem.item.countLevel,
-				x - 4, y - 4, (int) e->entityItem.zz);
+		renderItemIcon(e->entityItem.item.id, e->entityItem.item.countLevel,
+				x - 4, y - 4 - (int) e->entityItem.zz);
 		break;
 	case ENTITY_FURNITURE:
 		renderFurniture(e->entityFurniture.itemID, x - 8, y - 8);
@@ -1101,117 +1101,6 @@ void renderItemWithTextCentered(Item* item, int width, int y) {
 	else
 		drawTextColorSpecial(getItemName(item->id, item->countLevel), x + 18,
 				y + 2, 0xFFD2D2D2, 0xFFFFFFFF);
-}
-
-void renderItemIcon2(int itemID, int countLevel, int x, int y, int z) {
-	switch (itemID) {
-	case ITEM_NULL:
-		return;
-	case TOOL_SHOVEL:
-		renderb(x, y, countLevel * 8, 144, 0, 0xFF);
-		break;
-	case TOOL_HOE:
-		renderb(x, y, 40 + countLevel * 8, 144, 0, 0xFF);
-		break;
-	case TOOL_SWORD:
-		renderb(x, y, 80 + countLevel * 8, 144, 0, 0xFF);
-		break;
-	case TOOL_PICKAXE:
-		renderb(x, y, 120 + countLevel * 8, 144, 0, 0xFF);
-		break;
-	case TOOL_AXE:
-		renderb(x, y, 160 + countLevel * 8, 144, 0, 0xFF);
-		break;
-	case ITEM_ANVIL:
-		renderb(x, y, 120, 152, 0, 0xFF);
-		break;
-	case ITEM_CHEST:
-		renderb(x, y, 128, 152, 0, 0xFF);
-		break;
-	case ITEM_OVEN:
-		renderb(x, y, 136, 152, 0, 0xFF);
-		break;
-	case ITEM_FURNACE:
-		renderb(x, y, 144, 152, 0, 0xFF);
-		break;
-	case ITEM_WORKBENCH:
-		renderb(x, y, 152, 152, 0, 0xFF);
-		break;
-	case ITEM_LANTERN:
-		renderb(x, y, 160, 152, 0, 0xFF);
-		break;
-	case ITEM_POWGLOVE:
-		renderb(x, y, 56, 152, 0, 0xFF);
-		break;
-	case ITEM_FLOWER:
-		renderb(x, y, 0, 152, 0, 0xFF);
-		break;
-	case ITEM_WOOD:
-		renderb(x, y, 8, 152, 0, 0xFF);
-		break;
-	case ITEM_STONE:
-		renderb(x, y, 16, 152, 0, 0xFF);
-		break;
-	case ITEM_SAND:
-		renderb(x, y, 16, 152, 0, 0xFF);
-		break;
-	case ITEM_DIRT:
-		renderb(x, y, 16, 152, 0, 0xFF);
-		break;
-	case ITEM_CLOUD:
-		renderb(x, y, 16, 152, 0, 0xFF);
-		break;
-	case ITEM_ACORN:
-		renderb(x, y, 24, 152, 0, 0xFF);
-		break;
-	case ITEM_CACTUS:
-		renderb(x, y, 32, 152, 0, 0xFF);
-		break;
-	case ITEM_SEEDS:
-		renderb(x, y, 40, 152, 0, 0xFF);
-		break;
-	case ITEM_WHEAT:
-		renderb(x, y, 48, 152, 0, 0xFF);
-		break;
-	case ITEM_FLESH:
-		renderb(x, y, 64, 152, 0, 0xFF);
-		break;
-	case ITEM_BREAD:
-		renderb(x, y, 72, 152, 0, 0xFF);
-		break;
-	case ITEM_APPLE:
-		renderb(x, y, 80, 152, 0, 0xFF);
-		break;
-	case ITEM_SLIME:
-		renderb(x, y, 88, 152, 0, 0xFF);
-		break;
-	case ITEM_COAL:
-		renderb(x, y, 88, 152, 0, 0xFF);
-		break;
-	case ITEM_IRONORE:
-		renderb(x, y, 88, 152, 0, 0xFF);
-		break;
-	case ITEM_GOLDORE:
-		renderb(x, y, 88, 152, 0, 0xFF);
-		break;
-	case ITEM_IRONINGOT:
-		renderb(x, y, 96, 152, 0, 0xFF);
-		break;
-	case ITEM_GOLDINGOT:
-		renderb(x, y, 96, 152, 0, 0xFF);
-		break;
-	case ITEM_GLASS:
-		renderb(x, y, 104, 152, 0, 0xFF);
-		break;
-	case ITEM_GEM:
-		renderb(x, y, 112, 152, 0, 0xFF);
-		break;
-	case TOOL_BUCKET:
-		renderb(x, y, 200 + countLevel * 8, 144, 0, 0xFF);
-		break;
-	}
-	y -= z;
-	renderItemIcon(itemID, countLevel, x, y);
 }
 
 void renderItemIcon(int itemID, int countLevel, int x, int y) {
