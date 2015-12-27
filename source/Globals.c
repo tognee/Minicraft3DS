@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-char versionText[34] = "BETA BUILD 5.01 (pre 1.0)";
+char versionText[34] = "BETA BUILD 6.00 (pre 1.0)";
 char fpsstr[34];
 u8 currentMenu = 0;
 
@@ -441,6 +441,7 @@ u32 getTileColor(int tile){
         case TILE_STAIRS_DOWN: return 0x9F9F9FFF;
         case TILE_STAIRS_UP: return 0x9F9F9FFF;
         case TILE_HOLE: return 0x383838FF;
+		case TILE_WOOD_WALL: return 0xC1A55EFF;
         default: return 0x111111FF;
     }
 }
