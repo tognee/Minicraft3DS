@@ -1206,6 +1206,9 @@ void renderItemIcon2(int itemID, int countLevel, int x, int y, int z) {
 	case ITEM_GEM:
 		renderb(x, y, 112, 152, 0, 0xFF);
 		break;
+	case TOOL_BUCKET:
+		renderb(x, y, 200 + countLevel * 8, 144, 0, 0xFF);
+		break;
 	}
 	y -= z;
 	renderItemIcon(itemID, countLevel, x, y);
@@ -1313,6 +1316,9 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		break;
 	case ITEM_GEM:
 		render(x, y, 112, 152, 0);
+		break;
+	case TOOL_BUCKET:
+		render(x, y, 200 + countLevel * 8, 144, 0);
 		break;
 	}
 }

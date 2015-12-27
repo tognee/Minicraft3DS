@@ -3,7 +3,7 @@
 char currentName[16];
 
 bool isItemEmpty(Item* item){
-    if(item->id < 6 || item->onlyOne == true) return false;
+    if(item->id < 6 || item->id > 100 || item->onlyOne == true) return false;
     if(item->countLevel < 1) return true;
     return false;
 }
@@ -59,7 +59,7 @@ Item newItem(int id, int cLevel){
     if(id != ITEM_NULL){
         if(cLevel > 999) cLevel = 999;
         item.countLevel = cLevel;
-        if(id < 7 || id > 27) item.onlyOne = true; // Tools + Furniture.
+        if(id < 7 || id > 27 || id > 100) item.onlyOne = true; // Tools + Furniture.
         else item.onlyOne = false; 
     }
     item.chestPtr = NULL;
@@ -158,6 +158,12 @@ char* getItemName(int itemID, int countLevel){
         case ITEM_GLASS: sprintf(currentName,"%d Glass", countLevel); return currentName;
         case ITEM_GEM: sprintf(currentName,"%d Gem", countLevel); return currentName;
         case ITEM_SLIME: sprintf(currentName,"%d Slime", countLevel); return currentName;
+		case TOOL_BUCKET:
+			switch(countLevel){
+                case 1: return "Water Bucket";
+                case 2: return "Lava Bucket";
+                default: return "Empty Bucket";
+            }
         default: return ""; // null
     }
 }
@@ -232,6 +238,12 @@ char* getBasicItemName(int itemID, int countLevel){
         case ITEM_GLASS: return "Glass";
         case ITEM_GEM: return "Gem";
         case ITEM_SLIME: return "Slime";
+		case TOOL_BUCKET:
+			switch(countLevel){
+                case 1: return "Water Bucket";
+                case 2: return "Lava Bucket";
+                default: return "Empty Bucket";
+            }
         default: return ""; // null
     }
     

@@ -98,7 +98,7 @@ void initRecipes(){
     workbenchRecipes.recipes[14] = defineRecipe(TOOL_PICKAXE,1,2,ITEM_WOOD,5,ITEM_STONE,5);
     workbenchRecipes.recipes[15] = defineRecipe(TOOL_SHOVEL,1,2,ITEM_WOOD,5,ITEM_STONE,5);
 
-    anvilRecipes.size = 15;
+    anvilRecipes.size = 16;
     anvilRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (anvilRecipes.size));
     anvilRecipes.recipes[0] = defineRecipe(TOOL_SWORD,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
     anvilRecipes.recipes[1] = defineRecipe(TOOL_AXE,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
@@ -115,6 +115,7 @@ void initRecipes(){
     anvilRecipes.recipes[12] = defineRecipe(TOOL_HOE,4,2,ITEM_WOOD,5,ITEM_GEM,50);
     anvilRecipes.recipes[13] = defineRecipe(TOOL_PICKAXE,4,2,ITEM_WOOD,5,ITEM_GEM,50);
     anvilRecipes.recipes[14] = defineRecipe(TOOL_SHOVEL,4,2,ITEM_WOOD,5,ITEM_GEM,50);
+	anvilRecipes.recipes[15] = defineRecipe(TOOL_BUCKET,0,1,ITEM_IRONINGOT,10);
        	
     furnaceRecipes.size = 3;
     furnaceRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (furnaceRecipes.size));

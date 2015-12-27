@@ -455,7 +455,7 @@ void healPlayer(int amount){
 s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir){
     
      // Furniture items
-    if(item->id > 27){
+    if(item->id > 27 && item->id < 34){
         if(!tileIsSolid(getTile(x,y), NULL)){
             addEntityToList(newFurnitureEntity(item->id,item->chestPtr, (x<<4)+8, (y<<4)+8, currentLevel), &eManager);
             removeItemFromCurrentInv(item);
@@ -576,12 +576,38 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 return 1;
             } break;
         case TILE_HOLE:
+			if(item->id == ITEM_DIRT){
+                setTile(TILE_DIRT,x,y);    
+                --item->countLevel;
+                return 1;
+			}
+			else if(item->id == TOOL_BUCKET && item->countLevel == 1 && playerUseEnergy(4)) {
+				setTile(TILE_WATER,x,y);
+				item->countLevel = 0;
+            } 
+			else if(item->id == TOOL_BUCKET && item->countLevel == 2 && playerUseEnergy(4)) {
+				setTile(TILE_LAVA,x,y);
+				item->countLevel = 0;
+            } break;
         case TILE_WATER:
+			if(item->id == ITEM_DIRT){
+                setTile(TILE_DIRT,x,y);    
+                --item->countLevel;
+                return 1;
+			}
+			else if(item->id == TOOL_BUCKET && item->countLevel == 0 && playerUseEnergy(4)) {
+				setTile(TILE_HOLE,x,y);
+				item->countLevel = 1;
+            } break;
         case TILE_LAVA:
             if(item->id == ITEM_DIRT){
                 setTile(TILE_DIRT,x,y);    
                 --item->countLevel;
                 return 1;
+            }
+			else if(item->id == TOOL_BUCKET && item->countLevel == 0 && playerUseEnergy(4)) {
+				setTile(TILE_HOLE,x,y);
+				item->countLevel = 2;
             } break;
         case TILE_NULL:
             if(item->id == ITEM_CLOUD){
@@ -639,6 +665,8 @@ void tickTile(int x, int y){
             if(getTile(x-1,y)==TILE_HOLE) setTile(TILE_LAVA,x-1,y);
             if(getTile(x,y+1)==TILE_HOLE) setTile(TILE_LAVA,x,y+1);
             if(getTile(x,y-1)==TILE_HOLE) setTile(TILE_LAVA,x,y-1);
+			
+			if(getTile(x+1,y)==TILE_WATER || getTile(x-1,y)==TILE_WATER || getTile(x,y+1)==TILE_WATER || getTile(x,y-1)==TILE_WATER) setTile(TILE_ROCK,x,y);
             break;
         case TILE_HOLE: // This makes water flow slightly faster than lava
             if(getTile(x+1,y)==TILE_WATER) setTile(TILE_WATER,x,y);
