@@ -542,6 +542,7 @@ void renderTile(int i, int x, int y) {
 		renderDotsWithColor(v, x, y, 0, 0xFF8ED38E);
 		break;
 	case TILE_TREE:
+		renderTile(TILE_GRASS, x, y);
 		render16(x, y, treeTable[checkSurrTiles8(x >> 4, y >> 4, TILE_TREE)],
 				16, 0);
 		break;
@@ -593,6 +594,7 @@ void renderTile(int i, int x, int y) {
 		render16(x, y, 48, 0, 0);
 		break;
 	case TILE_FLOWER:
+		renderTile(TILE_GRASS, x, y);
 		render16(x, y, 64, 0, getData(x >> 4, y >> 4));
 		break;
 	case TILE_STAIRS_DOWN:
