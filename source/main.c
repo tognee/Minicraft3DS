@@ -46,65 +46,7 @@ void initMiniMap(bool loadUpWorld) {
 				}
 
 				/* Minimaps */
-				switch (map[i][x + y * 128]) {
-				case TILE_WATER:
-					sf2d_set_pixel(minimap[i], x, y, 0xFFFF0000);
-					break;
-				case TILE_LAVA:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF0000FF);
-					break;
-				case TILE_DIRT:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF6C6D82);
-					break;
-				case TILE_ROCK:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF7F7F7F);
-					break;
-				case TILE_HARDROCK:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF7F5F5F);
-					break;
-				case TILE_GRASS:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF00FF00);
-					break;
-				case TILE_TREE:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF007F00);
-					break;
-				case TILE_SAND:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF00FFFF);
-					break;
-				case TILE_CACTUS:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF009F00);
-					break;
-				case TILE_FLOWER:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF00FF3F);
-					break;
-				case TILE_IRONORE:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF9696DC);
-					break;
-				case TILE_GOLDORE:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF9AE8E5);
-					break;
-				case TILE_GEMORE:
-					sf2d_set_pixel(minimap[i], x, y, 0xFFDE98DF);
-					break;
-				case TILE_CLOUD:
-					sf2d_set_pixel(minimap[i], x, y, 0xFFFFFFFF);
-					break;
-				case TILE_CLOUDCACTUS:
-					sf2d_set_pixel(minimap[i], x, y, 0xFFAFAFAF);
-					break;
-				case TILE_STAIRS_DOWN:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF9F9F9F);
-					break;
-				case TILE_STAIRS_UP:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF9F9F9F);
-					break;
-				case 255:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF007F00);
-					break;
-				default:
-					sf2d_set_pixel(minimap[i], x, y, 0xFF111111);
-					break;
-				}
+				sf2d_set_pixel(minimap[i], x, y, getTileColor(map[i][x + y * 128]));
 			}
 		}
 	}
@@ -198,7 +140,7 @@ void tick() {
 void clearScreen(int* data, u8 fill, int size) {
 	int i;
 	for (i = 0; i < size / 4; ++i)
-		data[i] = 0x000000FF;
+		data[i] = 0xFF000000;
 }
 
 char debugText[34];

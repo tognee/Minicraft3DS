@@ -351,7 +351,7 @@ void EntityVsEntity(Entity* e1, Entity* e2){
         case ENTITY_PLAYER: playerEntityInteract(e2); break;
         case ENTITY_ZOMBIE:
             if(e2->type == ENTITY_PLAYER){ 
-                hurtEntity(e2, 2, e1->zombie.dir, 0xFF00AFFF);
+                hurtEntity(e2, 2, e1->zombie.dir, 0xFFAF00FF);
                 switch(e1->zombie.dir){
 	                case 0: e1->yKnockback = -4; break;
 	                case 1: e1->yKnockback = +4; break;
@@ -362,7 +362,7 @@ void EntityVsEntity(Entity* e1, Entity* e2){
         break;
         case ENTITY_SLIME:
             if(e2->type == ENTITY_PLAYER){
-                hurtEntity(e2, 1, e1->slime.dir, 0xFF00AFFF);
+                hurtEntity(e2, 1, e1->slime.dir, 0xFFAF00FF);
                 switch(e1->slime.dir){
 	                case 0: e1->yKnockback = -4; break;
 	                case 1: e1->yKnockback = +4; break;
@@ -372,10 +372,10 @@ void EntityVsEntity(Entity* e1, Entity* e2){
             }
         break;
         case ENTITY_AIRWIZARD:
-            if(e2->type == ENTITY_PLAYER) hurtEntity(e2, 3, e1->wizard.dir, 0xFF00AFFF);
+            if(e2->type == ENTITY_PLAYER) hurtEntity(e2, 3, e1->wizard.dir, 0xFFAF00FF);
         break;
         case ENTITY_SPARK:
-            if(e2 != e1->spark.parent) hurtEntity(e2, 1, -1, 0xFF00AFFF);
+            if(e2 != e1->spark.parent) hurtEntity(e2, 1, -1, 0xFFAF00FF);
         break;
     }  
 }
@@ -422,19 +422,19 @@ bool tileIsSolid(int tile, Entity * e){
 /* For minimap */
 u32 getTileColor(int tile){
     switch(tile){
-        case TILE_WATER: return 0xFFFF0000;
-        case TILE_LAVA: return 0xFF0000FF;
-        case TILE_DIRT: return 0xFF6C6D82;
+        case TILE_WATER: return 0xFF0000FF;
+        case TILE_LAVA: return 0xFFFF0000;
+        case TILE_DIRT: return 0xFF826D6C;
         case TILE_ROCK: return 0xFF7F7F7F;
-        case TILE_HARDROCK: return 0xFF7F5F5F;
+        case TILE_HARDROCK: return 0xFF5F5F7F;
         case TILE_GRASS: return 0xFF00FF00;
         case TILE_TREE: return 0xFF007F00;
-        case TILE_SAND: return 0xFF00FFFF;
+        case TILE_SAND: return 0xFFFFFF00;
         case TILE_CACTUS: return 0xFF009F00;
-        case TILE_FLOWER: return 0xFF00FF3F;
-        case TILE_IRONORE: return 0xFF9696DC;
-        case TILE_GOLDORE: return 0xFF9AE8E5;
-        case TILE_GEMORE: return 0xFFDE98DF;
+        case TILE_FLOWER: return 0xFF3FFF00;
+        case TILE_IRONORE: return 0xFFDC9696;
+        case TILE_GOLDORE: return 0xFFE5E89A;
+        case TILE_GEMORE: return 0xFFDF98DE;
         case TILE_CLOUD: return 0xFFFFFFFF;
         case TILE_CLOUDCACTUS: return 0xFFAFAFAF;
         case TILE_STAIRS_DOWN: return 0xFF9F9F9F;
@@ -449,7 +449,7 @@ void healPlayer(int amount){
     if(player.p.health > 10) player.p.health = 10;
     char healText[11];
     sprintf(healText, "%d", amount);
-    addEntityToList(newTextParticleEntity(healText,0x00FF00FF,player.x,player.y,currentLevel), &eManager);
+    addEntityToList(newTextParticleEntity(healText,0xFF00FF00,player.x,player.y,currentLevel), &eManager);
 }
 
 s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir){
@@ -1222,8 +1222,8 @@ void entityTileInteract(Entity*e, int tile, int x, int y){
                 player.y = (y << 4) + 8;
             }
         return;
-        case TILE_CACTUS: if(e->type == ENTITY_PLAYER)hurtEntity(e,1,-1,0xFF00AFFF); return;
-        case TILE_LAVA: if(e->type == ENTITY_PLAYER)hurtEntity(e,1,-1,0xFF00AFFF); return;
+        case TILE_CACTUS: if(e->type == ENTITY_PLAYER)hurtEntity(e,1,-1,0xFFAF00FF); return;
+        case TILE_LAVA: if(e->type == ENTITY_PLAYER)hurtEntity(e,1,-1,0xFFAF00FF); return;
         case TILE_WHEAT: 
             if(e->type == ENTITY_PLAYER || e->type == ENTITY_ZOMBIE){
                 if(getData(x,y) > -1 && rand()%20 == 0){
@@ -1372,7 +1372,7 @@ void tickPlayer(){
 		if (player.p.stamina > 0) {
 			--player.p.stamina;
 		} else {
-		    hurtEntity(&player,1,-1,0xFF00AFFF);
+		    hurtEntity(&player,1,-1,0xFFAF00FF);
 		}
 	}
 	
