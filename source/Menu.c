@@ -390,6 +390,8 @@ void tickMenu(int menu){
 	                sf2d_set_clear_color(0xFF);
                     currentSelection = 0;
                     currentMenu = MENU_TITLE;
+					
+					playMusic(music_menu);
                 } else if (k_decline.clicked){
                     areYouSure = false;
                     areYouSureSave = false;
@@ -436,6 +438,8 @@ void tickMenu(int menu){
                 currentSelection = 0;
                 currentMenu = MENU_TITLE;
                 saveCurrentWorld(currentFileName, &eManager, &player, (u8*)map, (u8*)data);
+				
+				playMusic(music_menu);
             }
         break;
         case MENU_LOSE:
@@ -443,6 +447,8 @@ void tickMenu(int menu){
 	            sf2d_set_clear_color(0xFF);
                 currentSelection = 0;
                 currentMenu = MENU_TITLE;
+				
+				playMusic(music_menu);
             }
         break;
         case MENU_ABOUT:
@@ -1145,8 +1151,12 @@ void renderMenu(int menu,int xscr,int yscr){
 				drawTextColor("Special Thanks to:",52,12,0xFF7F7FFF);
 		        drawTextColor("Smea",136,60,0xFF2020FF);
 		        drawSizedTextColor("for ctrulib",116,80,1.0,0xFF2020FF);
-		        drawTextColor("Xerpi",130,120,0xFFFF2020);
-		        drawSizedTextColor("for sf2dlib",116,140,1.0,0xFFFF2020);
+		        drawTextColor("Xerpi",130,110,0xFFFF2020);
+		        drawSizedTextColor("for sf2dlib",116,130,1.0,0xFFFF2020);
+				drawTextColor("Music from",100,160,0xFF20FF20);
+		        drawSizedTextColor("opengameart.org/content/",64,180,1.0,0xFF20FF20);
+				drawSizedTextColor("generic-8-bit-jrpg-soundtrack",48,190,1.0,0xFF20FF20);
+				
                 drawText("Press   to return", 58, 220);
                 renderButtonIcon(k_decline.input & -k_decline.input, 128, 218, 1);
 		    sf2d_end_frame();

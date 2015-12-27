@@ -16,6 +16,28 @@ void playSound(Sound snd){
     csndPlaySound(8, SOUND_FORMAT_16BIT | SOUND_ONE_SHOT, 44100, 1, 0, snd.buffer, snd.buffer, snd.size);
 }
 
+void playMusic(Sound snd){
+    csndPlaySound(10, SOUND_FORMAT_16BIT | SOUND_REPEAT, 44100, 1, 0, snd.buffer, snd.buffer, snd.size);
+}
+
+void updateMusic(int lvl) {
+	switch(lvl) {
+	case 0:
+		playMusic(music_floor0);
+		break;
+	case 1:
+		playMusic(music_floor1);
+		break;
+	case 2:
+	case 3:
+		playMusic(music_floor23);
+		break;
+	case 4:
+		playMusic(music_floor4);
+		break;
+	}
+}
+
 void freeSounds(){
     linearFree(snd_playerHurt.buffer);
     linearFree(snd_playerDeath.buffer);
@@ -24,4 +46,10 @@ void freeSounds(){
     linearFree(snd_pickup.buffer);
     linearFree(snd_bossdeath.buffer);
     linearFree(snd_craft.buffer);
+	
+	linearFree(music_menu.buffer);
+	linearFree(music_floor0.buffer);
+	linearFree(music_floor1.buffer);
+	linearFree(music_floor23.buffer);
+	linearFree(music_floor4.buffer);
 }

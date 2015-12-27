@@ -81,6 +81,8 @@ void setupGame(bool loadUpWorld) {
 		initPlayer();
 		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
 	}
+	
+	updateMusic(currentLevel);
 
 	initMiniMap(loadUpWorld);
 	shouldRenderMap = false;
@@ -176,7 +178,15 @@ int main() {
 	loadSound(&snd_pickup, "resources/pickup.raw");
 	loadSound(&snd_bossdeath, "resources/bossdeath.raw");
 	loadSound(&snd_craft, "resources/craft.raw");
+	
+	loadSound(&music_menu, "resources/music/menu.raw");
+	loadSound(&music_floor0, "resources/music/floor0.raw");
+	loadSound(&music_floor1, "resources/music/floor1.raw");
+	loadSound(&music_floor23, "resources/music/floor2_3.raw");
+	loadSound(&music_floor4, "resources/music/floor4.raw");
 
+	playMusic(music_menu);
+	
 	bakeLights();
 	
 
