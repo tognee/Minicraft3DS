@@ -429,8 +429,9 @@ void renderLightsToStencil() {
 		int xo = offsetX >> 4;
 		int yo = offsetY >> 4;
 		int x, y;
-		for (x = xo; x <= 13 + xo; ++x) {
-			for (y = yo; y <= 8 + yo; ++y)
+		//added offset to render lights from lava which is offscreen
+		for (x = xo-2; x <= 13 + xo+2; ++x) {
+			for (y = yo-2; y <= 8 + yo+2; ++y)
 			    if(getTile(x, y) == TILE_LAVA) renderLight(x << 4, y << 4, playerLightBake);
 		}
 		
