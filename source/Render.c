@@ -591,6 +591,7 @@ void renderTile(int i, int x, int y) {
 				0xFF383838);
 		break;
 	case TILE_CACTUS:
+		renderTile(TILE_SAND, x, y);
 		render16(x, y, 48, 0, 0);
 		break;
 	case TILE_FLOWER:
