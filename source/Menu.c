@@ -564,11 +564,7 @@ void tickMenu(int menu){
                     isLoadingTP = 4;
                 } else {
 	                icons = sfil_load_PNG_buffer(icons2_png, SF2D_PLACE_RAM);
-	                dirtColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 0)); 
-	                dirtColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 1)); 
-	                dirtColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 2)); 
-	                dirtColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 3)); 
-	                dirtColor[4] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 4)); 
+	                reloadColors();
 	                font = sfil_load_PNG_buffer(Font_png, SF2D_PLACE_RAM);
 	                bottombg = sfil_load_PNG_buffer(bottombg_png, SF2D_PLACE_RAM);
                     currentMenu = MENU_SETTINGS;
@@ -1233,10 +1229,10 @@ void renderMenu(int menu,int xscr,int yscr){
                         render16(startX,startY+12,0,128,0);//Player(Carrying)
                         render16(startX,startY,128,128,0);//Workbench
                         startX = 120;startY = 20;
-                        render16b(startX,startY,16,96,0,0xFFC11D00);// water pit
-                        render16b(startX+16,startY,32,96,0,0xFFC11D00);
-                        render16b(startX,startY+16,48,96,0,0xFFC11D00);
-                        render16b(startX+16,startY+16,64,96,0,0xFFC11D00);
+                        render16b(startX,startY,16,96,0,waterColor[0]);// water pit
+                        render16b(startX+16,startY,32,96,0,waterColor[0]);
+                        render16b(startX,startY+16,48,96,0,waterColor[0]);
+                        render16b(startX+16,startY+16,64,96,0,waterColor[0]);
                         renderc  (startX+8,startY+12,48,160,16,8,0);//Waves
                         renderc  (startX+8,startY+8,0,112,16,8,0);//Player (Top-Half)
                         startX = 110;startY = 76;
@@ -1250,10 +1246,10 @@ void renderMenu(int menu,int xscr,int yscr){
                         renderc  (startX+14,startY,32,160,8,16,0);//Slash
                         render   (startX+12,startY+4,104,144,1);//Sword
                         startX = 64;startY = 40;
-                        render16b(startX,startY,16,80,0,0xFF69B569);// grass pit
-                        render16b(startX+16,startY,32,80,0,0xFF69B569);
-                        render16b(startX,startY+16,48,80,0,0xFF69B569);
-                        render16b(startX+16,startY+16,64,80,0,0xFF69B569);
+                        render16b(startX,startY,16,80,0,grassColor[0]);// grass pit
+                        render16b(startX+16,startY,32,80,0,grassColor[0]);
+                        render16b(startX,startY+16,48,80,0,grassColor[0]);
+                        render16b(startX+16,startY+16,64,80,0,grassColor[0]);
                         render16 (startX+8,startY+4,0,16,0);//Tree
                         render   (startX+1,startY+14,80,152,0);// Apple
                         render16 (startX+9,startY+18,16,112,0);//Player

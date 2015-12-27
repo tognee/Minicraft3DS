@@ -1403,3 +1403,27 @@ bool isSwimming(){
     return getTile(player.x>>4,player.y>>4)==TILE_WATER;
 }
 
+void reloadColors() {
+	dirtColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 0)); 
+	dirtColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 1)); 
+	dirtColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 2)); 
+	dirtColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 3)); 
+	dirtColor[4] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 4)); 
+	
+	grassColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 17, 0)); 
+	grassColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 17, 1)); 
+
+	sandColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 18, 0)); 
+	sandColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 18, 1)); 
+	
+	waterColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 19, 0)); 
+	waterColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 19, 1)); 
+	
+	lavaColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 20, 0)); 
+	lavaColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 20, 1)); 
+	
+	rockColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 0)); 
+	rockColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 1)); 
+	rockColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 2)); 
+	rockColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 3)); 
+}

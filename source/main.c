@@ -187,13 +187,8 @@ int main() {
 		sf2d_texture_tile32(minimap[i]);
 	}
 	
-	dirtColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 0)); 
-	dirtColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 1)); 
-	dirtColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 2)); 
-	dirtColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 3)); 
-	dirtColor[4] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 4)); 
-
-
+	reloadColors();
+	
 	sf2d_set_vblank_wait(true);
 
 	sf2d_set_clear_color(0xFF);

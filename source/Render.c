@@ -538,8 +538,8 @@ void renderTile(int i, int x, int y) {
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_TREE)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_FLOWER)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_TREE);
-		render16b(x, y, grassTable[v], 80, 0, 0xFF69B569);
-		renderDotsWithColor(v, x, y, 0, 0xFF8ED38E);
+		render16b(x, y, grassTable[v], 80, 0, grassColor[0]);
+		renderDotsWithColor(v, x, y, 0, grassColor[1]);
 		break;
 	case TILE_TREE:
 		renderTile(TILE_GRASS, x, y);
@@ -548,13 +548,13 @@ void renderTile(int i, int x, int y) {
 		break;
 	case TILE_ROCK:
 		v = checkSurrTiles8(x >> 4, y >> 4, TILE_ROCK);
-		render16s(x, y, rockTable[v] + 8192, 0, 0xFFFFFFFF);
-		renderRockDotsWithColor(rockTable[v], x, y, 0xFF949494);
+		render16s(x, y, rockTable[v] + 8192, 0, rockColor[0]);
+		renderRockDotsWithColor(rockTable[v], x, y, rockColor[1]);
 		break;
 	case TILE_HARDROCK:
 		v = checkSurrTiles8(x >> 4, y >> 4, TILE_HARDROCK);
-		render16s(x, y, rockTable[v] + 8192, 0, 0xFFFFCFCF);
-		renderRockDotsWithColor(rockTable[v], x, y, 0xFFFF9494);
+		render16s(x, y, rockTable[v] + 8192, 0, rockColor[2]);
+		renderRockDotsWithColor(rockTable[v], x, y, rockColor[3]);
 		break;
 	case TILE_DIRT: // render dots.
 		if (currentLevel > 1)
@@ -566,22 +566,22 @@ void renderTile(int i, int x, int y) {
 		v = checkSurrTiles4(x >> 4, y >> 4, TILE_SAND)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_CACTUS)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
-		render16b(x, y, grassTable[v], 80, 0, 0xFF7BF7F7);
-		renderDotsWithColor(v, x, y, 0, 0xFF5BB7B7);
+		render16b(x, y, grassTable[v], 80, 0, sandColor[0]);
+		renderDotsWithColor(v, x, y, 0, sandColor[1]);
 		break;
 	case TILE_WATER:
 		v = checkSurrTiles4(x >> 4, y >> 4, TILE_WATER)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
-		render16b(x, y, grassTable[v], 96, 0, 0xFFC11D00);
+		render16b(x, y, grassTable[v], 96, 0, waterColor[0]);
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(v, x, y, rand() & 3, 0xFFFF6B6B);
+		renderDotsWithColor(v, x, y, rand() & 3, waterColor[1]);
 		break;
 	case TILE_LAVA:
 		v = checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA)
 				| checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
-		render16b(x, y, grassTable[v], 96, 0, 0xFF001DC1);
+		render16b(x, y, grassTable[v], 96, 0, lavaColor[0]);
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(v, x, y, rand() & 3, 0xFF6B6BFF);
+		renderDotsWithColor(v, x, y, rand() & 3, lavaColor[1]);
 		break;
 	case TILE_HOLE:
 		render16b(x, y,
@@ -1258,10 +1258,10 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		render(x, y, 8, 152, 0);
 		break;
 	case ITEM_STONE:
-		renderb(x, y, 16, 152, 0, 0xFFCFCFCF);
+		renderb(x, y, 16, 152, 0, rockColor[1]);
 		break;
 	case ITEM_SAND:
-		renderb(x, y, 16, 152, 0, 0xFF7BF7F7);
+		renderb(x, y, 16, 152, 0, sandColor[0]);
 		break;
 	case ITEM_DIRT:
 		renderb(x, y, 16, 152, 0, 0xFF8197AF);

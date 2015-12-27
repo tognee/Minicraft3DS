@@ -76,7 +76,14 @@ u8 data[5][128*128];
 u8 treeTable[256];
 u16 rockTable[256];
 u16 grassTable[16];
+
 u32 dirtColor[5];
+u32 grassColor[2];
+u32 sandColor[2];
+u32 waterColor[2];
+u32 lavaColor[2];
+u32 rockColor[4];
+
 char currentFileName[256];
 extern u8 currentMenu;
 extern char fpsstr[];
@@ -122,3 +129,5 @@ bool playerUseEnergy(int amount);
 void playerHurtTile(int tile, int xt, int yt, int damage, int dir);
 bool playerIntersectsEntity(Entity* e);
 void playerEntityInteract(Entity* e);
+
+void reloadColors();
