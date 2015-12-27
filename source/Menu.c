@@ -1136,7 +1136,8 @@ void renderMenu(int menu,int xscr,int yscr){
 		        drawTextColor("3DS Homebrew Edition",74,120,0xFF00FF00);
 		        drawSizedTextColor("This port was made by David Benepe (Davideesk)",16,144,1.0,0xFF00FF00);
 		        drawSizedTextColor("just for fun in September/October 2015.",44,156,1.0,0xFF00FF00);
-		        drawSizedTextColor("TY Notch for creating a fun game to remake!",28,180,1.0,0xFF00FF00);
+				drawSizedTextColor("Updated and modded by Andre Schweiger (andre111)",8,168,1.0,0xFF00FF00);
+		        drawSizedTextColor("TY Notch for creating a fun game to remake!",28,192,1.0,0xFF00FF00);
 		    sf2d_end_frame();
 		    sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
 		        sf2d_draw_rectangle(0, 0, 320, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
