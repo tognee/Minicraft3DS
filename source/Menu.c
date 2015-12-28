@@ -357,7 +357,7 @@ void tickMenu(int menu){
         case MENU_PAUSED:
             if(!areYouSure && !areYouSureSave){
                 if(pauseSaveDisplayTimer > 0) --pauseSaveDisplayTimer;
-                if (k_pause.clicked) currentMenu = MENU_NONE;
+                if (k_pause.clicked || k_decline.clicked) currentMenu = MENU_NONE;
 		        if (k_up.clicked){ --currentSelection; if(currentSelection < 0)currentSelection=2;}
 		        if (k_down.clicked){ ++currentSelection; if(currentSelection > 2)currentSelection=0;}
                 if (k_accept.clicked){
