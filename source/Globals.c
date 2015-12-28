@@ -681,7 +681,10 @@ void tickTile(int x, int y){
             if(getTile(x,y+1)==TILE_HOLE) setTile(TILE_LAVA,x,y+1);
             if(getTile(x,y-1)==TILE_HOLE) setTile(TILE_LAVA,x,y-1);
 			
-			if(getTile(x+1,y)==TILE_WATER || getTile(x-1,y)==TILE_WATER || getTile(x,y+1)==TILE_WATER || getTile(x,y-1)==TILE_WATER) setTile(TILE_ROCK,x,y);
+			if(getTile(x+1,y)==TILE_WATER || getTile(x-1,y)==TILE_WATER || getTile(x,y+1)==TILE_WATER || getTile(x,y-1)==TILE_WATER) {
+				setTile(TILE_ROCK,x,y);
+				setData(0,x,y);
+			}
             break;
         case TILE_HOLE: // This makes water flow slightly faster than lava
             if(getTile(x+1,y)==TILE_WATER) setTile(TILE_WATER,x,y);
