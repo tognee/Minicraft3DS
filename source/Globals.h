@@ -105,6 +105,7 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
 void tickEntity(Entity* e);
 
 void tickTouchMap();
+void tickTouchQuickSelect();
 
 void trySpawn(int count, int level);
 
@@ -128,5 +129,6 @@ bool playerUseEnergy(int amount);
 void playerHurtTile(int tile, int xt, int yt, int damage, int dir);
 bool playerIntersectsEntity(Entity* e);
 void playerEntityInteract(Entity* e);
+void playerSetActiveItem(Item * item);
 
 void reloadColors();

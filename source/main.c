@@ -110,6 +110,7 @@ void tick() {
 	}
 	
 	tickTouchMap();
+	tickTouchQuickSelect();
 
 	int i;
 	for (i = 0; i < 324; ++i) {

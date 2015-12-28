@@ -626,15 +626,30 @@ void renderGui() {
 		else
 			render(i * 8 + 6, 14, 191, 152, 0);
 	}
-	sf2d_draw_texture(minimap[currentLevel], 96, 102);
+	sf2d_draw_texture(minimap[currentLevel], 10, 102);
 	renderItemWithTextCentered(player.p.activeItem, 320, 66);
 	itoa(player.p.score, scoreT, 10); // integer to base10 string
 	drawText("Score:",214,12);
 	drawText(scoreT,(140-(strlen(scoreT)*12))/2 + 180,29);
 	if(currentLevel == 0){
-        renderc(44 + (awX/32), 47 + (awY/32), 88, 216, 8, 8, 0); // Mini-AWizard head.
+        renderc(1 + (awX/32), 47 + (awY/32), 88, 216, 8, 8, 0); // Mini-AWizard head.
     }
-	renderc(44 + (player.x/32), 47 + (player.y/32), 88, 208, 8, 8, 0); // Mini-Player head.
+	renderc(1 + (player.x/32), 47 + (player.y/32), 88, 208, 8, 8, 0); // Mini-Player head.
+	
+	//quick select
+	drawText("Quickselect:",164,118);
+
+	Inventory * inv = player.p.inv;
+	Item * item;
+	for (i = 0; i < 8; ++i) {
+		if((inv->lastSlot) > i) {
+			int xip = i % 4;
+			int yip = i / 4;
+		
+			item = &inv->items[i];
+			renderItemIcon(item->id, item->countLevel, 81+xip*21, 77+yip*21);
+		}
+	}
 }
 
 void renderPlayer() {

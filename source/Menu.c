@@ -409,9 +409,7 @@ void tickMenu(int menu){
                     median = player.p.inv->items[curInvSel]; // create copy of item.
                     removeItemFromInventory(curInvSel, player.p.inv); // remove original
                     pushItemToInventoryFront(median, player.p.inv); // add copy to front
-                    player.p.activeItem = &player.p.inv->items[0]; // active item = copy.
-                    if(player.p.activeItem->id > 27 && player.p.activeItem->id < 34) player.p.isCarrying = true;
-                    else player.p.isCarrying = false;
+					playerSetActiveItem(&player.p.inv->items[0]); // active item = copy.
                 }
                 currentMenu = MENU_NONE;
             }

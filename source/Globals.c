@@ -192,10 +192,29 @@ void tickTouchMap(){
         }
     } else {
         // touch minimap to bring up zoomed map.
-        if(k_touch.py > 100 && k_touch.py < 228 && k_touch.px > 96 && k_touch.px < 228){
+        if(k_touch.py > 100 && k_touch.py < 228 && k_touch.px > 10 && k_touch.px < 142){
             shouldRenderMap = true;
         }
     }
+}
+
+void tickTouchQuickSelect() {
+	if (currentMenu == 0) {
+		int i = 0;
+		Inventory * inv = player.p.inv;
+		Item * item;
+		
+		for (i = 0; i < 8; ++i) {
+			if((inv->lastSlot) > i) {
+				int xip = i % 4;
+				int yip = i / 4;
+			
+				if(k_touch.py > 72*2+yip*21*2 && k_touch.py < 72*2+yip*21*2+21*2 && k_touch.px > 76*2+xip*21*2 && k_touch.px < 76*2+xip*21*2+21*2) {
+					playerSetActiveItem(&inv->items[i]);
+				}
+			}
+		}
+	}
 }
 
 void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
@@ -1459,6 +1478,12 @@ void tickPlayer(){
 
 bool isSwimming(){
     return getTile(player.x>>4,player.y>>4)==TILE_WATER;
+}
+
+void playerSetActiveItem(Item * item) {
+	player.p.activeItem = item; 
+    if(player.p.activeItem->id > 27 && player.p.activeItem->id < 34) player.p.isCarrying = true;
+    else player.p.isCarrying = false;
 }
 
 void reloadColors() {
