@@ -1149,13 +1149,13 @@ void renderMenu(int menu,int xscr,int yscr){
 		        sf2d_draw_rectangle(0, 0, 320, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
 			
 				drawTextColor("Special Thanks to:",52,12,0xFF7F7FFF);
-		        drawTextColor("Smea",136,60,0xFF2020FF);
-		        drawSizedTextColor("for ctrulib",116,80,1.0,0xFF2020FF);
-		        drawTextColor("Xerpi",130,110,0xFFFF2020);
-		        drawSizedTextColor("for sf2dlib",116,130,1.0,0xFFFF2020);
-				drawTextColor("Music from",100,160,0xFF20FF20);
-		        drawSizedTextColor("opengameart.org/content/",64,180,1.0,0xFF20FF20);
-				drawSizedTextColor("generic-8-bit-jrpg-soundtrack",48,190,1.0,0xFF20FF20);
+		        drawTextColor("Smea",136,50,0xFF2020FF);
+		        drawSizedTextColor("for ctrulib",116,70,1.0,0xFF2020FF);
+		        drawTextColor("Xerpi",130,100,0xFFFF2020);
+		        drawSizedTextColor("for sf2dlib",116,120,1.0,0xFFFF2020);
+				drawTextColor("Music from",100,150,0xFF20FF20);
+		        drawSizedTextColor("opengameart.org/content/",64,170,1.0,0xFF20FF20);
+				drawSizedTextColor("generic-8-bit-jrpg-soundtrack",48,180,1.0,0xFF20FF20);
 				
                 drawText("Press   to return", 58, 220);
                 renderButtonIcon(k_decline.input & -k_decline.input, 128, 218, 1);
