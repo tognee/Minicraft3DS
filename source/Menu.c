@@ -879,15 +879,16 @@ void renderMenu(int menu,int xscr,int yscr){
 				drawTextColor("Touch the keypad below",(320-22*12)/2,12,0xFF33FFFF);
 				
 				sf2d_draw_rectangle(0, 50, 320, 110, 0xFF7F7FBF);
+				
+				if(touchDelay > 0){
+					sf2d_draw_rectangle(touchX, touchY, touchW, touchH, 0xFF0000AF);
+				}
+				
 				drawSizedText(guiText0,4, 60, 2);
 				drawSizedText(guiText1,4, 80, 2);
 				drawSizedText(guiText2,12, 100, 2);
 				drawSizedText(guiText3,28, 120, 2);
 				drawSizedText(guiText4,12, 140, 2);
-				
-				if(touchDelay > 0){
-					sf2d_draw_rectangle(touchX, touchY, touchW, touchH, 0xAF);
-				}
 				
 				drawText("Press   to confirm", (320-18*12)/2, 180);
 				renderButtonIcon(k_accept.input & -k_accept.input, 122, 178, 1);
@@ -1031,7 +1032,7 @@ void renderMenu(int menu,int xscr,int yscr){
                 if(!rev){ opacity+=5; if(opacity == 255) rev = true; }
                 else { opacity-=5; if(opacity == 100) rev = false; }
                 sprintf(scoreText,"Score: %d", player.p.score);
-                drawTextColor("You Win!",158,76,0x0000AFAF + opacity);
+                drawTextColor("You Win!",158,76,0x0000AFAF + (opacity << 24));
                 drawText(scoreText, 200-((strlen(scoreText)-1)*6), 100);
                 drawText("Press   to continue", 96, 150);
                 renderButtonIcon(k_attack.input & -k_attack.input, 166, 148, 1);
@@ -1052,7 +1053,7 @@ void renderMenu(int menu,int xscr,int yscr){
                 if(!rev){ opacity+=5; if(opacity == 255) rev = true; }
                 else { opacity-=5; if(opacity == 100) rev = false; }
                 sprintf(scoreText,"Score: %d", player.p.score);
-                drawTextColor("You DIED!",158,76,0x000000AF + opacity);
+                drawTextColor("You DIED!",158,76,0x000000AF + (opacity << 24));
                 drawText(scoreText, 200-((strlen(scoreText)-1)*6), 100);
                 drawText("Press   to continue", 96, 150);
                 renderButtonIcon(k_attack.input & -k_attack.input, 166, 148, 1);
@@ -1240,11 +1241,8 @@ void renderMenu(int menu,int xscr,int yscr){
                         render16(startX,startY+12,0,128,0);//Player(Carrying)
                         render16(startX,startY,128,128,0);//Workbench
                         startX = 120;startY = 20;
-                        render16b(startX,startY,16,96,0,waterColor[0]);// water pit
-                        render16b(startX+16,startY,32,96,0,waterColor[0]);
-                        render16b(startX,startY+16,48,96,0,waterColor[0]);
-                        render16b(startX+16,startY+16,64,96,0,waterColor[0]);
-                        renderc  (startX+8,startY+12,48,160,16,8,0);//Waves
+						menuRenderTilePit(startX,startY,176,16,waterColor[0]);// water pit
+						renderc  (startX+8,startY+12,48,160,16,8,0);//Waves
                         renderc  (startX+8,startY+8,0,112,16,8,0);//Player (Top-Half)
                         startX = 110;startY = 76;
                         render16 (startX,startY,48,112,0);//Player
@@ -1257,10 +1255,7 @@ void renderMenu(int menu,int xscr,int yscr){
                         renderc  (startX+14,startY,32,160,8,16,0);//Slash
                         render   (startX+12,startY+4,104,144,1);//Sword
                         startX = 64;startY = 40;
-                        render16b(startX,startY,16,80,0,grassColor[0]);// grass pit
-                        render16b(startX+16,startY,32,80,0,grassColor[0]);
-                        render16b(startX,startY+16,48,80,0,grassColor[0]);
-                        render16b(startX+16,startY+16,64,80,0,grassColor[0]);
+                        menuRenderTilePit(startX,startY,112,16,grassColor);// grass pit
                         render16 (startX+8,startY+4,0,16,0);//Tree
                         render   (startX+1,startY+14,80,152,0);// Apple
                         render16 (startX+9,startY+18,16,112,0);//Player
@@ -1314,4 +1309,23 @@ void renderMenu(int menu,int xscr,int yscr){
             break;
     }
 
+}
+
+void menuRenderTilePit(int x,int y,int xt,int yt,u32 color) {
+	render16b(x+8,y+8,xt+48,yt,0,color);
+	
+	renderb(x,   y,   xt,   yt,  0,color);
+	renderb(x+24,y,   xt+8, yt,  0,color);
+	renderb(x,   y+24,xt,   yt+8,0,color);
+	renderb(x+24,y+24,xt+8, yt+8,0,color);
+	
+	renderb(x+8, y,   xt+16,yt,  0,color);
+	renderb(x+16,y,   xt+24,yt,  0,color);
+	renderb(x+8, y+24,xt+16,yt+8,0,color);
+	renderb(x+16,y+24,xt+24,yt+8,0,color);
+	
+	renderb(x,   y+8, xt+32,yt,  0,color);
+	renderb(x,   y+16,xt+32,yt,  0,color);
+	renderb(x+24,y+8, xt+40,yt,  0,color);
+	renderb(x+24,y+16,xt+40,yt,  0,color);
 }

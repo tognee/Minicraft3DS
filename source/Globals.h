@@ -74,17 +74,14 @@ sf2d_texture *bottombg;
 sf2d_texture * minimap[5];
 u8 map[5][128*128];
 u8 data[5][128*128];
-u8 treeTable[256];
-u16 rockTable[256];
-u16 grassTable[16];
 
 u32 dirtColor[5];
-u32 grassColor[2];
-u32 sandColor[2];
+u32 grassColor;
+u32 sandColor;
 u32 waterColor[2];
 u32 lavaColor[2];
 u32 rockColor[4];
-u32 woodColor[2];
+u32 woodColor;
 
 char currentFileName[256];
 extern u8 currentMenu;

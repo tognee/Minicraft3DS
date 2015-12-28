@@ -114,20 +114,14 @@ void renderTutorialPage(bool topScreen){
                 renderButtonIcon(k_attack.input & -k_attack.input, 80, 56, 2);
                 renderc(60,68,16,160,16,8,2);//Slash
                 
-                render16b(12,20,16,80,0,grassColor[0]);// grass pit
-                render16b(12+16,20,32,80,0,grassColor[0]);
-                render16b(12,20+16,48,80,0,grassColor[0]);
-                render16b(12+16,20+16,64,80,0,grassColor[0]);
+				menuRenderTilePit(12,20,112,16,grassColor);// grass pit
                 render16(12+8,20+4,0,16,0);//Tree
                 renderc(12+9,20+14,16,160,16,8,0);//Slash
                 render(12+9+4,20+14,192,144,0);//Axe
                 render16(12+9,20+18,16,112,0);//Player-up
                 
-                render16b(122,62,16,80,0,sandColor[0]);// sand pit
-                render16b(122+16,62,32,80,0,sandColor[0]);
-                render16b(122,62+16,48,80,0,sandColor[0]);
-                render16b(122+16,62+16,64,80,0,sandColor[0]);
-                render16b(130,70,0,96,0,0xFF383838);// hole
+                menuRenderTilePit(122,62,112,16,sandColor);// sand pit
+                render16b(130,70,176,16,0,0xFF383838);// hole
                 render16(116,70,48,112,0);//Player-right
                 renderb(136,76,16,152,0,0xFF8197AF);// Dirt item
                 renderc(128,70,40,160,8,16,0);//Slash
@@ -147,7 +141,7 @@ void renderTutorialPage(bool topScreen){
                 renderButtonIcon(biasedCirclePad(k_down.input), 44, 125, 1);
                 break;
             case 3: // Furniture
-                sf2d_draw_rectangle(64, 48, 192, 32, grassColor[0]);
+                sf2d_draw_rectangle(64, 48, 192, 32, grassColor);
                 renderc(32,24,64,128,96,16,0);//Furniture entities
                 
                 renderFurniture(ITEM_WORKBENCH, 50,60);
@@ -186,14 +180,14 @@ void renderTutorialPage(bool topScreen){
                 render(76,48,40,152,0); // Seeds
                 
                 sf2d_draw_rectangle(216, 80, 32, 32, dirtColor[1]); // Dirt color for grass
-                render16b(108, 40, 0, 80, 0, grassColor[0]); // Grass
+                render16b(108, 40, 112, 16, 0, grassColor); // Grass
                 render16(124, 40,144,0,0); // Farm Tile
                 render16(108,54,16,112,0); // Player (Up)
                 renderc(108,50,16,160,16,8,0); // Slash (Up)
                 render(112,48,72,144,0); // Gem Hoe
                 
                 sf2d_draw_rectangle(112, 156, 32, 32, dirtColor[1]); // Dirt color for grass
-                render16b(56, 78, 0, 80, 0, grassColor[0]); // Grass
+                render16b(56, 78, 112, 16, 0, grassColor); // Grass
                 sf2d_draw_rectangle(80, 156, 32, 32, dirtColor[1]); // Dirt color
                 render16b(40, 78, 0, 0, 0, 0xFF8F8FA8); // Dirt Dots
                 render(44, 82, 40,152,0); // Seeds

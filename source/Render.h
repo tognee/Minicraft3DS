@@ -27,6 +27,8 @@ void render16s(s32 xp, s32 yp, u32 tile, u8 bits, u32 color);
 void renderTitle(int x, int y);
 void renderFrame(int x1, int y1, int x2, int y2, u32 bgColor);
 void renderTile(int i, int x, int y);
+void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile, u32 color);
+void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile, u32 color);
 void renderBackground(int xScroll, int yScroll);
 void renderMenuBackground(int xScroll, int yScroll); //Renders the darkness
 void renderButtonIcon(u32 icon, int x, int y, float scale);
@@ -61,5 +63,3 @@ void renderItemStuffWithText(int itemID, int itemCL, bool onlyOne, int x, int y)
 void renderItemWithTextCentered(Item* item, int width, int y);
 void renderItemIcon(int itemID, int countLevel, int x, int y);
 void renderItemIcon2(int itemID, int countLevel, int x, int y, int z);
-
-void defineTables();

@@ -1468,23 +1468,20 @@ void reloadColors() {
 	dirtColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 3)); 
 	dirtColor[4] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 4)); 
 	
-	grassColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 17, 0)); 
-	grassColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 17, 1)); 
+	grassColor = SWAP_UINT32(sf2d_get_pixel(icons, 17, 0)); 
 
-	sandColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 18, 0)); 
-	sandColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 18, 1)); 
+	sandColor = SWAP_UINT32(sf2d_get_pixel(icons, 18, 0)); 
 	
-	waterColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 19, 0)); 
-	waterColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 19, 1)); 
+	waterColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 19, 0)); 
+	waterColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 19, 1)); 
 	
-	lavaColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 20, 0)); 
-	lavaColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 20, 1)); 
+	lavaColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 20, 0)); 
+	lavaColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 20, 1)); 
 	
 	rockColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 0)); 
 	rockColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 1)); 
 	rockColor[2] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 2)); 
 	rockColor[3] = SWAP_UINT32(sf2d_get_pixel(icons, 21, 3)); 
 	
-	woodColor[0]  = SWAP_UINT32(sf2d_get_pixel(icons, 22, 0)); 
-	woodColor[1]  = SWAP_UINT32(sf2d_get_pixel(icons, 22, 1)); 
+	woodColor  = SWAP_UINT32(sf2d_get_pixel(icons, 22, 0)); 
 }

@@ -256,142 +256,6 @@ void renderFrame(int x1, int y1, int x2, int y2, u32 bgColor) {
 	}
 }
 
-void renderDotsWithColor(int val, int x, int y, u8 bits, u32 color) {
-	switch (val) {
-	case 3:
-		renderb(x, y, 0, 0, bits, color);
-		return;
-	case 5:
-		renderb(x + 8, y, 8, 0, bits, color);
-		return;
-	case 7:
-		renderbc(x, y, 0, 0, 16, 8, bits, color);
-		return;
-	case 10:
-		renderb(x, y + 8, 0, 8, bits, color);
-		return;
-	case 11:
-		renderbc(x, y, 0, 0, 8, 16, bits, color);
-		return;
-	case 12:
-		renderb(x + 8, y + 8, 8, 8, bits, color);
-		return;
-	case 13:
-		renderbc(x + 8, y, 8, 0, 8, 16, bits, color);
-		return;
-	case 14:
-		renderbc(x, y + 8, 0, 8, 16, 8, bits, color);
-		return;
-	case 15:
-		render16b(x, y, 0, 0, bits, color);
-		return;
-	}
-}
-
-void renderRockDotsWithColor(int val, int x, int y, u32 color) {
-	switch (val) {
-	case 208:
-		render16b(x, y, 0, 0, 0, color);
-		return;
-	case 16:
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		return;
-	case 32:
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 48:
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 64:
-		renderb(x, y, 0, 0, 0, color);
-		return;
-	case 80:
-		renderbc(x, y, 0, 0, 8, 16, 0, color);
-		return;
-	case 96:
-		renderbc(x + 8, y, 8, 0, 8, 16, 0, color);
-		return;
-	case 112:
-		renderbc(x, y + 8, 0, 8, 16, 8, 0, color);
-		return;
-	case 128:
-		renderbc(x, y, 0, 0, 16, 8, 0, color);
-		return;
-	case 144:
-		renderb(x, y + 8, 0, 8, 0, color);
-		renderbc(x + 8, y, 8, 0, 8, 16, 0, color);
-		return;
-	case 160:
-		renderb(x, y, 0, 0, 0, color);
-		renderbc(x + 8, y, 8, 0, 8, 16, 0, color);
-		return;
-	case 176:
-		renderb(x + 8, y, 8, 0, 0, color);
-		renderbc(x, y, 0, 0, 8, 16, 0, color);
-		return;
-	case 192:
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		renderbc(x, y, 0, 0, 8, 16, 0, color);
-		return;
-	case 4112:
-		renderbc(x, y, 0, 0, 8, 16, 0, color);
-		return;
-	case 4128:
-		renderbc(x, y + 8, 0, 8, 8, 16, 0, color);
-		return;
-	case 4192:
-		renderb(x, y, 0, 0, 0, color);
-		return;
-	case 8192:
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 8208:
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		return;
-	case 8224:
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		return;
-	case 8240:
-		renderb(x + 8, y, 8, 0, 0, color);
-		return;
-	case 8256:
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 8272:
-		renderb(x + 8, y, 8, 0, 0, color);
-		return;
-	case 8288:
-		renderb(x, y, 0, 0, 0, color);
-		return;
-	case 8304:
-		renderb(x + 8, y, 8, 0, 0, color);
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 8320:
-		renderbc(x + 8, y, 8, 0, 8, 16, 0, color);
-		return;
-	case 8336:
-		renderbc(x, y, 0, 0, 8, 16, 0, color);
-		return;
-	case 8352:
-		renderb(x, y, 0, 0, 0, color);
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		return;
-	case 8368:
-		renderb(x + 8, y, 8, 0, 0, color);
-		return;
-	case 8384:
-		renderb(x, y + 8, 0, 8, 0, color);
-		return;
-	case 8400:
-		renderb(x, y, 0, 0, 0, color);
-		return;
-	case 8416:
-		renderb(x + 8, y + 8, 8, 8, 0, color);
-		return;
-	}
-}
-
 void bakeLights() {
 	playerLightBake = sf2d_create_texture(64, 64, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 	lanternLightBake = sf2d_create_texture(128, 128, TEXFMT_RGBA8,
@@ -495,66 +359,94 @@ void bakeLight(sf2d_texture* texture, int x, int y, int r) {
 	sf2d_texture_tile32(texture);
 }
 
-u8 checkSurrTiles8(int xt, int yt, int id) {
-	u8 vt = 0;
-	if (getTile(xt, yt - 1) == id)
-		vt |= 1;
-	if (getTile(xt - 1, yt) == id)
-		vt |= 2;
-	if (getTile(xt + 1, yt) == id)
-		vt |= 4;
-	if (getTile(xt, yt + 1) == id)
-		vt |= 8;
-	if (getTile(xt - 1, yt - 1) == id)
-		vt |= 16;
-	if (getTile(xt + 1, yt - 1) == id)
-		vt |= 32;
-	if (getTile(xt - 1, yt + 1) == id)
-		vt |= 64;
-	if (getTile(xt + 1, yt + 1) == id)
-		vt |= 128;
-	return vt;
-}
-u8 checkSurrTiles4(int xt, int yt, int id) {
-	u8 vt = 0;
-	if (getTile(xt, yt - 1) == id)
-		vt |= 1;
-	if (getTile(xt - 1, yt) == id)
-		vt |= 2;
-	if (getTile(xt + 1, yt) == id)
-		vt |= 4;
-	if (getTile(xt, yt + 1) == id)
-		vt |= 8;
-	return vt;
+bool tu = false;
+bool td = false;
+bool tl = false;
+bool tr = false;
+
+bool tul = false;
+bool tur = false;
+bool tdl = false;
+bool tdr = false;
+
+void renderDotsWithColor(int x, int y, u8 bits1, u8 bits2, u8 bits3, u8 bits4, u32 color) {
+	if(tu && tl) renderb(x, y, 0, 0, bits1, color);
+	if(tu && tr) renderb(x + 8, y, 8, 0, bits2, color);
+	if(td && tl) renderb(x, y + 8, 0, 8, bits3, color);
+	if(td && tr) renderb(x + 8, y + 8, 8, 8, bits4, color);
 }
 
-u8 v = 0;
+void resetSurrTiles() {
+	tu = false;
+	td = false;
+	tl = false;
+	tr = false;
+
+	tul = false;
+	tur = false;
+	tdl = false;
+	tdr = false;
+}
+
+void checkSurrTiles8(int xt, int yt, int id) {
+	if (getTile(xt, yt - 1) == id)
+		tu = true;
+	if (getTile(xt - 1, yt) == id)
+		tl = true;
+	if (getTile(xt + 1, yt) == id)
+		tr = true;
+	if (getTile(xt, yt + 1) == id)
+		td = true;
+	if (getTile(xt - 1, yt - 1) == id)
+		tul = true;
+	if (getTile(xt + 1, yt - 1) == id)
+		tur = true;
+	if (getTile(xt - 1, yt + 1) == id)
+		tdl = true;
+	if (getTile(xt + 1, yt + 1) == id)
+		tdr = true;
+}
+void checkSurrTiles4(int xt, int yt, int id) {
+	if (getTile(xt, yt - 1) == id)
+		tu = true;
+	if (getTile(xt - 1, yt) == id)
+		tl = true;
+	if (getTile(xt + 1, yt) == id)
+		tr = true;
+	if (getTile(xt, yt + 1) == id)
+		td = true;
+}
+
 u8 tData = 0;
 void renderTile(int i, int x, int y) {
 	int age = 0;
 	switch (i) {
 	case TILE_GRASS:
-		v = checkSurrTiles4(x >> 4, y >> 4, TILE_GRASS)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_TREE)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_FLOWER)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_TREE);
-		render16b(x, y, grassTable[v], 80, 0, grassColor[0]);
-		renderDotsWithColor(v, x, y, 0, grassColor[1]);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_GRASS);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_TREE);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_FLOWER);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_TREE);
+		
+		renderConnectedTile4(x, y, 112, 16, grassColor);
 		break;
 	case TILE_TREE:
 		renderTile(TILE_GRASS, x, y);
-		render16(x, y, treeTable[checkSurrTiles8(x >> 4, y >> 4, TILE_TREE)],
-				16, 0);
+		
+		checkSurrTiles8(x >> 4, y >> 4, TILE_TREE);
+		
+		render(x,   y,   0+((tu && tl && tul) ? 16 : 0), 16, 0);
+		render(x+8, y,   8+((tu && tr && tur) ? 16 : 0), 16, 0);
+		render(x,   y+8, 0+((td && tl && tdl) ? 16 : 0), 24, 0);
+		render(x+8, y+8, 8+((td && tr && tdr) ? 16 : 0), 24, 0);
+		
 		break;
 	case TILE_ROCK:
-		v = checkSurrTiles8(x >> 4, y >> 4, TILE_ROCK);
-		render16s(x, y, rockTable[v] + 8192, 0, rockColor[0]);
-		renderRockDotsWithColor(rockTable[v], x, y, rockColor[1]);
+		checkSurrTiles8(x >> 4, y >> 4, TILE_ROCK);
+		renderConnectedTile8(x, y, 32, 16, rockColor[0]);
 		break;
 	case TILE_HARDROCK:
-		v = checkSurrTiles8(x >> 4, y >> 4, TILE_HARDROCK);
-		render16s(x, y, rockTable[v] + 8192, 0, rockColor[2]);
-		renderRockDotsWithColor(rockTable[v], x, y, rockColor[3]);
+		checkSurrTiles8(x >> 4, y >> 4, TILE_HARDROCK);
+		renderConnectedTile8(x, y, 32, 16, rockColor[2]);
 		break;
 	case TILE_DIRT: // render dots.
 		if (currentLevel > 1)
@@ -563,32 +455,36 @@ void renderTile(int i, int x, int y) {
 			render16b(x, y, 0, 0, 0, 0xFF8F8FA8);
 		break;
 	case TILE_SAND:
-		v = checkSurrTiles4(x >> 4, y >> 4, TILE_SAND)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_CACTUS)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
-		render16b(x, y, grassTable[v], 80, 0, sandColor[0]);
-		renderDotsWithColor(v, x, y, 0, sandColor[1]);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_SAND);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_CACTUS);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
+		
+		renderConnectedTile4(x, y, 112, 16, sandColor);
 		break;
 	case TILE_WATER:
-		v = checkSurrTiles4(x >> 4, y >> 4, TILE_WATER)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
-		render16b(x, y, grassTable[v], 96, 0, waterColor[0]);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
+		
+		renderConnectedTile4(x, y, 176, 16, waterColor[0]);
+		
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(v, x, y, rand() & 3, waterColor[1]);
+		renderDotsWithColor(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, waterColor[1]);
 		break;
 	case TILE_LAVA:
-		v = checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA)
-				| checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
-		render16b(x, y, grassTable[v], 96, 0, lavaColor[0]);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
+		
+		renderConnectedTile4(x, y, 176, 16, lavaColor[0]);
+		
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(v, x, y, rand() & 3, lavaColor[1]);
+		renderDotsWithColor(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, lavaColor[1]);
 		break;
 	case TILE_HOLE:
-		render16b(x, y,
-				grassTable[checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE)
-						| checkSurrTiles4(x >> 4, y >> 4, TILE_WATER)
-						| checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA)], 96, 0,
-				0xFF383838);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA);
+		
+		renderConnectedTile4(x, y, 176, 16, 0xFF383838);
 		break;
 	case TILE_CACTUS:
 		renderTile(TILE_SAND, x, y);
@@ -616,11 +512,11 @@ void renderTile(int i, int x, int y) {
 		render16b(x, y, 80, 0, 0, 0xFFDE98DF);
 		break;
 	case TILE_CLOUD:
-		render16b(x, y,
-				grassTable[checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUD)
-						| checkSurrTiles4(x >> 4, y >> 4, TILE_STAIRS_DOWN)
-						| checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUDCACTUS)],
-				80, 0, 0xFFFFFFFF);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUD);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_STAIRS_DOWN);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUDCACTUS);
+		
+		renderConnectedTile4(x, y, 64, 32, 0xFFFFFFFF);
 		break;
 	case TILE_CLOUDCACTUS:
 		renderTile(TILE_CLOUD, x, y);
@@ -644,10 +540,49 @@ void renderTile(int i, int x, int y) {
 		render16(x, y, 160 + (age << 4), 0, 0);
 		break;
 	case TILE_WOOD_WALL:
-		render16b(x, y, grassTable[checkSurrTiles4(x >> 4, y >> 4, TILE_WOOD_WALL)], 176, 0, woodColor[0]);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_WOOD_WALL);
+		
+		renderConnectedTile4(x, y, 0, 32, woodColor);
 		break;
 	}
 
+	resetSurrTiles();
+}
+
+void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile, u32 color) {
+	//render complete tile in one piece to reduce strain(added for o3DS)
+	if (tl && tr && tu && td) {
+		render16b(x, y, xTile+48, yTile, 0, color);
+		return;
+	}
+	
+	int l = (tl ? 16 : 0);
+	int r = (tr ? 16 : 0);
+	int u = (tu ? 32 : 0);
+	int d = (td ? 32 : 0);
+	
+	renderb(x,   y,   xTile  +l+u, yTile, 0, color);
+	renderb(x+8, y,   xTile+8+r+u, yTile, 0, color);
+	renderb(x,   y+8, xTile  +l+d, yTile+8, 0, color);
+	renderb(x+8, y+8, xTile+8+r+d, yTile+8, 0, color);
+}
+
+void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile, u32 color) {
+	//render complete tile in one piece to reduce strain(added for o3DS)
+	if (tl && tr && tu && td && tul && tur && tdl && tdr) {
+		render16b(x, y, xTile+64, yTile, 0, color);
+		return;
+	}
+	
+	int l = (tl ? 16 : 0);
+	int r = (tr ? 16 : 0);
+	int u = (tu ? 32 : 0);
+	int d = (td ? 32 : 0);
+	
+	renderb(x,   y,   xTile  +l+u+((tl && tu && tul) ? 16 : 0), yTile, 0, color);
+	renderb(x+8, y,   xTile+8+r+u+((tr && tu && tur) ? 16 : 0), yTile, 0, color);
+	renderb(x,   y+8, xTile  +l+d+((tl && td && tdl) ? 16 : 0), yTile+8, 0, color);
+	renderb(x+8, y+8, xTile+8+r+d+((tr && td && tdr) ? 16 : 0), yTile+8, 0, color);
 }
 
 void renderZoomedMap() {
@@ -1157,7 +1092,7 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		renderb(x, y, 16, 152, 0, rockColor[1]);
 		break;
 	case ITEM_SAND:
-		renderb(x, y, 16, 152, 0, sandColor[0]);
+		renderb(x, y, 16, 152, 0, sandColor);
 		break;
 	case ITEM_DIRT:
 		renderb(x, y, 16, 152, 0, 0xFF8197AF);
@@ -1214,170 +1149,4 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		render(x, y, 200 + countLevel * 8, 144, 0);
 		break;
 	}
-}
-
-void defineTables() {
-
-	int i = 0;
-	for (i = 256; i > 0; --i) {
-		// Creates the lookup table for the tree tile.
-		if ((i & 255) == 255)
-			treeTable[i] = 208;
-		else if ((i & 239) == 239)
-			treeTable[i] = 144;
-		else if ((i & 191) == 191)
-			treeTable[i] = 160;
-		else if ((i & 127) == 127)
-			treeTable[i] = 176;
-		else if ((i & 223) == 223)
-			treeTable[i] = 192;
-		else if ((i & 206) == 206)
-			treeTable[i] = 112;
-		else if ((i & 55) == 55)
-			treeTable[i] = 128;
-		else if ((i & 173) == 173)
-			treeTable[i] = 96;
-		else if ((i & 91) == 91)
-			treeTable[i] = 80;
-
-		else if ((i & 159) == 159)
-			treeTable[i] = 224;
-		else if ((i & 111) == 111)
-			treeTable[i] = 240;
-
-		else if ((i & 19) == 19)
-			treeTable[i] = 64;
-		else if ((i & 37) == 37)
-			treeTable[i] = 48;
-		else if ((i & 74) == 74)
-			treeTable[i] = 32;
-		else if ((i & 140) == 140)
-			treeTable[i] = 16;
-	}
-
-	/*
-	 boolean up = i & 1
-	 boolean left = i & 2
-	 boolean right = i & 4
-	 boolean down = i & 8
-	 boolean up-left = i & 16
-	 boolean up-right = i & 32
-	 boolean down-left = i & 64
-	 boolean down-right = i & 128
-	 */
-
-	for (i = 256; i > 0; --i) {
-		// Creates the lookup table for the rock tile.
-		if ((i & 255) == 255)
-			rockTable[i] = 208;
-		else if ((i & 239) == 239)
-			rockTable[i] = 144;
-		else if ((i & 191) == 191)
-			rockTable[i] = 160;
-		else if ((i & 127) == 127)
-			rockTable[i] = 176;
-		else if ((i & 223) == 223)
-			rockTable[i] = 192;
-		else if ((i & 207) == 207)
-			rockTable[i] = 256 * 16 + 32;
-		else if ((i & 63) == 63)
-			rockTable[i] = 256 * 16 + 16;
-		else if ((i & 206) == 206)
-			rockTable[i] = 112;
-		else if ((i & 95) == 95)
-			rockTable[i] = 256 * 32 + 144;
-		else if ((i & 159) == 159)
-			rockTable[i] = 256 * 32 + 160;
-		else if ((i & 31) == 31)
-			rockTable[i] = 256 * 32 + 208;
-		else if ((i & 55) == 55)
-			rockTable[i] = 128;
-		else if ((i & 175) == 175)
-			rockTable[i] = 256 * 32 + 128;
-		else if ((i & 143) == 143)
-			rockTable[i] = 256 * 32 + 224;
-		else if ((i & 173) == 173)
-			rockTable[i] = 96;
-		else if ((i & 111) == 111)
-			rockTable[i] = 256 * 32 + 112;
-		else if ((i & 47) == 47)
-			rockTable[i] = 256 * 32 + 48;
-		else if ((i & 45) == 45)
-			rockTable[i] = 256 * 32 + 176;
-		else if ((i & 79) == 79)
-			rockTable[i] = 256 * 32 + 192;
-		else if ((i & 23) == 23)
-			rockTable[i] = 256 * 32 + 96;
-		else if ((i & 91) == 91)
-			rockTable[i] = 80;
-		else if ((i & 27) == 27)
-			rockTable[i] = 256 * 16 + 96;
-		else if ((i & 19) == 19)
-			rockTable[i] = 64;
-		else if ((i & 75) == 75)
-			rockTable[i] = 256 * 32;
-		else if ((i & 141) == 141)
-			rockTable[i] = 256 * 32 + 16;
-		else if ((i & 142) == 142)
-			rockTable[i] = 256 * 32 + 32;
-		else if ((i & 78) == 78)
-			rockTable[i] = 256 * 32 + 64;
-		else if ((i & 39) == 39)
-			rockTable[i] = 256 * 32 + 80;
-		else if ((i & 37) == 37)
-			rockTable[i] = 48;
-		else if ((i & 74) == 74)
-			rockTable[i] = 32;
-		else if ((i & 140) == 140)
-			rockTable[i] = 16;
-		else if ((i & 15) == 15)
-			rockTable[i] = 256 * 16 + 112;
-		else if ((i & 11) == 11)
-			rockTable[i] = 256 * 16 + 192;
-		else if ((i & 13) == 13)
-			rockTable[i] = 256 * 16 + 208;
-		else if ((i & 14) == 14)
-			rockTable[i] = 256 * 16 + 224;
-		else if ((i & 7) == 7)
-			rockTable[i] = 256 * 16 + 240;
-		else if ((i & 12) == 12)
-			rockTable[i] = 256 * 16 + 128;
-		else if ((i & 10) == 10)
-			rockTable[i] = 256 * 16 + 144;
-		else if ((i & 5) == 5)
-			rockTable[i] = 256 * 16 + 160;
-		else if ((i & 3) == 3)
-			rockTable[i] = 256 * 16 + 176;
-		else if ((i & 9) == 9)
-			rockTable[i] = 256 * 16;
-		else if ((i & 6) == 6)
-			rockTable[i] = 256 * 16 + 48;
-		else if ((i & 8) == 8)
-			rockTable[i] = 224;
-		else if ((i & 4) == 4)
-			rockTable[i] = 256 * 16 + 64;
-		else if ((i & 2) == 2)
-			rockTable[i] = 256 * 16 + 80;
-		else if ((i & 1) == 1)
-			rockTable[i] = 240;
-
-	}
-
-	// Lookup table for the grass/sand tile.
-	grassTable[1] = 192;
-	grassTable[2] = 160;
-	grassTable[3] = 64;
-	grassTable[4] = 144;
-	grassTable[5] = 48;
-	grassTable[6] = 224;
-	grassTable[7] = 128;
-	grassTable[8] = 176;
-	grassTable[9] = 240;
-	grassTable[10] = 32;
-	grassTable[11] = 80;
-	grassTable[12] = 16;
-	grassTable[13] = 96;
-	grassTable[14] = 112;
-	grassTable[15] = 208;
-
 }

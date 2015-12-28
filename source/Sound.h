@@ -16,6 +16,7 @@ void playSound(Sound snd);
 void playMusic(Sound snd);
 void updateMusic(int lvl);
 
+void loadSounds();
 void freeSounds();
 
 Sound snd_playerHurt;
