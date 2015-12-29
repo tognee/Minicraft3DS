@@ -599,6 +599,10 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 setTile(TILE_WOOD_WALL,x,y); --item->countLevel;
                 return 1;
             } 
+			else if(item->id == ITEM_SAND){ 
+                setTile(TILE_SAND,x,y); --item->countLevel;
+                return 1;
+            } 
             else if(item->id == TOOL_SHOVEL && playerUseEnergy(4-item->countLevel)){ 
                 addEntityToList(newItemEntity(newItem(ITEM_DIRT,1), (x<<4)+8, (y<<4)+8, currentLevel), &eManager);
                 setTile(TILE_HOLE,x,y); 
