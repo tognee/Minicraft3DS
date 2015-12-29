@@ -418,7 +418,7 @@ void checkSurrTiles4(int xt, int yt, int id) {
 }
 
 u8 tData = 0;
-void renderTile(int i, int x, int y) {
+void renderTile(int i, int d, int x, int y) {
 	int age = 0;
 	switch (i) {
 	case TILE_GRASS:
@@ -430,7 +430,7 @@ void renderTile(int i, int x, int y) {
 		renderConnectedTile4(x, y, 112, 16, grassColor);
 		break;
 	case TILE_TREE:
-		renderTile(TILE_GRASS, x, y);
+		renderTile(TILE_GRASS, 0, x, y);
 		
 		checkSurrTiles8(x >> 4, y >> 4, TILE_TREE);
 		
@@ -460,6 +460,10 @@ void renderTile(int i, int x, int y) {
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
 		
 		renderConnectedTile4(x, y, 112, 16, sandColor);
+		
+		if (d > 0) {
+			render16b(x, y, 128, 0, 0, sandColor);
+		}
 		break;
 	case TILE_WATER:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
@@ -487,16 +491,16 @@ void renderTile(int i, int x, int y) {
 		renderConnectedTile4(x, y, 176, 16, 0xFF383838);
 		break;
 	case TILE_CACTUS:
-		renderTile(TILE_SAND, x, y);
+		renderTile(TILE_SAND, 0, x, y);
 		render16(x, y, 48, 0, 0);
 		break;
 	case TILE_FLOWER:
-		renderTile(TILE_GRASS, x, y);
+		renderTile(TILE_GRASS, 0, x, y);
 		render16(x, y, 64, 0, getData(x >> 4, y >> 4));
 		break;
 	case TILE_STAIRS_DOWN:
 		if (currentLevel == 0)
-			renderTile(TILE_CLOUD, x, y);
+			renderTile(TILE_CLOUD, 0, x, y);
 		render16(x, y, 96, 0, 0);
 		break;
 	case TILE_STAIRS_UP:
@@ -519,15 +523,15 @@ void renderTile(int i, int x, int y) {
 		renderConnectedTile4(x, y, 64, 32, 0xFFFFFFFF);
 		break;
 	case TILE_CLOUDCACTUS:
-		renderTile(TILE_CLOUD, x, y);
+		renderTile(TILE_CLOUD, 0, x, y);
 		render16(x, y, 80, 0, 0);
 		break;
 	case TILE_SAPLING_TREE:
-		renderTile(TILE_GRASS, x, y);
+		renderTile(TILE_GRASS, 0, x, y);
 		render16(x, y, 32, 0, 0);
 		break;
 	case TILE_SAPLING_CACTUS:
-		renderTile(TILE_SAND, x, y);
+		renderTile(TILE_SAND, 0, x, y);
 		render16(x, y, 32, 0, 0);
 		break;
 	case TILE_FARM:
@@ -758,7 +762,7 @@ void renderBackground(int xScroll, int yScroll) {
 	int x, y;
 	for (x = xo; x <= 13 + xo; ++x) {
 		for (y = yo; y <= 8 + yo; ++y)
-			renderTile(getTile(x, y), x << 4, y << 4);
+			renderTile(getTile(x, y), getData(x, y), x << 4, y << 4);
 	}
 }
 

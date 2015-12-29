@@ -720,6 +720,9 @@ void tickTile(int x, int y){
             if(getTile(x,y+1)==TILE_DIRT) if((rand()%25) == 0) setTile(TILE_GRASS,x,y+1);
             if(getTile(x,y-1)==TILE_DIRT) if((rand()%25) == 0) setTile(TILE_GRASS,x,y-1);
             break;
+		case TILE_SAND:
+			if(data > 0) setData(--data,x,y);
+			break;
     }
     
 }
@@ -1324,6 +1327,9 @@ void entityTileInteract(Entity*e, int tile, int x, int y){
                 if(rand()%20 == 0)setTile(TILE_DIRT,x,y);
             }
          return; 
+		case TILE_SAND:
+			setData(10,x,y);
+		 return;
     }
 }
 
