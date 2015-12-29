@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-char versionText[34] = "BETA BUILD 6.00 (pre 1.0)";
+char versionText[34] = "Version 1.1";
 char fpsstr[34];
 u8 currentMenu = 0;
 
@@ -202,7 +202,6 @@ void tickTouchQuickSelect() {
 	if (currentMenu == 0) {
 		int i = 0;
 		Inventory * inv = player.p.inv;
-		Item * item;
 		
 		for (i = 0; i < 8; ++i) {
 			if((inv->lastSlot) > i) {
