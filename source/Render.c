@@ -590,22 +590,27 @@ void renderZoomedMap() {
     int my = mScrollY;
     if(zoomLevel == 2) mx = 32;
 	sf2d_draw_texture_scale(minimap[currentLevel], mx, my, zoomLevel, zoomLevel); // zoomed map
+	// Airwizard on zoomed map
 	if(currentLevel == 0){
-        render16c(
-        (mx+((awX/16)*zoomLevel)-16)/2, 
-        (my+((awY/16)*zoomLevel)-16)/2, 
-        160, 112, 
-        ((player.p.walkDist >> 6) & 1) == 0 ? 0 : 1, 
-        2, 2
-        ); // Airwizard on zoomed map
+		if(awX != 0 && awY != 0){
+			render16c(
+			(mx+((awX/16)*zoomLevel)-16)/2, 
+			(my+((awY/16)*zoomLevel)-16)/2, 
+			160, 112, 
+			((player.p.walkDist >> 6) & 1) == 0 ? 0 : 1, 
+			2, 2
+			);
+		}
     }
+	// Player on zoomed map
     render16c(
     (mx+((player.x/16)*zoomLevel)-16)/2, 
     (my+((player.y/16)*zoomLevel)-16)/2, 
     0, 112, 
     ((player.p.walkDist >> 6) & 1) == 0 ? 0 : 1, 
     2, 2
-    ); // Player on zoomed map
+    );
+	
     drawText(mapText,224, 214); // "x2"/"x4"/"x6"
     render16(142, 2, 72, 208, 0); // Exit button
     renderc(126, 102, 40, 208, 32, 16, 0); // Plus/Minus zoom buttons
@@ -632,7 +637,9 @@ void renderGui() {
 	drawText("Score:",214,12);
 	drawText(scoreT,(140-(strlen(scoreT)*12))/2 + 180,29);
 	if(currentLevel == 0){
-        renderc(1 + (awX/32), 47 + (awY/32), 88, 216, 8, 8, 0); // Mini-AWizard head.
+		if(awX != 0 && awY != 0){
+			renderc(1 + (awX/32), 47 + (awY/32), 88, 216, 8, 8, 0); // Mini-AWizard head.
+		}
     }
 	renderc(1 + (player.x/32), 47 + (player.y/32), 88, 208, 8, 8, 0); // Mini-Player head.
 	
