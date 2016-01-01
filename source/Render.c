@@ -811,7 +811,7 @@ void renderDayNight() {
 	if(currentLevel==1 && (daytime<6000 || daytime>18000)) {
 		int color1 = 0x000C0C0C;
 		int color2 = 0x00100C0C;
-		int alpha1 = 0x99;
+		int alpha1 = 0x88;
 		int alpha2 = 0xDD;
 		
 		if(daytime>5000 && daytime<6000) {
