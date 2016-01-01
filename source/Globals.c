@@ -1253,9 +1253,13 @@ void tickEntity(Entity* e){
             return;
 		case ENTITY_GLOWWORM:
 			if(daytime>5000 && daytime<6000) {
-				if(rand()%200==0) removeEntityFromList(e,e->level,&eManager);
+				if(rand()%200==0) {
+					removeEntityFromList(e,e->level,&eManager);
+					return;
+				}
 			} else if(daytime>6000 && daytime<18000) {
 				removeEntityFromList(e,e->level,&eManager);
+				return;
 			}
 			
 		    int gspeed = (((tickCount & 0x3) == 3) ? 1 : 0);
