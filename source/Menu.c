@@ -366,7 +366,7 @@ void tickMenu(int menu){
                         currentMenu = MENU_NONE;
                         break;
                     case 1:
-	                    areYouSureSave = true;
+	                    if(currentLevel!=5) areYouSureSave = true;
                         break;
                     case 2:
 	                    areYouSure = true;
@@ -454,48 +454,69 @@ void tickMenu(int menu){
         break;
         
         case MENU_CONTAINER:
-        if (k_menu.clicked || k_decline.clicked)currentMenu = MENU_NONE;
-        
-        if (k_left.clicked) {
-			curChestEntity->entityFurniture.r = 0;
-			int tmp = curInvSel;
-			curInvSel = curChestEntity->entityFurniture.oSel;
-			curChestEntity->entityFurniture.oSel = tmp;
-		}
-		if (k_right.clicked) {
-			curChestEntity->entityFurniture.r = 1;
-			int tmp = curInvSel;
-			curInvSel = curChestEntity->entityFurniture.oSel;
-			curChestEntity->entityFurniture.oSel = tmp;
-		}
-		
-		Inventory* i1 = curChestEntity->entityFurniture.r == 1 ? player.p.inv : curChestEntity->entityFurniture.inv;
-		Inventory* i2 = curChestEntity->entityFurniture.r == 0 ? player.p.inv : curChestEntity->entityFurniture.inv;
-		int len = i1->lastSlot;
-		if (curInvSel < 0) curInvSel = 0;
-		if (curInvSel >= len) curInvSel = len - 1;
-		if (k_up.clicked) --curInvSel;
-		if (k_down.clicked) ++curInvSel;
-		if (len == 0) curInvSel = 0;
-		if (curInvSel < 0) curInvSel += len;
-		if (curInvSel >= len) curInvSel -= len;
-		
-		if(k_accept.clicked && len > 0){
-            Item* pullItem = &i1->items[curInvSel];
-            Item pushItem = newItem(pullItem->id,pullItem->countLevel);
-            pushItem.chestPtr = pullItem->chestPtr;
-            pushItemToInventoryFront(pushItem, i2);
-            if(i2 == player.p.inv){
-                int newslot = player.p.activeItem->slotNum + 1;
-                player.p.activeItem = &player.p.inv->items[newslot];
-            } else if(pullItem == player.p.activeItem){
-                player.p.activeItem = &noItem;
-            }
-            removeItemFromCurrentInv(pullItem);
-			if (curInvSel >= i1->lastSlot) curInvSel = i1->lastSlot - 1;
-        }
-		
+			if (k_menu.clicked || k_decline.clicked) currentMenu = MENU_NONE;
+			
+			if (k_left.clicked) {
+				curChestEntity->entityFurniture.r = 0;
+				int tmp = curInvSel;
+				curInvSel = curChestEntity->entityFurniture.oSel;
+				curChestEntity->entityFurniture.oSel = tmp;
+			}
+			if (k_right.clicked) {
+				curChestEntity->entityFurniture.r = 1;
+				int tmp = curInvSel;
+				curInvSel = curChestEntity->entityFurniture.oSel;
+				curChestEntity->entityFurniture.oSel = tmp;
+			}
+			
+			Inventory* i1 = curChestEntity->entityFurniture.r == 1 ? player.p.inv : curChestEntity->entityFurniture.inv;
+			Inventory* i2 = curChestEntity->entityFurniture.r == 0 ? player.p.inv : curChestEntity->entityFurniture.inv;
+			int len = i1->lastSlot;
+			if (curInvSel < 0) curInvSel = 0;
+			if (curInvSel >= len) curInvSel = len - 1;
+			if (k_up.clicked) --curInvSel;
+			if (k_down.clicked) ++curInvSel;
+			if (len == 0) curInvSel = 0;
+			if (curInvSel < 0) curInvSel += len;
+			if (curInvSel >= len) curInvSel -= len;
+			
+			if(k_accept.clicked && len > 0){
+				Item* pullItem = &i1->items[curInvSel];
+				Item pushItem = newItem(pullItem->id,pullItem->countLevel);
+				pushItem.chestPtr = pullItem->chestPtr;
+				pushItemToInventoryFront(pushItem, i2);
+				if(i2 == player.p.inv){
+					int newslot = player.p.activeItem->slotNum + 1;
+					player.p.activeItem = &player.p.inv->items[newslot];
+				} else if(pullItem == player.p.activeItem){
+					player.p.activeItem = &noItem;
+				}
+				removeItemFromCurrentInv(pullItem);
+				if (curInvSel >= i1->lastSlot) curInvSel = i1->lastSlot - 1;
+			}
         break;
+		
+		case MENU_DUNGEON:
+			if (k_menu.clicked || k_decline.clicked) currentMenu = MENU_NONE;
+			
+			if(k_accept.clicked) {
+				if(currentLevel!=5) {
+					Item * item = getItemFromInventory(ITEM_DUNGEON_KEY, player.p.inv);
+					if(item!=NULL) {
+						--item->countLevel;
+						if(item->countLevel==0) {
+							removeItemFromCurrentInv(item);
+						}
+						
+						enterDungeon();
+					}
+				} else {
+					leaveDungeon();
+				}
+				
+				currentMenu = MENU_NONE;
+			}
+		break;
         
         case MENU_LOADGAME:
             if(!enteringName && !areYouSure){ // World select
@@ -999,6 +1020,10 @@ void renderMenu(int menu,int xscr,int yscr){
                     char* msg = pOptions[i];
                     u32 color = 0xFF7F7F7F;
                     if(i == currentSelection) color = 0xFFFFFFFF;
+					if(i == 1 && currentLevel==5) {
+						color = 0xFF7F7FFF;
+						if(i == currentSelection) color = 0xFFAFAFFF;
+					}
                     drawTextColor(msg,(400 - (strlen(msg) * 12))/2, (i * 24) + 100, color);    
                 }
                 
@@ -1068,6 +1093,8 @@ void renderMenu(int menu,int xscr,int yscr){
 		            renderMenuBackground(xscr,yscr);
 	            offsetX = 0;offsetY = 0;
                 renderFrame(1,1,24,14,0xFFFF1010);
+				drawTextColor("Inventory",24+1,14+1,0xFF000000);
+				drawTextColor("Inventory",24,14,0xFF6FE2E2);
                 renderItemList(player.p.inv, 1,1,24,14, curInvSel);
 		    sf2d_end_frame();
         break;  
@@ -1082,8 +1109,14 @@ void renderMenu(int menu,int xscr,int yscr){
 	            offsetX = 0;offsetY = 0;
 	            
                 renderFrame(15,1,24,4,0xFFFF1010);
+				drawTextColor("Have",248+1,14+1,0xFF000000);
+				drawTextColor("Have",248,14,0xFF6FE2E2);
                 renderFrame(15,5,24,14,0xFFFF1010);
+				drawTextColor("Cost",248+1,78+1,0xFF000000);
+				drawTextColor("Cost",248,78,0xFF6FE2E2);
                 renderFrame(1,1,14,14,0xFFFF1010);
+				drawTextColor("Crafting",24+1,14+1,0xFF000000);
+				drawTextColor("Crafting",24,14,0xFF6FE2E2);
                 renderRecipes(currentRecipes, 1, 1, 14, 14, curInvSel);
                 
                 Recipe* rec = &currentRecipes->recipes[curInvSel];
@@ -1119,14 +1152,62 @@ void renderMenu(int menu,int xscr,int yscr){
 		        else {offsetX = 0;offsetY = 0;}
 		        
 		        renderFrame(1,1,14,14,0xFFFF1010);
+				drawTextColor("Chest",24+1,14+1,0xFF000000);
+				drawTextColor("Chest",24,14,0xFF6FE2E2);
 		        renderItemList(curChestEntity->entityFurniture.inv,1,1,14,14,
                 curChestEntity->entityFurniture.r == 0 ? curInvSel : -curChestEntity->entityFurniture.oSel - 1);
 		        renderFrame(15,1,28,14,0xFFFF1010);
+				drawTextColor("Inventory",248+1,14+1,0xFF000000);
+				drawTextColor("Inventory",248,14,0xFF6FE2E2);
 		        renderItemList(player.p.inv,15,1,28,14,
                 curChestEntity->entityFurniture.r == 1 ? curInvSel : -curChestEntity->entityFurniture.oSel - 1);
 		        offsetX = 0;offsetY = 0;
 		    sf2d_end_frame();
         break;
+		
+		case MENU_DUNGEON:
+			sf2d_start_frame(GFX_TOP, GFX_LEFT);
+                if(currentLevel == 0){ 
+                    sf2d_draw_texture_part_scale(minimap[1],(-xscr/3)-256,(-yscr/3)-32,0,0,128,128,12.5,7.5);
+                    sf2d_draw_rectangle(0,0,400,240, 0xAFDFDFDF);
+                }
+	            offsetX = xscr;offsetY = yscr;
+		            renderMenuBackground(xscr,yscr);
+	            offsetX = 0;offsetY = 0;
+                renderFrame(1,1,24,14,0xFFFF1010);
+				if(currentLevel!=5) {
+					drawTextColor("Dungeon Entrance",24+1,14+1,0xFF000000);
+					drawTextColor("Dungeon Entrance",24,14,0xFF6FE2E2);
+					
+					drawText("Warning: ", 32, 32);
+					drawText("You need a Dungeon Key to   ", 32, 56);
+					drawText("enter and cannot save while ", 32, 72);
+					drawText("being in the Dungeon!       ", 32, 88);
+					drawText("After leaving you will need ", 32, 112);
+					drawText("a new Dungeon Key for       ", 32, 128);
+					drawText("entering another Dungeon!   ", 32, 144);
+					
+					drawText("   Enter", 148, 171);
+				} else {
+					drawTextColor("Dungeon Exit",24+1,14+1,0xFF000000);
+					drawTextColor("Dungeon Exit",24,14,0xFF6FE2E2);
+					
+					drawText("Warning: ", 32, 32);
+					drawText("The Dungeon and everything  ", 32, 56);
+					drawText("in it will disappear when   ", 32, 72);
+					drawText("you leave it!               ", 32, 88);
+					drawText("You will need a new Dungeon ", 32, 112);
+					drawText("Key for entering another    ", 32, 128);
+					drawText("Dungeon again!              ", 32, 144);
+					
+					drawText("   Leave", 148, 171);
+				}
+				
+                renderButtonIcon(k_accept.input & -k_accept.input, 150, 168, 1);
+                drawText("   Stay", 148, 195);
+                renderButtonIcon(k_decline.input & -k_decline.input, 150, 192, 1);
+		    sf2d_end_frame();
+		break;
 		
         case MENU_ABOUT:
 		    sf2d_start_frame(GFX_TOP, GFX_LEFT);

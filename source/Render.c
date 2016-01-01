@@ -258,20 +258,28 @@ void renderFrame(int x1, int y1, int x2, int y2, u32 bgColor) {
 
 void bakeLights() {
 	playerLightBake = sf2d_create_texture(64, 64, TEXFMT_RGBA8, SF2D_PLACE_RAM);
-	lanternLightBake = sf2d_create_texture(128, 128, TEXFMT_RGBA8,
-			SF2D_PLACE_RAM);
+	lanternLightBake = sf2d_create_texture(128, 128, TEXFMT_RGBA8, SF2D_PLACE_RAM);
+	
+	glowwormLightBake = sf2d_create_texture(16, 16, TEXFMT_RGBA8, SF2D_PLACE_RAM);
+	glowwormBigLightBake = sf2d_create_texture(32, 32, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 
 	bakeLight(playerLightBake, 32, 32, 32);
 	bakeLight(lanternLightBake, 64, 64, 64);
+	
+	bakeLight(glowwormLightBake, 8, 8, 8);
+	bakeLight(glowwormBigLightBake, 12, 12, 12);
 }
 
 void freeLightBakes() {
 	sf2d_free_texture(playerLightBake);
 	sf2d_free_texture(lanternLightBake);
+	
+	sf2d_free_texture(glowwormLightBake);
+	sf2d_free_texture(glowwormBigLightBake);
 }
 
-void renderLightsToStencil() {
-	if (currentLevel > 1) {
+void renderLightsToStencil(bool force, bool invert, bool rplayer) {
+	if (force || (currentLevel > 1 && currentLevel != 5)) {
 		GPU_SetDepthTestAndWriteMask(true, GPU_NEVER, 0);
 		GPU_SetStencilTest(true, GPU_NEVER, 1, 0xFF, 0xFF);
 		GPU_SetStencilOp(GPU_STENCIL_REPLACE, GPU_STENCIL_KEEP,
@@ -279,40 +287,55 @@ void renderLightsToStencil() {
 		GPU_SetAlphaTest(true, GPU_GREATER, 0);
 
         if(player.p.activeItem->id == ITEM_LANTERN) renderLight(player.x, player.y, lanternLightBake);
-        else renderLight(player.x, player.y, playerLightBake);
+        else if(rplayer) renderLight(player.x, player.y, playerLightBake);
         
 		int i;
 		for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
 			Entity e = eManager.entities[currentLevel][i];
-			if (e.type != ENTITY_FURNITURE)continue;
-			if (e.entityFurniture.itemID == ITEM_LANTERN && e.x > player.x - 160 
-            && e.y > player.y - 125 && e.x < player.x + 160 && e.y < player.y + 125)
-			renderLight(e.x, e.y, lanternLightBake);
+			if (e.type == ENTITY_FURNITURE) {
+				if (e.entityFurniture.itemID == ITEM_LANTERN && e.x > player.x - 160 && e.y > player.y - 125 && e.x < player.x + 160 && e.y < player.y + 125)
+					renderLight(e.x, e.y, lanternLightBake);
+			} else if(e.type == ENTITY_GLOWWORM && e.x > player.x - 160 && e.y > player.y - 125 && e.x < player.x + 160 && e.y < player.y + 125) { //TODO could be made smaller becuase of smaller light radius
+				if(rand()%10==0) continue;
+				else if(rand()%100==0) renderLight(e.x+4, e.y-4, glowwormBigLightBake);
+				else renderLight(e.x, e.y, glowwormLightBake);
+			}
 		}
 		
 		int xo = offsetX >> 4;
 		int yo = offsetY >> 4;
 		int x, y;
 		//added offset to render lights from lava which is offscreen
+		//TODO: Even this is not performant enough for old 3DS, when there is a lot of lava on screen
 		for (x = xo-2; x <= 13 + xo+2; ++x) {
-			for (y = yo-2; y <= 8 + yo+2; ++y)
-			    if(getTile(x, y) == TILE_LAVA) renderLight(x << 4, y << 4, playerLightBake);
+			for (y = yo-2; y <= 8 + yo+2; ++y) {
+			    if(getTile(x, y) == TILE_LAVA) {
+					//experimental "speedhack"
+					if(getTile(x+1,y)==TILE_LAVA && getTile(x-1,y)==TILE_LAVA && getTile(x,y+1)==TILE_LAVA && getTile(x,y-1)==TILE_LAVA) {
+						if((x+y)%2 == 0) continue;
+					}
+					renderLight((x << 4) + 8, (y << 4) + 8, playerLightBake);
+				}
+			}
 		}
 		
 		
 		GPU_SetDepthTestAndWriteMask(true, GPU_GEQUAL, GPU_WRITE_ALL);
-		GPU_SetStencilTest(true, GPU_EQUAL, 1, 0xFF, 0x0);
+		if(invert) {
+			GPU_SetStencilTest(true, GPU_EQUAL, 0, 0xFF, 0x0);
+		} else {
+			GPU_SetStencilTest(true, GPU_EQUAL, 1, 0xFF, 0x0);
+		}
 		GPU_SetAlphaTest(false, GPU_ALWAYS, 0x00);
-		GPU_SetStencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP,
-				GPU_STENCIL_REPLACE);
+		GPU_SetStencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_REPLACE);
 	}
 }
 
 void resetStencilStuff() {
-	if (currentLevel > 1) {
+	//if (currentLevel > 1) {
 		GPU_SetStencilTest(false, GPU_ALWAYS, 0x00, 0xFF, 0x00);
 		GPU_SetStencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_KEEP);
-	}
+	//}
 }
 
 void renderLight(int x, int y, sf2d_texture* texture) {
@@ -507,13 +530,13 @@ void renderTile(int i, int d, int x, int y) {
 		render16(x, y, 112, 0, 0);
 		break;
 	case TILE_IRONORE:
-		render16b(x, y, 80, 0, 0, 0xFFC8C8DF);
+		render16b(x, y, 80, 0, 0, ironColor);
 		break;
 	case TILE_GOLDORE:
-		render16b(x, y, 80, 0, 0, 0xFFB9E8E5);
+		render16b(x, y, 80, 0, 0, goldColor);
 		break;
 	case TILE_GEMORE:
-		render16b(x, y, 80, 0, 0, 0xFFDE98DF);
+		render16b(x, y, 80, 0, 0, gemColor);
 		break;
 	case TILE_CLOUD:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUD);
@@ -547,6 +570,37 @@ void renderTile(int i, int d, int x, int y) {
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WOOD_WALL);
 		
 		renderConnectedTile4(x, y, 0, 32, woodColor);
+		break;
+	case TILE_STONE_WALL:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_STONE_WALL);
+		
+		renderConnectedTile4(x, y, 128, 32, rockColor[0]);
+		break;
+	case TILE_IRON_WALL:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_IRON_WALL);
+		
+		renderConnectedTile4(x, y, 128, 32, ironColor);
+		break;
+	case TILE_GOLD_WALL:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_GOLD_WALL);
+		
+		renderConnectedTile4(x, y, 128, 32, goldColor);
+		break;
+	case TILE_GEM_WALL:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_GEM_WALL);
+		
+		renderConnectedTile4(x, y, 128, 32, gemColor);
+		break;
+	case TILE_DUNGEON_WALL:
+		checkSurrTiles8(x >> 4, y >> 4, TILE_DUNGEON_WALL);
+		
+		renderConnectedTile8(x, y, 128, 32, dungeonColor[0]);
+		break;
+	case TILE_DUNGEON_FLOOR:
+		render16b(x, y, 208, 32, 0, dungeonColor[1]);
+		break;
+	case TILE_DUNGEON_ENTRANCE:
+		render16b(x, y, 224 + (currentLevel==5 ? 16 : 0), 32, 0, dungeonColor[0]);
 		break;
 	}
 
@@ -746,16 +800,46 @@ void renderPlayer() {
 
 void renderMenuBackground(int xScroll, int yScroll) {
 	sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
-	renderLightsToStencil();
+	renderLightsToStencil(false, false, true);
 	renderBackground(xScroll, yScroll);
 	resetStencilStuff();
+	
+	renderDayNight();
+}
+
+void renderDayNight() {
+	if(currentLevel==1 && (daytime<6000 || daytime>18000)) {
+		int color1 = 0x000C0C0C;
+		int color2 = 0x00100C0C;
+		int alpha1 = 0x99;
+		int alpha2 = 0xDD;
+		
+		if(daytime>5000 && daytime<6000) {
+			alpha1 = (alpha1 * (1000-(daytime-5000)))/1000;
+			alpha2 = (alpha2 * (1000-(daytime-5000)))/1000;
+		} else if(daytime>18000 && daytime<19000) {
+			alpha1 = (alpha1 * (daytime-18000))/1000;
+			alpha2 = (alpha2 * (daytime-18000))/1000;
+		}
+		
+		color1 = color1 | (alpha1 << 24);
+		color2 = color2 | (alpha2 << 24);
+		
+		sf2d_draw_rectangle(0, 0, 400, 240, color1); //You might think "real" black would be better, but it actually looks better that way
+		renderLightsToStencil(true, true, false);
+		sf2d_draw_rectangle(0, 0, 400, 240, color2); //You might think "real" black would be better, but it actually looks better that way
+		resetStencilStuff();
+	}
 }
 
 void renderBackground(int xScroll, int yScroll) {
-    if(currentLevel > 0) sf2d_draw_rectangle(0, 0, 400, 240, dirtColor[currentLevel]); // dirt color
-	else {
+    if(currentLevel == 0) {
 		sf2d_draw_texture_part_scale(minimap[1], (-xScroll / 3) - 256, (-yScroll / 3) - 32, 0, 0, 128, 128, 12.5, 7.5);
 		sf2d_draw_rectangle(0, 0, 400, 240, 0xAFDFDFDF);
+	} else if(currentLevel == 5) {
+		sf2d_draw_rectangle(0, 0, 400, 240, dungeonColor[1]);
+	} else {
+		sf2d_draw_rectangle(0, 0, 400, 240, dirtColor[currentLevel]); // dirt color
 	}
 	int xo = xScroll >> 4;
 	int yo = yScroll >> 4;
@@ -862,6 +946,12 @@ void renderFurniture(int itemID, int x, int y) {
 	case ITEM_LANTERN:
 		render16(x, y, 144, 128, 0);
 		break;
+	case ITEM_LOOM:
+		render16(x, y, 224, 128, 0);
+		break;
+	case ITEM_ENCHANTER:
+		render16(x, y, 240, 128, 0);
+		break;
 	}
 }
 
@@ -879,24 +969,50 @@ void renderEntity(Entity* e, int x, int y) {
 		renderFurniture(e->entityFurniture.itemID, x - 8, y - 8);
 		break;
 	case ENTITY_ZOMBIE:
-		switch (e->zombie.dir) {
+		switch (e->hostile.dir) {
 		case 0: // down
-			render16b(x - 8, y - 8, 64, 112,
-					((e->zombie.walkDist >> 4) & 1) == 0 ? 0 : 1,
-					e->zombie.color);
+			render16b(x - 8, y - 8, 64, 112, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
 			break;
 		case 1: // up
-			render16b(x - 8, y - 8, 80, 112,
-					((e->zombie.walkDist >> 4) & 1) == 0 ? 0 : 1,
-					e->zombie.color);
+			render16b(x - 8, y - 8, 80, 112, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
 			break;
 		case 2: // left
-			render16b(x - 8, y - 8, 96 + (((e->zombie.walkDist >> 4) & 1) << 4),
-					112, 1, e->zombie.color);
+			render16b(x - 8, y - 8, 96 + (((e->hostile.walkDist >> 4) & 1) << 4), 112, 1, e->hostile.color);
 			break;
 		case 3: // right
-			render16b(x - 8, y - 8, 96 + (((e->zombie.walkDist >> 4) & 1) << 4),
-					112, 0, e->zombie.color);
+			render16b(x - 8, y - 8, 96 + (((e->hostile.walkDist >> 4) & 1) << 4), 112, 0, e->hostile.color);
+			break;
+		}
+		break;
+	case ENTITY_SKELETON:
+		switch (e->hostile.dir) {
+		case 0: // down
+			render16b(x - 8, y - 8, 0, 80, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
+			break;
+		case 1: // up
+			render16b(x - 8, y - 8, 16, 80, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
+			break;
+		case 2: // left
+			render16b(x - 8, y - 8, 32 + (((e->hostile.walkDist >> 4) & 1) << 4), 80, 1, e->hostile.color);
+			break;
+		case 3: // right
+			render16b(x - 8, y - 8, 32 + (((e->hostile.walkDist >> 4) & 1) << 4), 80, 0, e->hostile.color);
+			break;
+		}
+		break;
+	case ENTITY_KNIGHT:
+		switch (e->hostile.dir) {
+		case 0: // down
+			render16b(x - 8, y - 8, 64, 80, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
+			break;
+		case 1: // up
+			render16b(x - 8, y - 8, 80, 80, ((e->hostile.walkDist >> 4) & 1) == 0 ? 0 : 1, e->hostile.color);
+			break;
+		case 2: // left
+			render16b(x - 8, y - 8, 96 + (((e->hostile.walkDist >> 4) & 1) << 4), 80, 1, e->hostile.color);
+			break;
+		case 3: // right
+			render16b(x - 8, y - 8, 96 + (((e->hostile.walkDist >> 4) & 1) << 4), 80, 0, e->hostile.color);
 			break;
 		}
 		break;
@@ -932,6 +1048,22 @@ void renderEntity(Entity* e, int x, int y) {
 			break;
 		}
 		break;
+	case ENTITY_PASSIVE:
+		switch (e->passive.dir) {
+		case 0: // down
+			render16(x - 8, y - 8, (e->passive.mtype*64) + 0, 96, ((e->passive.walkDist >> 4) & 1) == 0 ? 0 : 1);
+			break;
+		case 1: // up
+			render16(x - 8, y - 8, (e->passive.mtype*64) + 16, 96, ((e->passive.walkDist >> 4) & 1) == 0 ? 0 : 1);
+			break;
+		case 2: // left
+			render16(x - 8, y - 8, (e->passive.mtype*64) + 32 + (((e->passive.walkDist >> 4) & 1) << 4), 96, 1);
+			break;
+		case 3: // right
+			render16(x - 8, y - 8, (e->passive.mtype*64) + 32 + (((e->passive.walkDist >> 4) & 1) << 4), 96, 0);
+			break;
+		}
+		break;
 	case ENTITY_TEXTPARTICLE:
 		x -= offsetX;
 		y -= offsetY;
@@ -948,6 +1080,45 @@ void renderEntity(Entity* e, int x, int y) {
 			if (e->spark.age / 6 % 2 == 0)
 				return;
 		renderr(x, y, 200, 152, 0, e->spark.age * 0.0349);
+		break;
+	case ENTITY_ARROW:
+		if (e->arrow.age >= 200)
+			if (e->arrow.age / 6 % 2 == 0)
+				return;
+		
+		int abits = 0;
+		int ayp = 168;
+		if(e->arrow.xa<0) {
+			abits += 1;
+		}
+		if(e->arrow.ya<0) {
+			ayp += 8;
+		}
+		if(e->arrow.ya>0) {
+			ayp += 8;
+			abits += 2;
+		}
+		
+		switch (e->arrow.itemID) {
+		case ITEM_ARROW_WOOD:
+			render(x-2, y-2, 72, ayp, abits);
+			break;
+		case ITEM_ARROW_STONE:
+			render(x-2, y-2, 80, ayp, abits);
+			break;
+		case ITEM_ARROW_IRON:
+			render(x-2, y-2, 88, ayp, abits);
+			break;
+		case ITEM_ARROW_GOLD:
+			render(x-2, y-2, 96, ayp, abits);
+			break;
+		case ITEM_ARROW_GEM:
+			render(x-2, y-2, 104, ayp, abits);
+			break;
+		}
+		break;
+	case ENTITY_GLOWWORM:
+		render(x-4, y-4, 224, 112, 0);
 		break;
 	}
 }
@@ -1154,16 +1325,16 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		renderb(x, y, 88, 152, 0, 0xFF383838);
 		break;
 	case ITEM_IRONORE:
-		renderb(x, y, 88, 152, 0, 0xFF9999BC);
+		renderb(x, y, 88, 152, 0, ironColor);
 		break;
 	case ITEM_GOLDORE:
-		renderb(x, y, 88, 152, 0, 0xFF77CECE);
+		renderb(x, y, 88, 152, 0, goldColor);
 		break;
 	case ITEM_IRONINGOT:
-		renderb(x, y, 96, 152, 0, 0xFFC8C8DF);
+		renderb(x, y, 96, 152, 0, ironColor);
 		break;
 	case ITEM_GOLDINGOT:
-		renderb(x, y, 96, 152, 0, 0xFFBCEAEA);
+		renderb(x, y, 96, 152, 0, goldColor);
 		break;
 	case ITEM_GLASS:
 		render(x, y, 104, 152, 0);
@@ -1171,8 +1342,77 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 	case ITEM_GEM:
 		render(x, y, 112, 152, 0);
 		break;
+	case ITEM_LOOM:
+		render(x, y, 120, 160, 0);
+		break;
+	case ITEM_ENCHANTER:
+		render(x, y, 144, 160, 0);
+		break;
+	case ITEM_WALL_WOOD:
+		renderb(x, y, 224, 144, 0, woodColor);
+		break;
+	case ITEM_WALL_STONE:
+		renderb(x, y, 224, 144, 0, rockColor[1]);
+		break;
+	case ITEM_WALL_IRON:
+		renderb(x, y, 224, 144, 0, ironColor);
+		break;
+	case ITEM_WALL_GOLD:
+		renderb(x, y, 224, 144, 0, goldColor);
+		break;
+	case ITEM_WALL_GEM:
+		renderb(x, y, 224, 144, 0, gemColor);
+		break;
+	case ITEM_WOOL:
+		render(x, y, 64, 160, 0);
+		break;
+	case ITEM_STRING:
+		render(x, y, 72, 160, 0);
+		break;
+	case ITEM_PORK_RAW:
+		render(x, y, 80, 160, 0);
+		break;
+	case ITEM_PORK_COOKED:
+		render(x, y, 88, 160, 0);
+		break;
+	case ITEM_BEEF_RAW:
+		render(x, y, 96, 160, 0);
+		break;
+	case ITEM_BEEF_COOKED:
+		render(x, y, 104, 160, 0);
+		break;
+	case ITEM_LEATHER:
+		render(x, y, 112, 160, 0);
+		break;
+	case ITEM_ARROW_WOOD:
+		render(x, y, 72, 168, 0);
+		break;
+	case ITEM_ARROW_STONE:
+		render(x, y, 80, 168, 0);
+		break;
+	case ITEM_ARROW_IRON:
+		render(x, y, 88, 168, 0);
+		break;
+	case ITEM_ARROW_GOLD:
+		render(x, y, 96, 168, 0);
+		break;
+	case ITEM_ARROW_GEM:
+		render(x, y, 104, 168, 0);
+		break;
+	case ITEM_BONE:
+		render(x, y, 128, 160, 0);
+		break;
+	case ITEM_DUNGEON_KEY:
+		render(x, y, 136, 160, 0);
+		break;
+	case ITEM_WIZARD_SUMMON:
+		render(x, y, 152, 160, 0);
+		break;
 	case TOOL_BUCKET:
 		render(x, y, 200 + countLevel * 8, 144, 0);
+		break;
+	case TOOL_BOW:
+		render(x, y, 64, 168, 0);
 		break;
 	}
 }

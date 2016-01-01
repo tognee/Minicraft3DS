@@ -9,6 +9,8 @@
 
 sf2d_texture *playerLightBake;
 sf2d_texture *lanternLightBake;
+sf2d_texture *glowwormLightBake;
+sf2d_texture *glowwormBigLightBake;
 int offsetX, offsetY;
 
 void render(s32 xp, s32 yp, u32 xTile, u32 yTile, u8 bits);
@@ -31,11 +33,12 @@ void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile, u32 color);
 void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile, u32 color);
 void renderBackground(int xScroll, int yScroll);
 void renderMenuBackground(int xScroll, int yScroll); //Renders the darkness
+void renderDayNight();
 void renderButtonIcon(u32 icon, int x, int y, float scale);
 
 void bakeLights();
 void freeLightBakes();
-void renderLightsToStencil();
+void renderLightsToStencil(bool force, bool invert, bool rplayer);
 void resetStencilStuff();
 void bakeLight(sf2d_texture* texture, int x, int y, int r);
 void renderLight(int x, int y, sf2d_texture* texture);

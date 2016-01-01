@@ -14,41 +14,9 @@
 #include "texturepack.h"
 
 void initMiniMap(bool loadUpWorld) {
-	int i, x, y;
+	int i;
 	for (i = 0; i < 5; ++i) {
-		for (x = 0; x < 128; ++x) {
-			for (y = 0; y < 128; ++y) {
-
-				if (!loadUpWorld) { // generate stairs up when making a new world.
-					switch (map[i][x + y * 128]) {
-					case TILE_STAIRS_DOWN:
-						map[i + 1][x + y * 128] = TILE_STAIRS_UP;
-						if (i == 0) {
-							map[i + 1][(x + 1) + y * 128] = TILE_HARDROCK;
-							map[i + 1][x + (y + 1) * 128] = TILE_HARDROCK;
-							map[i + 1][(x - 1) + y * 128] = TILE_HARDROCK;
-							map[i + 1][x + (y - 1) * 128] = TILE_HARDROCK;
-							map[i + 1][(x + 1) + (y + 1) * 128] = TILE_HARDROCK;
-							map[i + 1][(x - 1) + (y - 1) * 128] = TILE_HARDROCK;
-							map[i + 1][(x - 1) + (y + 1) * 128] = TILE_HARDROCK;
-							map[i + 1][(x + 1) + (y - 1) * 128] = TILE_HARDROCK;
-						} else {
-							map[i + 1][(x + 1) + y * 128] = TILE_DIRT;
-							map[i + 1][x + (y + 1) * 128] = TILE_DIRT;
-							map[i + 1][(x - 1) + y * 128] = TILE_DIRT;
-							map[i + 1][x + (y - 1) * 128] = TILE_DIRT;
-							map[i + 1][(x + 1) + (y + 1) * 128] = TILE_DIRT;
-							map[i + 1][(x - 1) + (y - 1) * 128] = TILE_DIRT;
-							map[i + 1][(x - 1) + (y + 1) * 128] = TILE_DIRT;
-							map[i + 1][(x + 1) + (y - 1) * 128] = TILE_DIRT;
-						}
-					}
-				}
-
-				/* Minimaps */
-				sf2d_set_pixel(minimap[i], x, y, getTileColor(map[i][x + y * 128]));
-			}
-		}
+		initMinimapLevel(i, loadUpWorld);
 	}
 }
 
@@ -77,12 +45,13 @@ void setupGame(bool loadUpWorld) {
 			trySpawn(500, i);
 		}
 		addEntityToList(newAirWizardEntity(630, 820, 0), &eManager);
+		daytime = 6000;
 	} else {
 		initPlayer();
 		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
 	}
 	
-	updateMusic(currentLevel);
+	updateMusic(currentLevel, daytime);
 
 	initMiniMap(loadUpWorld);
 	shouldRenderMap = false;
@@ -112,6 +81,17 @@ void tick() {
 	tickTouchMap();
 	tickTouchQuickSelect();
 
+	++daytime;
+	//daytime += 20;
+	if(daytime>=24000) {
+		daytime -= 24000;
+	}
+	if(daytime==6000 && currentLevel==1) {
+		playMusic(music_floor1);
+	} else if(daytime==19000 && currentLevel==1) {
+		playMusic(music_floor1_night);
+	}
+	
 	int i;
 	for (i = 0; i < 324; ++i) {
 		int xx = rand() & 127;
@@ -129,12 +109,15 @@ void tick() {
 		yscr = 16;
 	else if (yscr > 1912)
 		yscr = 1912;
+	
+	if(eManager.lastSlot[currentLevel]<80) {
+		trySpawn(1, currentLevel);
+	}
 
 	for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
 		Entity * e = &eManager.entities[currentLevel][i];
-		if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SLIME)
-				|| (e->x > player.x - 160 && e->y > player.y - 125
-						&& e->x < player.x + 160 && e->y < player.y + 125))
+		if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SKELETON && e->type != ENTITY_KNIGHT && e->type != ENTITY_SLIME && e->type != ENTITY_PASSIVE && (e->type == ENTITY_GLOWWORM && (daytime>6000 || daytime<18000))) 
+			|| (e->x > player.x - 160 && e->y > player.y - 125 && e->x < player.x + 160 && e->y < player.y + 125))
 			tickEntity(e);
 	}
 
@@ -179,7 +162,7 @@ int main() {
 	
 
 	int i;
-	for (i = 0; i < 5; ++i) {
+	for (i = 0; i < 6; ++i) {
 		minimap[i] = sf2d_create_texture(128, 128, TEXFMT_RGBA8,
 				SF2D_PLACE_RAM);
 		sf2d_texture_tile32(minimap[i]);
@@ -248,13 +231,17 @@ int main() {
 			offsetX = xscr;
 			offsetY = yscr;
 			sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //RGBA8(12, 12, 12, 255)); //You might think "real" black would be better, but it actually looks better that way
-			renderLightsToStencil();
+			
+			renderLightsToStencil(false, false, true);
 
 			renderBackground(xscr, yscr);
 			renderEntities(player.x, player.y, &eManager);
 			renderPlayer();
 			
 			resetStencilStuff();
+			
+			renderDayNight();
+			
 			offsetX = 0;
 			offsetY = 0;
 			
@@ -290,6 +277,7 @@ int main() {
 	sf2d_free_texture(minimap[2]);
 	sf2d_free_texture(minimap[3]);
 	sf2d_free_texture(minimap[4]);
+	sf2d_free_texture(minimap[5]);
 	freeSounds();
 	csndExit();
     cfguExit();

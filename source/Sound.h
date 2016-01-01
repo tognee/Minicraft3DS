@@ -14,7 +14,7 @@ void loadSound(Sound * snd, char * filename);
 void playSound(Sound snd);
 
 void playMusic(Sound snd);
-void updateMusic(int lvl);
+void updateMusic(int lvl, int time);
 
 void loadSounds();
 void freeSounds();
@@ -30,5 +30,6 @@ Sound snd_craft;
 Sound music_menu;
 Sound music_floor0;
 Sound music_floor1;
+Sound music_floor1_night;
 Sound music_floor23;
 Sound music_floor4;

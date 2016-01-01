@@ -20,19 +20,21 @@ void playMusic(Sound snd){
     csndPlaySound(10, SOUND_FORMAT_16BIT | SOUND_REPEAT, 44100, 1, 0, snd.buffer, snd.buffer, snd.size);
 }
 
-void updateMusic(int lvl) {
+void updateMusic(int lvl, int time) {
 	switch(lvl) {
 	case 0:
 		playMusic(music_floor0);
 		break;
 	case 1:
-		playMusic(music_floor1);
+		if(time>6000 && time<19000) playMusic(music_floor1);
+		else playMusic(music_floor1_night);
 		break;
 	case 2:
 	case 3:
 		playMusic(music_floor23);
 		break;
 	case 4:
+	case 5: //TODO - dungeon needs own music
 		playMusic(music_floor4);
 		break;
 	}
@@ -50,6 +52,7 @@ void loadSounds() {
 	loadSound(&music_menu, "resources/music/menu.raw");
 	loadSound(&music_floor0, "resources/music/floor0.raw");
 	loadSound(&music_floor1, "resources/music/floor1.raw");
+	loadSound(&music_floor1_night, "resources/music/floor1_night.raw");
 	loadSound(&music_floor23, "resources/music/floor2_3.raw");
 	loadSound(&music_floor4, "resources/music/floor4.raw");
 }
@@ -66,6 +69,7 @@ void freeSounds(){
 	linearFree(music_menu.buffer);
 	linearFree(music_floor0.buffer);
 	linearFree(music_floor1.buffer);
+	linearFree(music_floor1_night.buffer);
 	linearFree(music_floor23.buffer);
 	linearFree(music_floor4.buffer);
 }

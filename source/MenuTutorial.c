@@ -206,24 +206,24 @@ void renderTutorialPage(bool topScreen){
                 render(132,82,72,152,0); // Bread
                 break;
             case 6: //Mining
-                render16b(23,32,80,0,0,0xFFC8C8DF); // iron ore
-                render16b(23,52,80,0,0,0xFFB9E8E5); // gold ore
-                render16b(23,72,80,0,0,0xFFDE98DF); // gem ore
-                renderb(41,38,88,152,0,0xFFC8C8DF); // Iron ore item
-                renderb(41,58,88,152,0,0xFFB9E8E5); // Gold ore item
+                render16b(23,32,80,0,0,ironColor); // iron ore
+                render16b(23,52,80,0,0,goldColor); // gold ore
+                render16b(23,72,80,0,0,gemColor); // gem ore
+                renderb(41,38,88,152,0,ironColor); // Iron ore item
+                renderb(41,58,88,152,0,goldColor); // Gold ore item
                 render(41,78,112,152,0); // Gem item
                 drawText(">",104,74);
                 drawText(">",104,114);
                 drawText(">",104,154);
                 render16(60,32,112,128,0); // Furnace
                 render16(60,52,112,128,0); // Furnace
-                render16(60,72,64,128,0); // Anvil
+                render16(60,72,240,128,0); // Enchanter
                 drawText(">",160,74);
                 drawText(">",160,114);
                 drawText(">",160,154);
-                renderb(88,36,96,152,0,0xFFC8C8DF); // Iron ingot item
-                renderb(88,56,96,152,0,0xFFB9E8E5); // Gold ingot item
-                renderb(88,76,152,144,0,0xFFB9E8E5); // Gem Pickaxe
+                renderb(88,36,96,152,0,ironColor); // Iron ingot item
+                renderb(88,56,96,152,0,goldColor); // Gold ingot item
+                renderb(88,76,152,144,0,goldColor); // Gem Pickaxe
                 drawText(">",200,74);
                 drawText(">",200,114);
                 render16(106,32,64,128,0); // Anvil

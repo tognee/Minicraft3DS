@@ -15,5 +15,7 @@ void createAndValidateTopMap(int w, int h, u8 * map, u8 * data);
 void createTopMap(int w, int h, u8 * map, u8 * data);
 void createAndValidateUndergroundMap(int w, int h,int depthLevel, u8 * map, u8 * data);
 void createUndergroundMap(int w, int h,int depthLevel, u8 * map, u8 * data);
+void createAndValidateDungeonMap(int w, int h, u8 * map, u8 * data);
+void createDungeonMap(int w, int h, u8 * map, u8 * data);
 void createAndValidateSkyMap(int w, int h, u8 * map, u8 * data);
 void createSkyMap(int w, int h, u8 * map, u8 * data);

@@ -100,6 +100,21 @@ void createAndValidateUndergroundMap(int w, int h,int depthLevel, u8 * map, u8 *
 		return;
 	} while (true);
 }
+
+void createAndValidateDungeonMap(int w, int h, u8 * map, u8 * data) {
+	do {
+		createDungeonMap(w, h, map, data);
+        
+		int count[256]={[0 ... 255] = 0};
+        int i = 0;
+        for (i = 0; i < w * h; ++i)count[map[i] & 0xff]++;
+		if (count[TILE_DUNGEON_WALL & 0xff] < 100) continue;
+		if (count[TILE_DUNGEON_FLOOR & 0xff] < 100) continue;
+            
+		return;
+	} while (true);
+}
+
 void createAndValidateSkyMap(int w, int h, u8 * map, u8 * data) {
 	do {
 		createSkyMap(w, h, map, data);
@@ -341,63 +356,207 @@ void createUndergroundMap(int w, int h,int depthLevel, u8 * map, u8 * data) {
         free(noise2);
         
 }
-	void createSkyMap(int w, int h, u8 * map, u8 * data) {
-		double* noise1 = Noise(w, h, 8);
-		double* noise2 = Noise(w, h, 8);
-		int x, y;
-		for(x = 0; x < w; ++x){
-            for(y = 0; y < w; ++y){
-                int i = x + y * w;
 
-				double val = fabs(noise1[i] - noise2[i]) * 3 - 2;
-
-				double xd = x / (w - 1.0) * 2 - 1;
-				double yd = y / (h - 1.0) * 2 - 1;
-				if (xd < 0) xd = -xd;
-				if (yd < 0) yd = -yd;
-				double dist = xd >= yd ? xd : yd;
-				dist = dist * dist * dist * dist;
-				dist = dist * dist * dist * dist;
-				val = -val * 1 - 2.2;
-				val = val + 1 - dist * 20;
-                
-				if (val < -0.25) {
-					map[i] = -1; // render nothing
+void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
+	int tries;
+	
+	for(tries=0; tries<100; ++tries) {
+		int x = 5+(rand()%(w-10));
+		int y = 5+(rand()%(h-10));
+		int xr;
+		int yr;
+		int wr = 10+(rand()%11);
+		int hr = 10+(rand()&11);
+		int xp;
+		int yp;
+		int i;
+		
+		if(x+wr > w-5) wr = (w-5) - x;
+		if(y+hr > h-5) hr = (h-5) - y;
+		
+		//check instersection
+		bool allowed = true;
+		for(xr = x; xr < x+wr; ++xr) {
+			for(yr = y; yr < y+hr; ++yr) {
+				i = xr + yr * w;
+				
+				//255 for paths so rooms can overlap paths
+				if(map[i]!=TILE_DUNGEON_WALL && map[i]!=255) {
+					allowed = false;
+					break;
+				}
+			}
+			if(!allowed) break;
+		}
+		if(!allowed) continue;
+		
+		//create room
+		for(xr = x; xr < x+wr; ++xr) {
+			for(yr = y; yr < y+hr; ++yr) {
+				i = xr + yr * w;
+				
+				map[i] = TILE_DUNGEON_FLOOR;
+			}
+		}
+		
+		//Create path back to existing stuff
+		xp = x;
+		yp = y;
+		i = xp + yp * w;
+		bool checkForFloor = false;
+		bool xFirst = (rand()%2)==0;
+		while((checkForFloor && (map[i]!=TILE_DUNGEON_FLOOR && map[i]!=255)) || (!checkForFloor && (map[i]==TILE_DUNGEON_FLOOR || map[i]==255))) {
+			if(checkForFloor) {
+				//TODO check for dungeon entrance: if(map[i]==TILE_DUNGEON_ENTRANCE) break;
+				
+				//make connection
+				map[i] = 255;
+			}
+			
+			//move
+			if(xFirst) {
+				if(xp > w/2) --xp;
+				else if(xp < w/2) ++xp;
+				else if(yp > h/2) --yp;
+				else if(yp < h/2) ++yp;
+				else break;
+			} else {
+				if(yp > h/2) --yp;
+				else if(yp < h/2) ++yp;
+				else if(xp > w/2) --xp;
+				else if(xp < w/2) ++xp;
+				else break;
+			}
+			
+			i = xp + yp * w;
+			
+			//search for end of current room
+			if(!checkForFloor && (map[i]!=TILE_DUNGEON_FLOOR && map[i]!=255)) checkForFloor = true;
+		}
+		
+		//dekorate room
+		bool lava = (rand()%4)==0;
+		bool pillars = (rand()%4)==0;
+		for(xr = x; xr < x+wr; ++xr) {
+			for(yr = y; yr < y+hr; ++yr) {
+				i = xr + yr * w;
+				
+				if(lava && xr > x+1 && xr < x+wr-2 && yr > y+1 && yr < y+hr-2) {
+					map[i] = TILE_LAVA;
+				} else if(pillars && xr > x && xr < x+wr-1 && yr > y && yr < y+hr-1 && xr%2 == 0 && yr%2 == 0) {
+					map[i] = TILE_DUNGEON_WALL;
 				} else {
-					map[i] = TILE_CLOUD;
-				}
-            }
-        }
-        int i;
-        for (i = 0; i < w * h / 50; ++i) {
-			int xx = rand()%w;
-			int yy = rand()%h;
-			if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
-				if (map[xx + yy * w] == TILE_CLOUD) map[xx + yy * w] = TILE_CLOUDCACTUS;
-			}
-		}
-        int sCount, attempts = 0;
-		for (sCount = 0; sCount < 2;) {
-			int xx = rand()%w;
-			int yy = rand()%h;
-			if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
-				if (map[xx + yy * w] == TILE_CLOUD) 
-                {
-					map[xx + yy * w] = TILE_STAIRS_DOWN;
-					map[xx + (yy+1) * w] = TILE_CLOUD;
-					map[(xx+1) + yy * w] = TILE_CLOUD;
-					map[xx + (yy-1) * w] = TILE_CLOUD;
-					map[(xx-1) + yy * w] = TILE_CLOUD;
-					map[(xx-1) + (yy-1) * w] = TILE_CLOUD;
-					map[(xx+1) + (yy+1) * w] = TILE_CLOUD;
-					map[(xx+1) + (yy-1) * w] = TILE_CLOUD;
-					map[(xx-1) + (yy+1) * w] = TILE_CLOUD;
-					++sCount;
+					if(rand()%50==0) map[i] = TILE_IRONORE + (rand()%3);
 				}
 			}
-			if(attempts < w*h) ++attempts; else break;
 		}
-        free(noise1);
-        free(noise2);
-    }
+		
+		break;
+	}
+}
+
+void createDungeonMap(int w, int h, u8 * map, u8 * data) {
+	int i, x, y;
+	for(x = 0; x < w; ++x){
+		for(y = 0; y < w; ++y){
+			i = x + y * w;
+
+			//Startroom
+			if (x >= (w/2-5) && x <= (w/2+5) && y >= (h/2-5) && y <= (h/2+5) ) {
+				map[i] = TILE_DUNGEON_FLOOR;
+			} else {
+				map[i] = TILE_DUNGEON_WALL;
+			}
+			data[i] = 0;
+		}
+	}
+	
+	for(i = 0; i < 40; ++i) {
+		createDungeonRoom(w, h, map, data);
+	}
+	
+	//replace paths with actual dungeon floor
+	for(x = 0; x < w; ++x){
+		for(y = 0; y < w; ++y){
+			i = x + y * w;
+
+			if (map[i]==255) {
+				map[i] = TILE_DUNGEON_FLOOR;
+			}
+		}
+	}
+	
+	//create entrance
+	map[w/2 + h/2 * w] = TILE_DUNGEON_ENTRANCE;
+	
+	map[w/2+1 + h/2 * w] = TILE_DUNGEON_FLOOR;
+	map[w/2-1 + h/2 * w] = TILE_DUNGEON_FLOOR;
+	map[w/2 + (h/2+1) * w] = TILE_DUNGEON_FLOOR;
+	map[w/2 + (h/2-1) * w] = TILE_DUNGEON_FLOOR;
+	
+	map[w/2+1 + (h/2+1) * w] = TILE_DUNGEON_WALL;
+	map[w/2+1 + (h/2-1) * w] = TILE_DUNGEON_WALL;
+	map[w/2-1 + (h/2+1) * w] = TILE_DUNGEON_WALL;
+	map[w/2-1 + (h/2-1) * w] = TILE_DUNGEON_WALL;
+}
+
+void createSkyMap(int w, int h, u8 * map, u8 * data) {
+	double* noise1 = Noise(w, h, 8);
+	double* noise2 = Noise(w, h, 8);
+	int x, y;
+	for(x = 0; x < w; ++x){
+		for(y = 0; y < w; ++y){
+			int i = x + y * w;
+
+			double val = fabs(noise1[i] - noise2[i]) * 3 - 2;
+
+			double xd = x / (w - 1.0) * 2 - 1;
+			double yd = y / (h - 1.0) * 2 - 1;
+			if (xd < 0) xd = -xd;
+			if (yd < 0) yd = -yd;
+			double dist = xd >= yd ? xd : yd;
+			dist = dist * dist * dist * dist;
+			dist = dist * dist * dist * dist;
+			val = -val * 1 - 2.2;
+			val = val + 1 - dist * 20;
+			
+			if (val < -0.25) {
+				map[i] = -1; // render nothing
+			} else {
+				map[i] = TILE_CLOUD;
+			}
+		}
+	}
+	int i;
+	for (i = 0; i < w * h / 50; ++i) {
+		int xx = rand()%w;
+		int yy = rand()%h;
+		if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
+			if (map[xx + yy * w] == TILE_CLOUD) map[xx + yy * w] = TILE_CLOUDCACTUS;
+		}
+	}
+	int sCount, attempts = 0;
+	for (sCount = 0; sCount < 2;) {
+		int xx = rand()%w;
+		int yy = rand()%h;
+		if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
+			if (map[xx + yy * w] == TILE_CLOUD) 
+			{
+				map[xx + yy * w] = TILE_STAIRS_DOWN;
+				map[xx + (yy+1) * w] = TILE_CLOUD;
+				map[(xx+1) + yy * w] = TILE_CLOUD;
+				map[xx + (yy-1) * w] = TILE_CLOUD;
+				map[(xx-1) + yy * w] = TILE_CLOUD;
+				map[(xx-1) + (yy-1) * w] = TILE_CLOUD;
+				map[(xx+1) + (yy+1) * w] = TILE_CLOUD;
+				map[(xx+1) + (yy-1) * w] = TILE_CLOUD;
+				map[(xx-1) + (yy+1) * w] = TILE_CLOUD;
+				++sCount;
+			}
+		}
+		if(attempts < w*h) ++attempts; else break;
+	}
+	free(noise1);
+	free(noise2);
+}
 	

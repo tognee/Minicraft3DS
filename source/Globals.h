@@ -2,6 +2,7 @@
 #include <3ds.h>
 #include "SaveLoad.h"
 #include "Input.h"
+#include "MapGen.h"
 
 #include "icons2_png.h"
 #include "Font_png.h"
@@ -24,6 +25,7 @@
 #define MENU_LOADGAME 11
 #define MENU_SETTINGS_REBIND 12
 #define MENU_SETTINGS_TP 13
+#define MENU_DUNGEON 14
 
 #define TILE_NULL 255
 #define TILE_GRASS 0
@@ -48,7 +50,15 @@
 #define TILE_HARDROCK 19
 #define TILE_CLOUDCACTUS 20
 #define TILE_HOLE 21
+
 #define TILE_WOOD_WALL 22
+#define TILE_STONE_WALL 23
+#define TILE_IRON_WALL 24
+#define TILE_GOLD_WALL 25
+#define TILE_GEM_WALL 26
+#define TILE_DUNGEON_WALL 27
+#define TILE_DUNGEON_FLOOR 28
+#define TILE_DUNGEON_ENTRANCE 29
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
@@ -71,9 +81,9 @@ s16 mScrollX, mScrollY;
 sf2d_texture *icons;
 sf2d_texture *font;
 sf2d_texture *bottombg;
-sf2d_texture * minimap[5];
-u8 map[5][128*128];
-u8 data[5][128*128];
+sf2d_texture * minimap[6];
+u8 map[6][128*128];
+u8 data[6][128*128];
 
 u32 dirtColor[5];
 u32 grassColor;
@@ -82,6 +92,10 @@ u32 waterColor[2];
 u32 lavaColor[2];
 u32 rockColor[4];
 u32 woodColor;
+u32 ironColor;
+u32 goldColor;
+u32 gemColor;
+u32 dungeonColor[2];
 
 char currentFileName[256];
 extern u8 currentMenu;
@@ -96,6 +110,8 @@ Entity* curChestEntity;
 s16 curInvSel;
 bool quitGame;
 s8 currentSelection;
+
+u16 daytime;
 
 void tickTile(int x, int y);
 bool tileIsSolid(int tile, Entity * e);
@@ -130,5 +146,10 @@ void playerHurtTile(int tile, int xt, int yt, int damage, int dir);
 bool playerIntersectsEntity(Entity* e);
 void playerEntityInteract(Entity* e);
 void playerSetActiveItem(Item * item);
+
+void enterDungeon();
+void leaveDungeon();
+
+void initMinimapLevel(int level, bool loadUpWorld);
 
 void reloadColors();
