@@ -142,6 +142,22 @@ void render16s(s32 xp, s32 yp, u32 tile, u8 bits, u32 color) {
 			16, 16, scaleX, scaleY, color);
 }
 
+void render32(s32 xp, s32 yp, u32 xTile, u32 yTile, u8 bits) {
+	xp -= offsetX;
+	yp -= offsetY;
+	int scaleX = 2, scaleY = 2;
+	if ((bits & 1) > 0) {
+		scaleX = -2;
+		xp += 32;
+	}
+	if ((bits & 2) > 0) {
+		scaleY = -2;
+		yp += 32;
+	}
+	sf2d_draw_texture_part_scale(icons, xp << 1, yp << 1, xTile, yTile, 32, 32,
+			scaleX, scaleY);
+}
+
 void renderTitle(int x, int y) {
 	sf2d_draw_texture_part_scale(icons, (x - 26) << 1, y << 1, 0, 240, 104, 16,
 			2.0, 2.0); // MINICRAFT
@@ -392,11 +408,17 @@ bool tur = false;
 bool tdl = false;
 bool tdr = false;
 
-void renderDotsWithColor(int x, int y, u8 bits1, u8 bits2, u8 bits3, u8 bits4, u32 color) {
-	if(tu && tl) renderb(x, y, 0, 0, bits1, color);
-	if(tu && tr) renderb(x + 8, y, 8, 0, bits2, color);
-	if(td && tl) renderb(x, y + 8, 0, 8, bits3, color);
-	if(td && tr) renderb(x + 8, y + 8, 8, 8, bits4, color);
+void renderDots(int x, int y, u8 bits1, u8 bits2, u8 bits3, u8 bits4, u32 xTile, u32 yTile) {
+	//another speedhack for o3DS
+	if(tu && tl && tr && td) {
+		render16(x, y, xTile, yTile, bits1);
+		return;
+	}
+	
+	if(tu && tl) render(x, y, xTile, yTile, bits1);
+	if(tu && tr) render(x + 8, y, xTile+8, yTile, bits2);
+	if(td && tl) render(x, y + 8, xTile, yTile+8, bits3);
+	if(td && tr) render(x + 8, y + 8, xTile+8, yTile+8, bits4);
 }
 
 void resetSurrTiles() {
@@ -450,167 +472,194 @@ void renderTile(int i, int d, int x, int y) {
 		checkSurrTiles4(x >> 4, y >> 4, TILE_FLOWER);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_TREE);
 		
-		renderConnectedTile4(x, y, 112, 16, grassColor);
+		renderConnectedTile4(x, y, 256, 0);
 		break;
 	case TILE_TREE:
 		renderTile(TILE_GRASS, 0, x, y);
 		
 		checkSurrTiles8(x >> 4, y >> 4, TILE_TREE);
 		
-		render(x,   y,   0+((tu && tl && tul) ? 16 : 0), 16, 0);
-		render(x+8, y,   8+((tu && tr && tur) ? 16 : 0), 16, 0);
-		render(x,   y+8, 0+((td && tl && tdl) ? 16 : 0), 24, 0);
-		render(x+8, y+8, 8+((td && tr && tdr) ? 16 : 0), 24, 0);
+		render(x,   y,   256+((tu && tl && tul) ? 16 : 0), 48, 0);
+		render(x+8, y,   264+((tu && tr && tur) ? 16 : 0), 48, 0);
+		render(x,   y+8, 256+((td && tl && tdl) ? 16 : 0), 56, 0);
+		render(x+8, y+8, 264+((td && tr && tdr) ? 16 : 0), 56, 0);
 		
 		break;
 	case TILE_ROCK:
 		checkSurrTiles8(x >> 4, y >> 4, TILE_ROCK);
-		renderConnectedTile8(x, y, 32, 16, rockColor[0]);
+		renderConnectedTile8(x, y, 336, 64);
 		break;
 	case TILE_HARDROCK:
 		checkSurrTiles8(x >> 4, y >> 4, TILE_HARDROCK);
-		renderConnectedTile8(x, y, 32, 16, rockColor[2]);
+		renderConnectedTile8(x, y, 416, 64);
 		break;
 	case TILE_DIRT: // render dots.
 		if (currentLevel > 1)
-			render16b(x, y, 0, 0, 0, 0xFF383838);
+			render16(x, y, 320, 80, 0);
 		else
-			render16b(x, y, 0, 0, 0, 0xFF8F8FA8);
+			render16(x, y, 336, 80, 0);
 		break;
 	case TILE_SAND:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAND);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_CACTUS);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
 		
-		renderConnectedTile4(x, y, 112, 16, sandColor);
+		renderConnectedTile4(x, y, 320, 0);
 		
 		if (d > 0) {
-			render16b(x, y, 128, 0, 0, sandColor);
+			render16(x, y, 336, 48, 0);
 		}
 		break;
 	case TILE_WATER:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
 		
-		renderConnectedTile4(x, y, 176, 16, waterColor[0]);
+		renderConnectedTile4(x, y, 384, 0);
 		
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, waterColor[1]);
+		renderDots(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, 288, 64);
 		break;
 	case TILE_LAVA:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
 		
-		renderConnectedTile4(x, y, 176, 16, lavaColor[0]);
+		renderConnectedTile4(x, y, 448, 0);
 		
 		srand((tickCount + (x / 2 - y) * 4311) / 10);
-		renderDotsWithColor(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, lavaColor[1]);
+		renderDots(x, y, rand() & 3, rand() & 3, rand() & 3, rand() & 3, 304, 64);
 		break;
 	case TILE_HOLE:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_LAVA);
 		
-		renderConnectedTile4(x, y, 176, 16, 0xFF383838);
+		renderConnectedTile4(x, y, 256, 16);
 		break;
 	case TILE_CACTUS:
 		renderTile(TILE_SAND, 0, x, y);
-		render16(x, y, 48, 0, 0);
+		render16(x, y, 304, 48, 0);
 		break;
 	case TILE_FLOWER:
 		renderTile(TILE_GRASS, 0, x, y);
-		render16(x, y, 64, 0, getData(x >> 4, y >> 4));
+		render16(x, y, 320, 48, getData(x >> 4, y >> 4));
 		break;
 	case TILE_STAIRS_DOWN:
 		if (currentLevel == 0)
 			renderTile(TILE_CLOUD, 0, x, y);
-		render16(x, y, 96, 0, 0);
+		render16(x, y, 256, 64, 0);
 		break;
 	case TILE_STAIRS_UP:
-		render16(x, y, 112, 0, 0);
+		render16(x, y, 272, 64, 0);
 		break;
 	case TILE_IRONORE:
-		render16b(x, y, 80, 0, 0, ironColor);
+		render16(x, y, 464, 48, 0);
 		break;
 	case TILE_GOLDORE:
-		render16b(x, y, 80, 0, 0, goldColor);
+		render16(x, y, 480, 48, 0);
 		break;
 	case TILE_GEMORE:
-		render16b(x, y, 80, 0, 0, gemColor);
+		render16(x, y, 496, 48, 0);
 		break;
 	case TILE_CLOUD:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUD);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_STAIRS_DOWN);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_CLOUDCACTUS);
 		
-		renderConnectedTile4(x, y, 64, 32, 0xFFFFFFFF);
+		renderConnectedTile4(x, y, 320, 16);
 		break;
 	case TILE_CLOUDCACTUS:
 		renderTile(TILE_CLOUD, 0, x, y);
-		render16(x, y, 80, 0, 0);
+		render16(x, y, 496, 64, 0);
 		break;
 	case TILE_SAPLING_TREE:
 		renderTile(TILE_GRASS, 0, x, y);
-		render16(x, y, 32, 0, 0);
+		render16(x, y, 288, 48, 0);
 		break;
 	case TILE_SAPLING_CACTUS:
 		renderTile(TILE_SAND, 0, x, y);
-		render16(x, y, 32, 0, 0);
+		render16(x, y, 288, 48, 0);
 		break;
 	case TILE_FARM:
-		render16(x, y, 144, 0, 0);
+		render16(x, y, 352, 48, 0);
 		break;
 	case TILE_WHEAT:
 		age = getData(x >> 4, y >> 4) / 20;
 		if (age > 5)
 			age = 5;
-		render16(x, y, 160 + (age << 4), 0, 0);
+		render16(x, y, 368 + (age << 4), 48, 0);
 		break;
 	case TILE_WOOD_WALL:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WOOD_WALL);
 		
-		renderConnectedTile4(x, y, 0, 32, woodColor);
+		renderConnectedTile4(x, y, 384, 16);
 		break;
 	case TILE_STONE_WALL:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_STONE_WALL);
 		
-		renderConnectedTile4(x, y, 128, 32, rockColor[0]);
+		renderConnectedTile4(x, y, 256, 80);
 		break;
 	case TILE_IRON_WALL:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_IRON_WALL);
 		
-		renderConnectedTile4(x, y, 128, 32, ironColor);
+		renderConnectedTile4(x, y, 448, 16);
 		break;
 	case TILE_GOLD_WALL:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_GOLD_WALL);
 		
-		renderConnectedTile4(x, y, 128, 32, goldColor);
+		renderConnectedTile4(x, y, 256, 32);
 		break;
 	case TILE_GEM_WALL:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_GEM_WALL);
 		
-		renderConnectedTile4(x, y, 128, 32, gemColor);
+		renderConnectedTile4(x, y, 320, 32);
 		break;
 	case TILE_DUNGEON_WALL:
 		checkSurrTiles8(x >> 4, y >> 4, TILE_DUNGEON_WALL);
 		
-		renderConnectedTile8(x, y, 128, 32, dungeonColor[0]);
+		renderConnectedTile8(x, y, 384, 32);
 		break;
 	case TILE_DUNGEON_FLOOR:
-		render16b(x, y, 208, 32, 0, dungeonColor[1]);
+		render16(x, y, 464, 32, 0);
 		break;
 	case TILE_DUNGEON_ENTRANCE:
-		render16b(x, y, 224 + (currentLevel==5 ? 16 : 0), 32, 0, dungeonColor[0]);
+		render16(x, y, 480 + (currentLevel==5 ? 16 : 0), 32, 0);
+		break;
+	case TILE_MAGIC_BARRIER:
+		renderTile(TILE_DUNGEON_FLOOR, 0, x, y);
+		render16(x, y, 320, 64, 0);
+		
+		//draw remaining pillar count
+		if((player.x - (x+8))*(player.x - (x+8)) + (player.y - (y+8))*(player.y - (y+8)) <= 24*24) {
+			x -= offsetX;
+			y -= offsetY;
+		
+			int data = 0;
+			int i = 0;
+			for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
+				Entity * e = &eManager.entities[currentLevel][i];
+			
+				if(e->type == ENTITY_MAGIC_PILLAR) {
+					++data;
+				}
+			}
+			
+			char currentCount[3];
+			sprintf(currentCount,"%d", data);
+			
+			drawSizedTextColor(currentCount, x+4 + 1, y+4 + 1, 2, dungeonColor[1]);
+			drawSizedTextColor(currentCount, x+4, y+4, 2, dungeonColor[0]);
+		}
+		
 		break;
 	}
 
 	resetSurrTiles();
 }
 
-void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile, u32 color) {
+void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile) {
 	//render complete tile in one piece to reduce strain(added for o3DS)
 	if (tl && tr && tu && td) {
-		render16b(x, y, xTile+48, yTile, 0, color);
+		render16(x, y, xTile+48, yTile, 0);
 		return;
 	}
 	
@@ -619,16 +668,16 @@ void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile, u32 color) {
 	int u = (tu ? 32 : 0);
 	int d = (td ? 32 : 0);
 	
-	renderb(x,   y,   xTile  +l+u, yTile, 0, color);
-	renderb(x+8, y,   xTile+8+r+u, yTile, 0, color);
-	renderb(x,   y+8, xTile  +l+d, yTile+8, 0, color);
-	renderb(x+8, y+8, xTile+8+r+d, yTile+8, 0, color);
+	render(x,   y,   xTile  +l+u, yTile, 0);
+	render(x+8, y,   xTile+8+r+u, yTile, 0);
+	render(x,   y+8, xTile  +l+d, yTile+8, 0);
+	render(x+8, y+8, xTile+8+r+d, yTile+8, 0);
 }
 
-void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile, u32 color) {
+void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile) {
 	//render complete tile in one piece to reduce strain(added for o3DS)
 	if (tl && tr && tu && td && tul && tur && tdl && tdr) {
-		render16b(x, y, xTile+64, yTile, 0, color);
+		render16(x, y, xTile+64, yTile, 0);
 		return;
 	}
 	
@@ -637,13 +686,15 @@ void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile, u32 color) {
 	int u = (tu ? 32 : 0);
 	int d = (td ? 32 : 0);
 	
-	renderb(x,   y,   xTile  +l+u+((tl && tu && tul) ? 16 : 0), yTile, 0, color);
-	renderb(x+8, y,   xTile+8+r+u+((tr && tu && tur) ? 16 : 0), yTile, 0, color);
-	renderb(x,   y+8, xTile  +l+d+((tl && td && tdl) ? 16 : 0), yTile+8, 0, color);
-	renderb(x+8, y+8, xTile+8+r+d+((tr && td && tdr) ? 16 : 0), yTile+8, 0, color);
+	render(x,   y,   xTile  +l+u+((tl && tu && tul) ? 16 : 0), yTile, 0);
+	render(x+8, y,   xTile+8+r+u+((tr && tu && tur) ? 16 : 0), yTile, 0);
+	render(x,   y+8, xTile  +l+d+((tl && td && tdl) ? 16 : 0), yTile+8, 0);
+	render(x+8, y+8, xTile+8+r+d+((tr && td && tdr) ? 16 : 0), yTile+8, 0);
 }
 
 void renderZoomedMap() {
+	sf2d_draw_rectangle(0, 0, 320, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
+	
     int mx = mScrollX;
     int my = mScrollY;
     if(zoomLevel == 2) mx = 32;
@@ -1080,6 +1131,33 @@ void renderEntity(Entity* e, int x, int y) {
 			if (e->spark.age / 6 % 2 == 0)
 				return;
 		renderr(x, y, 200, 152, 0, e->spark.age * 0.0349);
+		break;
+	case ENTITY_DRAGON:
+		//TODO - render dragon(maybe with flying animation)
+		switch (e->dragon.dir) {
+		case 0: // down
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 256, 2);
+			break;
+		case 1: // up
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 256, 0);
+			break;
+		case 2: // left
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 288, 1);
+			break;
+		case 3: // right
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 288, 0);
+			break;
+		}
+		break;
+	case ENTITY_DRAGONPROJECTILE: 
+		if(e->dragonFire.type==0) {
+			renderr(x, y, 0, 320, 0, e->dragonFire.age * 0.349);
+		} else {
+			render(x, y, 8, 320 + (e->dragonFire.age/10)*8, 0);
+		}
+		break;
+	case ENTITY_MAGIC_PILLAR:
+		render16(x - 8, y - 8, 16, 320, 0);
 		break;
 	case ENTITY_ARROW:
 		if (e->arrow.age >= 200)

@@ -271,6 +271,28 @@ s8 checkPropButtons(){
     return -1;
 }
 
+bool menuHasMapLoaded = false;
+float mxscr = 400;
+float myscr = 400;
+float menuxa = 0;
+float menuya = 0;
+void initMenus() {
+	readFiles();
+	
+	if(worldFileCount>0) {
+		memset(&currentFileName, 0, 255); // reset currentFileName
+        sprintf(currentFileName,"%s.wld",fileNames[currentSelection]);
+		
+		initBGMap = 1;
+	} else {
+		initBGMap = 2;
+	}
+	
+	menuHasMapLoaded = true;
+	menuxa = (rand()%3 - 1) * 0.25;
+	menuya = (rand()%3 - 1) * 0.25;
+}
+
 Item median;
 void tickMenu(int menu){
     switch(menu){
@@ -663,6 +685,27 @@ void tickMenu(int menu){
             }
         break;
         case MENU_TITLE:
+			//Map BG
+			if(menuHasMapLoaded) {
+				mxscr += menuxa;
+				myscr += menuya;
+				
+				if (mxscr < 16) {
+					mxscr = 16;
+					menuxa = -menuxa;
+				} else if (mxscr > 1832) {
+					mxscr = 1832;
+					menuxa = -menuxa;
+				}
+				if (myscr < 16) {
+					myscr = 16;
+					menuya = -menuya;
+				} else if (myscr > 1792) {
+					myscr = 1792;
+					menuya = -menuya;
+				}
+			}
+		
 		    if (k_up.clicked){ --currentSelection; if(currentSelection < 0)currentSelection=4;}
 		    if (k_down.clicked){ ++currentSelection; if(currentSelection > 4)currentSelection=0;}
 		    
@@ -1140,7 +1183,7 @@ void renderMenu(int menu,int xscr,int yscr){
 		    sf2d_end_frame();
         break;  
 		
-        case MENU_CONTAINER:
+		case MENU_CONTAINER:
 		    sf2d_start_frame(GFX_TOP, GFX_LEFT);
                 if(currentLevel == 0){ 
                     sf2d_draw_texture_part_scale(minimap[1],(-xscr/3)-256,(-yscr/3)-32,0,0,128,128,12.5,7.5);
@@ -1148,18 +1191,18 @@ void renderMenu(int menu,int xscr,int yscr){
                 }
 	            offsetX = xscr;offsetY = yscr;
 		            renderMenuBackground(xscr,yscr);
-		        if (curChestEntity->entityFurniture.r == 1){ offsetX = 48;offsetY = 0;}
+		        if (curChestEntity->entityFurniture.r == 1){ offsetX = 48; offsetY = 0;}
 		        else {offsetX = 0;offsetY = 0;}
 		        
-		        renderFrame(1,1,14,14,0xFFFF1010);
+		        renderFrame(1,1,15,14,0xFFFF1010);
 				drawTextColor("Chest",24+1,14+1,0xFF000000);
 				drawTextColor("Chest",24,14,0xFF6FE2E2);
-		        renderItemList(curChestEntity->entityFurniture.inv,1,1,14,14,
+		        renderItemList(curChestEntity->entityFurniture.inv,1,1,15,14,
                 curChestEntity->entityFurniture.r == 0 ? curInvSel : -curChestEntity->entityFurniture.oSel - 1);
-		        renderFrame(15,1,28,14,0xFFFF1010);
-				drawTextColor("Inventory",248+1,14+1,0xFF000000);
-				drawTextColor("Inventory",248,14,0xFF6FE2E2);
-		        renderItemList(player.p.inv,15,1,28,14,
+		        renderFrame(16,1,30,14,0xFFFF1010);
+				drawTextColor("Inventory",264+1,14+1,0xFF000000);
+				drawTextColor("Inventory",264,14,0xFF6FE2E2);
+		        renderItemList(player.p.inv,16,1,30,14,
                 curChestEntity->entityFurniture.r == 1 ? curInvSel : -curChestEntity->entityFurniture.oSel - 1);
 		        offsetX = 0;offsetY = 0;
 		    sf2d_end_frame();
@@ -1296,6 +1339,14 @@ void renderMenu(int menu,int xscr,int yscr){
             /* Top Screen */
 		    sf2d_start_frame(GFX_TOP, GFX_LEFT);
 				sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
+				//map BG
+				if(menuHasMapLoaded) {
+					offsetX = (int) mxscr; offsetY = (int) myscr;
+						renderBackground((int) mxscr, (int) myscr);
+					offsetX = 0; offsetY = 0;
+					
+					sf2d_draw_rectangle(0, 0, 400, 240, 0xAA0C0C0C); //You might think "real" black would be better, but it actually looks better that way
+				}
 			
 		        renderTitle(76,16);
 		    
@@ -1303,6 +1354,7 @@ void renderMenu(int menu,int xscr,int yscr){
                     char* msg = options[i];
                     u32 color = 0xFF7F7F7F;
                     if(i == currentSelection) color = 0xFFFFFFFF;
+					drawSizedTextColor(msg,((200 - (strlen(msg) * 8))/2) + 1, (((8 + i) * 20 - 50) >> 1) + 1,2.0, 0xFF000000);   
                     drawSizedTextColor(msg,(200 - (strlen(msg) * 8))/2, ((8 + i) * 20 - 50) >> 1,2.0, color);    
                 }
                 
@@ -1312,34 +1364,18 @@ void renderMenu(int menu,int xscr,int yscr){
             /* Bottom Screen */
 		    sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);	
 				sf2d_draw_rectangle(0, 0, 320, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
+				//map BG
+				if(menuHasMapLoaded) {
+					offsetX = (int) mxscr + 20; offsetY = (int) myscr + 120;
+						renderBackground((int) mxscr + 20, (int) myscr + 120);
+					offsetX = 0; offsetY = 0;
+					
+					sf2d_draw_rectangle(0, 0, 320, 240, 0xAA0C0C0C); //You might think "real" black would be better, but it actually looks better that way
+				}
 			
 			  int startX = 0, startY = 0;// relative coordinates ftw
 		        switch(currentSelection){
                     case 0: // "Start Game"
-                        startX = 20;startY = 50;
-                        render16(startX,startY+12,0,128,0);//Player(Carrying)
-                        render16(startX,startY,128,128,0);//Workbench
-                        startX = 120;startY = 20;
-						menuRenderTilePit(startX,startY,176,16,waterColor[0]);// water pit
-						renderc  (startX+8,startY+12,48,160,16,8,0);//Waves
-                        renderc  (startX+8,startY+8,0,112,16,8,0);//Player (Top-Half)
-                        startX = 110;startY = 76;
-                        render16 (startX,startY,48,112,0);//Player
-                        renderc  (startX+12,startY,40,160,8,16,0);//Slash
-                        render   (startX+14,startY+4,152,144,0);//Pickaxe
-                        render16b(startX+18,startY,80,0,0,0xFFAEC6DC);//Iron ore
-                        startX = 40;startY = 90;
-                        render16b (startX,startY,128,112,0,0xFFADFFAD);//Slime
-                        render16 (startX+18,startY,48,112,1);//Player (Mirrored)
-                        renderc  (startX+14,startY,32,160,8,16,0);//Slash
-                        render   (startX+12,startY+4,104,144,1);//Sword
-                        startX = 64;startY = 40;
-                        menuRenderTilePit(startX,startY,112,16,grassColor);// grass pit
-                        render16 (startX+8,startY+4,0,16,0);//Tree
-                        render   (startX+1,startY+14,80,152,0);// Apple
-                        render16 (startX+9,startY+18,16,112,0);//Player
-                        renderc  (startX+9,startY+14,16,160,16,8,0);//Slash
-                        drawTextColor("Play minicraft",24,24,0xFF7FFFFF);
                         break;
                     case 1: // "How To Play"
                         startX = 72;startY = 54;
@@ -1356,7 +1392,6 @@ void renderMenu(int menu,int xscr,int yscr){
                         startX = 89;startY = 54;
                         render16(startX+16,startY,48,112,0);//Player
                         render16(startX,startY,160,208,0);//C-PAD right
-                        
                         drawTextColor("Learn the basics",64,24,0xFF7FFFFF);
                         break;
                     case 2: // "Settings"

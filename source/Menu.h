@@ -3,6 +3,8 @@
 #include "MenuTutorial.h"
 #include "texturepack.h"
 
+void initMenus();
+
 void renderMenu(int menu,int xscr,int yscr);
 void tickMenu(int menu);
 

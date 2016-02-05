@@ -14,6 +14,7 @@ s16 calculateImportantEntites(EntityManager * eManager, int level){
             case ENTITY_FURNITURE:
 			case ENTITY_PASSIVE:
 			case ENTITY_GLOWWORM:
+			case ENTITY_DRAGON:
                 count++;
                 break;
         }
@@ -32,6 +33,7 @@ bool entityIsImportant(Entity * e){
         case ENTITY_FURNITURE:
 		case ENTITY_PASSIVE:
 		case ENTITY_GLOWWORM:
+		case ENTITY_DRAGON:
             return true;
         default:
             return false;
@@ -102,6 +104,9 @@ void saveCurrentWorld(char * filename, EntityManager * eManager, Entity * player
 					fwrite(&eManager->entities[i][j].passive.health, sizeof(s16), 1, file);
                     fwrite(&eManager->entities[i][j].passive.mtype, sizeof(u8), 1, file);
                     break;
+				case ENTITY_DRAGON:
+                    fwrite(&eManager->entities[i][j].dragon.health, sizeof(s16), 1, file);
+                    break;
             }
         }
     }
@@ -112,6 +117,8 @@ void saveCurrentWorld(char * filename, EntityManager * eManager, Entity * player
     fwrite(mapData, sizeof(u8), 128*128*5, file); // Map Tile Data (Damage done to trees/rocks, age of wheat & saplings, etc). 80KB
 	
 	fwrite(&daytime, sizeof(u16), 1, file);
+	
+	fwrite(minimapData, sizeof(u8), 128*128, file); // Minimap, visibility data 16KB
     
     fclose(file);
 }
@@ -311,6 +318,23 @@ int loadWorld(char * filename, EntityManager * eManager, Entity * player, u8 * m
 							eManager->entities[i][j].glowworm.randWalkTime = 0;
 							eManager->entities[i][j].glowworm.waitTime = 0;
 							break;
+						case ENTITY_DRAGON:
+                            fread(&eManager->entities[i][j].dragon.health, sizeof(s16), 1, file);
+                            eManager->entities[i][j].level = i;
+                            eManager->entities[i][j].hurtTime = 0;
+                            eManager->entities[i][j].xKnockback = 0;
+                            eManager->entities[i][j].yKnockback = 0;
+                            eManager->entities[i][j].dragon.dir = 0;
+                            eManager->entities[i][j].dragon.attackDelay = 0;
+                            eManager->entities[i][j].dragon.attackTime = 0;
+                            eManager->entities[i][j].dragon.attackType = 0;
+							eManager->entities[i][j].dragon.animTimer = 0;
+                            eManager->entities[i][j].dragon.xa = 0;
+                            eManager->entities[i][j].dragon.ya = 0;
+                            eManager->entities[i][j].xr = 8;
+                            eManager->entities[i][j].yr = 8;
+                            eManager->entities[i][j].canPass = true;
+                            break;
                     }
                 }
             }
@@ -321,6 +345,8 @@ int loadWorld(char * filename, EntityManager * eManager, Entity * player, u8 * m
 			//set to startvalue incase file is old and doesn't contain saved time
 			daytime = 6001;
 			fread(&daytime, sizeof(u16), 1, file);
+			
+			fread(minimapData, sizeof(u8), 128*128, file);
 			
             fclose(file);
             return 0;

@@ -181,6 +181,8 @@ char* getItemName(int itemID, int countLevel){
 		case ITEM_BONE: sprintf(currentName,"%d Bone", countLevel); return currentName;
 		case ITEM_DUNGEON_KEY: sprintf(currentName,"%d Dungeon Key", countLevel); return currentName;
 		case ITEM_WIZARD_SUMMON: sprintf(currentName,"%d Wizard Summon", countLevel); return currentName;
+		case ITEM_DRAGON_EGG: sprintf(currentName,"%d Dragon Egg", countLevel); return currentName;
+		case ITEM_DRAGON_SCALE: sprintf(currentName,"%d Dragon Scale", countLevel); return currentName;
 		case TOOL_BUCKET:
 			switch(countLevel){
                 case 1: return "Water Bucket";
@@ -285,6 +287,8 @@ char* getBasicItemName(int itemID, int countLevel){
 		case ITEM_BONE: return "Bone";
 		case ITEM_DUNGEON_KEY: return "Dungeon Key";
 		case ITEM_WIZARD_SUMMON: return "Wizard Summon";
+		case ITEM_DRAGON_EGG: return "%d Dragon Egg";
+		case ITEM_DRAGON_SCALE: return "%d Dragon Scale";
 		case TOOL_BUCKET:
 			switch(countLevel){
                 case 1: return "Water Bucket";

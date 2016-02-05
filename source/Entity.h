@@ -19,6 +19,10 @@
 #define ENTITY_KNIGHT 13
 #define ENTITY_GLOWWORM 14
 
+#define ENTITY_DRAGON 15
+#define ENTITY_DRAGONPROJECTILE 16
+#define ENTITY_MAGIC_PILLAR 17
+
 typedef struct Entity Entity;
 
 typedef struct {
@@ -110,6 +114,15 @@ typedef struct {
 } AirWizard;
 
 typedef struct {
+    Entity* parent;
+    s16 age;
+    float xa;
+    float ya;
+    float xx;
+    float yy;
+} Spark;
+
+typedef struct {
 	Entity* parent;
 	s16 age;
 	s16 itemID;
@@ -118,13 +131,27 @@ typedef struct {
 } Arrow;
 
 typedef struct {
+    s8 xa;
+    s8 ya;
+    s16 health;
+    s8 randWalkTime;
+    s8 walkDist;
+    s8 dir;
+	int attackDelay;
+	int attackTime;
+	int attackType;
+	int animTimer;
+} Dragon;
+
+typedef struct {
     Entity* parent;
+	u8 type;
     s16 age;
     float xa;
     float ya;
     float xx;
     float yy;
-} Spark;
+} DragonFire;
 
 typedef struct {
     s8 xa;
@@ -171,6 +198,8 @@ struct Entity {
         Spark spark;
 		Arrow arrow;
 		Glowworm glowworm;
+		Dragon dragon;
+		DragonFire dragonFire;
         TextParticleEntity textParticle;
         SmashParticleEntity smashParticle;
     };
@@ -178,7 +207,6 @@ struct Entity {
 
 typedef struct {
     Entity entities[6][1000];
-    Entity wizardSparks[120];
     s16 lastSlot[6];
     Inventory invs[301];//1 for the player, 300 for chests.
     s16 nextInv;
@@ -199,6 +227,9 @@ Entity newKnightEntity(int lvl, int x, int y, int level);
 Entity newSlimeEntity(int lvl, int x, int y, int level);
 Entity newAirWizardEntity(int x, int y, int level);
 Entity newSparkEntity(Entity* parent, float xa, float ya);
+Entity newDragonEntity(int x, int y, int level);
+Entity newDragonFireEntity(Entity* parent, u8 type, int x, int y, float xa, float ya);
+Entity newMagicPillarEntity(int x, int y, int level);
 Entity newTextParticleEntity(char * str, u32 color, int xa, int ya, int level);
 Entity newSmashParticleEntity(int xa, int ya, int level);
 Entity newArrowEntity(Entity* parent, int itemID, s8 xa, s8 ya, int level);

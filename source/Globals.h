@@ -59,6 +59,7 @@
 #define TILE_DUNGEON_WALL 27
 #define TILE_DUNGEON_FLOOR 28
 #define TILE_DUNGEON_ENTRANCE 29
+#define TILE_MAGIC_BARRIER 30
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
@@ -84,6 +85,7 @@ sf2d_texture *bottombg;
 sf2d_texture * minimap[6];
 u8 map[6][128*128];
 u8 data[6][128*128];
+u8 minimapData[128*128];
 
 u32 dirtColor[5];
 u32 grassColor;
@@ -101,6 +103,7 @@ char currentFileName[256];
 extern u8 currentMenu;
 extern char fpsstr[];
 u8 initGame;
+u8 initBGMap;
 Item noItem;
 int airWizardHealthDisplay;
 s16 awX, awY;
@@ -150,6 +153,10 @@ void playerSetActiveItem(Item * item);
 void enterDungeon();
 void leaveDungeon();
 
+void setMinimapVisible(int level, int x, int y, bool visible);
+bool getMinimapVisible(int level, int x, int y);
+u32 getMinimapColor(int level, int x, int y);
 void initMinimapLevel(int level, bool loadUpWorld);
+void updateLevel1Map();
 
 void reloadColors();

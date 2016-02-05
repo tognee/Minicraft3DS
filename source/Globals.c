@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-char versionText[34] = "Version 1.2";
+char versionText[34] = "Version 1.2.1";
 char fpsstr[34];
 u8 currentMenu = 0;
 
@@ -199,7 +199,7 @@ void tickTouchMap(){
 }
 
 void tickTouchQuickSelect() {
-	if (currentMenu == 0) {
+	if (currentMenu == 0 && !shouldRenderMap) {
 		int i = 0;
 		Inventory * inv = player.p.inv;
 		
@@ -299,6 +299,17 @@ void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
                 return;
             }
 		break;
+		case ENTITY_DRAGON: 
+            e->dragon.health -= damage; 
+            if(e->dragon.health < 1){ 
+				addItemsToWorld(newItem(ITEM_DRAGON_EGG,1),e->x+8, e->y+8, 1);
+				addItemsToWorld(newItem(ITEM_DRAGON_SCALE,1),e->x+8, e->y+8, (rand()%11) + 10);
+                removeEntityFromList(e,e->level,&eManager);
+                playSound(snd_bossdeath);
+                player.p.score += 1000;
+                return;
+            }
+        break;
     }
 	
 	switch(dir){
@@ -368,9 +379,14 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
 				case ENTITY_KNIGHT:
                 case ENTITY_SLIME:
                 case ENTITY_AIRWIZARD:
+				case ENTITY_DRAGON:
                     if(playerUseEnergy(4-item->countLevel)) hurtEntity(e,(item->countLevel + 1) * 2 + (rand()%4),dir,0xFF0000FF);  
                     else hurtEntity(e,1+rand()%3,dir,0xFF0000FF);  
                 return true;
+				
+				case ENTITY_MAGIC_PILLAR:
+					removeEntityFromList(e, e->level, &eManager);
+				return true;
             } break;
         case TOOL_SWORD:
             switch(e->type){
@@ -380,9 +396,14 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
 				case ENTITY_KNIGHT:
                 case ENTITY_SLIME:
                 case ENTITY_AIRWIZARD:
+				case ENTITY_DRAGON:
                     if(playerUseEnergy(4-item->countLevel)) hurtEntity(e,(item->countLevel+1)*3+(rand()%(2+item->countLevel*item->countLevel*2)),dir,0xFF0000FF);   
                     else hurtEntity(e,1+rand()%3,dir,0xFF0000FF);     
                 return true;
+				
+				case ENTITY_MAGIC_PILLAR:
+					removeEntityFromList(e, e->level, &eManager);
+				return true;
             } break;
         case ITEM_NULL:
             switch(e->type){
@@ -392,8 +413,13 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
 				case ENTITY_KNIGHT:
                 case ENTITY_SLIME:
                 case ENTITY_AIRWIZARD:
+				case ENTITY_DRAGON:
                     hurtEntity(e,1+rand()%3,dir,0xFF0000FF);
                 return true;
+				
+				case ENTITY_MAGIC_PILLAR:
+					removeEntityFromList(e, e->level, &eManager);
+				return true;
             } break;
     }
     return false;
@@ -505,6 +531,12 @@ void EntityVsEntity(Entity* e1, Entity* e2){
         case ENTITY_SPARK:
             if(e2 != e1->spark.parent) hurtEntity(e2, 1, -1, 0xFFAF00FF);
         break;
+		case ENTITY_DRAGON:
+		    if(e2->type == ENTITY_PLAYER) hurtEntity(e2, 3, e1->dragon.dir, 0xFFAF00FF);
+        break;
+        case ENTITY_DRAGONPROJECTILE:
+            if(e2 != e1->dragonFire.parent) hurtEntity(e2, 1, -1, 0xFFAF00FF);
+        break;
 		case ENTITY_ARROW:
 			switch(e1->arrow.itemID) {
 			case ITEM_ARROW_WOOD: 
@@ -550,8 +582,10 @@ bool EntityBlocksEntity(Entity* e1, Entity* e2){
 				case ENTITY_KNIGHT:
                 case ENTITY_SLIME:
                 case ENTITY_AIRWIZARD:
+				case ENTITY_DRAGON:
                 case ENTITY_PLAYER:
 				case ENTITY_PASSIVE:
+				case ENTITY_MAGIC_PILLAR:
                     return true;
                 break;
             }
@@ -576,6 +610,7 @@ bool tileIsSolid(int tile, Entity * e){
 		case TILE_GOLD_WALL: 
 		case TILE_GEM_WALL: 
 		case TILE_DUNGEON_WALL: 
+		case TILE_MAGIC_BARRIER:
             return true;
 		case TILE_LAVA: 
 		case 255: 
@@ -616,6 +651,7 @@ u32 getTileColor(int tile){
 		case TILE_GEM_WALL: return SWAP_UINT32(gemColor);
 		case TILE_DUNGEON_WALL: return SWAP_UINT32(dungeonColor[0]);
 		case TILE_DUNGEON_FLOOR: return SWAP_UINT32(dungeonColor[1]);
+		case TILE_MAGIC_BARRIER: return SWAP_UINT32(dungeonColor[0]);
 		
         default: return 0x111111FF;
     }
@@ -966,6 +1002,18 @@ void tickTile(int x, int y){
 		case TILE_CLOUD:
 			if((rand()%24000)==0) setTile(TILE_CLOUDCACTUS,x,y);
 			break;
+		case TILE_MAGIC_BARRIER:
+			data = 0;
+			int i = 0;
+			for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
+				Entity * e = &eManager.entities[currentLevel][i];
+			
+				if(e->type == ENTITY_MAGIC_PILLAR) {
+					++data;
+				}
+			}
+			if(data==0) setTile(TILE_DUNGEON_FLOOR,x,y);
+			break;
     }
     
 }
@@ -1028,6 +1076,7 @@ void tickEntity(Entity* e){
     switch(e->type){
         case ENTITY_ITEM: tickEntityItem(e); return;
         case ENTITY_FURNITURE: return;
+		case ENTITY_MAGIC_PILLAR: return;
         case ENTITY_ZOMBIE: 
 		case ENTITY_SKELETON: 
 		case ENTITY_KNIGHT: 
@@ -1061,6 +1110,17 @@ void tickEntity(Entity* e){
 					
 					int aitemID = ITEM_ARROW_WOOD;
 					if(e->hostile.lvl >= 2) aitemID = ITEM_ARROW_STONE;
+					
+					//turn to player when attacking
+					int xd = player.x - e->x;
+					int yd = player.y - e->y;
+					if(xd*xd > yd*yd) {
+						if (xd < 0) e->hostile.dir = 2;
+						if (xd > 0) e->hostile.dir = 3;
+					} else {
+						if (yd < 0) e->hostile.dir = 1;
+						if (yd > 0) e->hostile.dir = 0;
+					}
 					
 					switch(e->hostile.dir) {
 					case 0:
@@ -1213,9 +1273,140 @@ void tickEntity(Entity* e){
 			    removeEntityFromList(e,e->level,&eManager);
             }
             return;
+		case ENTITY_DRAGON:
+			if (e->hurtTime > 0) e->hurtTime--;
+			
+			e->dragon.animTimer++;
+			if(e->dragon.animTimer>=20) {
+				e->dragon.animTimer = 0;
+			}
+			
+			//choose random attack
+			if (e->dragon.attackDelay > 0) {
+			    e->dragon.attackDelay--;
+			    if (e->dragon.attackDelay <= 0) {
+					e->wizard.attackType = rand()%2;
+				    e->wizard.attackTime = 121;
+				}
+				return;
+			}
+			
+			if (e->dragon.attackTime > 0) {
+			    e->dragon.attackTime--;
+				
+				//turn to player when attacking
+				int xd = player.x - e->x;
+				int yd = player.y - e->y;
+				if(xd*xd > yd*yd) {
+					if (xd < 0) e->dragon.dir = 2;
+					if (xd > 0) e->dragon.dir = 3;
+				} else {
+					if (yd < 0) e->dragon.dir = 1;
+					if (yd > 0) e->dragon.dir = 0;
+				}
+				
+				switch(e->dragon.attackType) {
+				case 0: //Firebreathing
+					if(e->dragon.attackTime%2 == 0) {
+						float dfdir = 0;
+						
+						if(e->dragon.dir==0) dfdir = 1 * 3.141592 / 2;
+						else if(e->dragon.dir==1) dfdir = 3 * 3.141592 / 2;
+						else if(e->dragon.dir==2) dfdir = 2 * 3.141592 / 2;
+						else if(e->dragon.dir==3) dfdir = 0 * 3.141592 / 2;
+						
+						dfdir += 0.03141592 * ((rand()%33) - 16);
+						
+						addEntityToList(newDragonFireEntity(e, e->dragon.attackType, e->x + cos(dfdir)*14, e->y + sin(dfdir)*14, cos(dfdir), sin(dfdir)), &eManager);
+					}
+				break;
+				case 1: //Firering
+					if(e->dragon.attackTime%20 == 0) {
+						int ai = 0;
+						for(ai = 0; ai < 16; ai++) {
+							float ddir = (3.141592 * 2 / 16.0) * ai;
+							float ddist = (140 - e->dragon.attackTime) / 2;
+							
+							addEntityToList(newDragonFireEntity(e, e->dragon.attackType, (e->x) + cos(ddir)*ddist, (e->y) + sin(ddir)*ddist, 0, 0), &eManager);
+						}
+					}
+				break;
+				}
+				
+				return;
+			}
+			
+			//TODO - movement copied from airwizard, adjust to better fit dragon
+			if (e->dragon.randWalkTime == 0) {
+			    int xd = player.x - e->x;
+			    int yd = player.y - e->y;
+			    int dist = xd * xd + yd * yd;
+			    if (dist > 64 * 64) {
+				    e->dragon.xa = 0;
+				    e->dragon.ya = 0;
+				    if (xd < 0) e->dragon.xa = -1; 
+				    if (xd > 0) e->dragon.xa = +1;
+				    if (yd < 0) e->dragon.ya = -1;
+				    if (yd > 0) e->dragon.ya = +1;
+			    } else if (dist < 16 * 16) {
+				    e->dragon.xa = 0;
+				    e->dragon.ya = 0;
+				    if (xd < 0) e->dragon.xa = +1; 
+				    if (xd > 0) e->dragon.xa = -1;
+				    if (yd < 0) e->dragon.ya = +1;
+				    if (yd > 0) e->dragon.ya = -1;
+                }
+		    }
+		    
+		    int dSpeed = (tickCount % 4) == 0 ? 0 : 1;
+		    if (!moveMob(e, e->dragon.xa * dSpeed, e->dragon.ya * dSpeed) || (rand()%120) == 0) {
+			    e->dragon.randWalkTime = 30;
+			    e->dragon.xa = ((rand()%3) - 1) * (rand()%2);
+			    e->dragon.ya = ((rand()%3) - 1) * (rand()%2);
+		    }
+		    
+		    if(e->dragon.xa != 0 || e->dragon.ya != 0){ 
+                e->dragon.walkDist++;
+            }
+		    
+		    if(e->dragon.xa < 0) e->dragon.dir = 2;
+		    else if(e->dragon.xa > 0) e->dragon.dir = 3;
+		    if(e->dragon.ya < 0) e->dragon.dir = 1;
+		    else if(e->dragon.ya > 0) e->dragon.dir = 0;
+		    
+		    //if (e->dragon.randWalkTime > 0) {
+			//    e->dragon.randWalkTime--;
+			//    if (e->dragon.randWalkTime == 0) {
+				    int xd = player.x - e->x;
+				    int yd = player.y - e->y;
+				    if (rand()%12 == 0 && xd * xd + yd * yd < 50 * 50) {
+					    if (e->dragon.attackDelay == 0 && e->dragon.attackTime == 0) e->dragon.attackDelay = 40;
+				    }
+			//    }
+		    //}
+			
+			return;
+		case ENTITY_DRAGONPROJECTILE: 
+            e->dragonFire.age++;
+		    if (e->dragonFire.age >= 30) {
+			    removeEntityFromList(e,e->level,&eManager);
+			    return;
+		    }
+		    e->dragonFire.xx += e->dragonFire.xa;
+		    e->dragonFire.yy += e->dragonFire.ya;
+		    e->x = (int) e->dragonFire.xx;
+		    e->y = (int) e->dragonFire.yy;
+		    
+            if(intersects(player, e->x + e->dragonFire.xa - e->xr, e->y + e->dragonFire.ya - e->yr, e->x + e->dragonFire.xa + e->xr, e->y + e->dragonFire.ya + e->yr)){
+                EntityVsEntity(e, &player);
+			    removeEntityFromList(e,e->level,&eManager);
+            }
+            return;
 		case ENTITY_ARROW: 
             e->arrow.age++;
 		    if (e->arrow.age >= 260 || !move(e, e->arrow.xa, e->arrow.ya)) {
+				//only drop arrows shot by player
+				if(e->arrow.parent->type == ENTITY_PLAYER) addItemsToWorld(newItem(e->arrow.itemID,1),e->x+4, e->y+4, 1);
 			    removeEntityFromList(e,e->level,&eManager);
 			    return;
 		    }
@@ -1355,7 +1546,7 @@ void setTile(int id, int x, int y){
     if(x < 0 || y < 0 || x > 128 || y > 128) return;
     map[currentLevel][x+y*128] = id;
 	data[currentLevel][x+y*128] = 0; //reset data(set again if needed, hopefully this breaks nothing)
-    sf2d_set_pixel(minimap[currentLevel], x, y, getTileColor(id));
+    sf2d_set_pixel(minimap[currentLevel], x, y, getMinimapColor(currentLevel,x,y));
 }
 int getData(int x, int y){
     if(x < 0 || y < 0 || x > 128 || y > 128) return -1;
@@ -1676,6 +1867,9 @@ void switchLevel(s8 change){
     else sf2d_set_clear_color(0xFF007F00); //sf2d_set_clear_color(RGBA8(0x00, 0x7F, 0x00, 0xFF));
 	
 	updateMusic(currentLevel, daytime);
+	
+	//for level 0 background
+	updateLevel1Map();
 }
 
 bool playerIntersectsEntity(Entity* e){
@@ -1918,6 +2112,20 @@ void tickPlayer(){
     
     if(isSwimming()) ++player.p.swimTimer;
     if(player.p.attackTimer > 0) --player.p.attackTimer;
+	
+	//TODO - maybe move to own function
+	//Update Minimap
+	int xp;
+	int yp;
+	for(xp = (player.x>>4)-5; xp<(player.x>>4)+5; ++xp) {
+		for(yp = (player.y>>4)-5; yp<(player.y>>4)+5; ++yp) {
+			if(xp>=0 && xp<128 && yp>=0 && yp<128) {
+				if(!getMinimapVisible(currentLevel,xp,yp)) {
+					setMinimapVisible(currentLevel,xp,yp,true);
+				}
+			}
+		}
+	}
 }
 
 bool isSwimming(){
@@ -1931,13 +2139,25 @@ void playerSetActiveItem(Item * item) {
 }
 
 void enterDungeon() {
-	currentLevel = 5;
-	createDungeonMap(128, 128, map[5], data[5]);
-	initMinimapLevel(5, false);
-	newSeed();
 	//reset Entities
 	(&eManager)->lastSlot[5] = 0;
 	(&eManager)->entities[5][0] = nullEntity;
+	
+	//create map
+	currentLevel = 5;
+	createDungeonMap(128, 128, map[5], data[5]);
+	
+	//reset minimap clear state
+	int xd,yd;
+	for(xd = 0; xd < 128; ++xd) {
+		for(yd = 0; yd < 128; ++yd) {
+			setMinimapVisible(5, xd, yd, false);
+		}
+	}
+	initMinimapLevel(5, false);
+	newSeed();
+	
+	//spawn new entities
 	trySpawn(500, 5);
 		
 	player.x = ((128/2) << 4) + 8;
@@ -1957,6 +2177,24 @@ void leaveDungeon() {
 	player.y = ((128/2) << 4) + 8;
 	
 	updateMusic(currentLevel, daytime);
+}
+
+void setMinimapVisible(int level, int x, int y, bool visible) {
+	if(visible) {
+		minimapData[x + y * 128] = minimapData[x + y * 128] | (1 << level);
+	} else {
+		minimapData[x + y * 128] = minimapData[x + y * 128] & (0xFF - (1 << level));
+	}
+	sf2d_set_pixel(minimap[level], x, y, getMinimapColor(level, x, y));
+}
+
+bool getMinimapVisible(int level, int x, int y) {
+	return (minimapData[x + y * 128] & (1 << level)) > 0;
+}
+
+u32 getMinimapColor(int level, int x, int y) {
+	if(getMinimapVisible(level, x, y) || (currentLevel==0 && level==1)) return getTileColor(map[level][x + y * 128]);
+	else return getTileColor(map[level][x + y * 128]) & 0xFFFFFF00;
 }
 
 void initMinimapLevel(int level, bool loadUpWorld) {
@@ -2010,10 +2248,22 @@ void initMinimapLevel(int level, bool loadUpWorld) {
 			}
 
 			/* Minimaps */
-			sf2d_set_pixel(minimap[level], x, y, getTileColor(map[level][x + y * 128]));
+			sf2d_set_pixel(minimap[level], x, y, getMinimapColor(level, x, y));
 		}
 	}
 }
+
+void updateLevel1Map() {
+	int x;
+	int y;
+	
+	for (x = 0; x < 128; ++x) {
+		for (y = 0; y < 128; ++y) {
+			sf2d_set_pixel(minimap[1], x, y, getMinimapColor(1, x, y));
+		}
+	}
+}
+
 
 void reloadColors() {
 	dirtColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 0)); 

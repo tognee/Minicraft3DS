@@ -228,6 +228,60 @@ Entity newSparkEntity(Entity* parent, float xa, float ya){
     return e;
 }
 
+Entity newDragonEntity(int x, int y, int level) {
+	Entity e;
+	e.type = ENTITY_DRAGON;
+    e.level = level;
+    e.x = x;
+    e.y = y;
+    e.hurtTime = 0;
+    e.xKnockback = 0;
+    e.yKnockback = 0;
+    e.dragon.dir = 0;
+    e.dragon.health = 2000;
+	e.dragon.attackDelay = 0;
+	e.dragon.attackTime = 0;
+	e.dragon.attackType = 0;
+	e.dragon.animTimer = 0;
+    e.dragon.xa = 0;
+    e.dragon.ya = 0;
+    e.xr = 8;
+    e.yr = 8;
+    e.canPass = false;
+	return e;
+}
+
+Entity newDragonFireEntity(Entity* parent, u8 type, int x, int y, float xa, float ya) {
+	Entity e;
+    e.type = ENTITY_DRAGONPROJECTILE;
+	e.level = parent->level;
+    e.dragonFire.age = 0;
+	e.dragonFire.type = type;
+    e.dragonFire.parent = parent;
+    e.dragonFire.xa = xa;
+    e.dragonFire.ya = ya;
+    e.dragonFire.xx = x;
+    e.dragonFire.yy = y;
+	e.x = (int) x;
+	e.y = (int) y;
+    e.xr = 3;
+    e.yr = 3;
+    e.canPass = true;
+    return e;
+}
+
+Entity newMagicPillarEntity(int x, int y, int level){
+	Entity e;
+    e.type = ENTITY_MAGIC_PILLAR;
+	e.level = level;
+	e.x = x;
+	e.y = y;
+    e.xr = 3;
+    e.yr = 3;
+    e.canPass = false;
+    return e;
+}
+
 Entity newTextParticleEntity(char * str, u32 color, int x, int y, int level){
     Entity e;
     e.type = ENTITY_TEXTPARTICLE;

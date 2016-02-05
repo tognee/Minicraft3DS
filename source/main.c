@@ -13,6 +13,13 @@
 #include "Menu.h"
 #include "texturepack.h"
 
+void initMiniMapData() {
+	int i;
+	for(i = 0; i < 128 * 128; ++i) {
+		minimapData[i] = 0;
+	}
+}
+
 void initMiniMap(bool loadUpWorld) {
 	int i;
 	for (i = 0; i < 5; ++i) {
@@ -36,6 +43,8 @@ void setupGame(bool loadUpWorld) {
 	memset(&eManager, 0, sizeof(eManager));
 	sf2d_set_clear_color(0xFF6C6D82); //sf2d_set_clear_color(RGBA8(0x82, 0x6D, 0x6C, 0xFF));
 
+	initMiniMapData();
+	
 	if (!loadUpWorld) {
 		initNewMap();
 		initPlayer();
@@ -60,6 +69,25 @@ void setupGame(bool loadUpWorld) {
 	zoomLevel = 2;
     sprintf(mapText,"x%d",zoomLevel);
 	initGame = 0;
+}
+
+void setupBGMap(bool loadUpWorld) {
+	// Reset entity manager.
+	memset(&eManager, 0, sizeof(eManager));
+	sf2d_set_clear_color(0xFF6C6D82); //sf2d_set_clear_color(RGBA8(0x82, 0x6D, 0x6C, 0xFF));
+	
+	if(!loadUpWorld) {
+		newSeed();
+		createAndValidateTopMap(128, 128, map[1], data[1]);
+	} else {
+		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
+	}
+	
+	// Reset entity manager.
+	memset(&eManager, 0, sizeof(eManager));
+	sf2d_set_clear_color(0xFF6C6D82); //sf2d_set_clear_color(RGBA8(0x82, 0x6D, 0x6C, 0xFF));
+	
+	initBGMap = 0;
 }
 
 int xscr = 0, yscr = 0;
@@ -147,6 +175,7 @@ int main() {
 	csndInit();
 	noItem = newItem(ITEM_NULL, 0);
 	
+	initMenus();
 	currentMenu = MENU_TITLE;
 	currentSelection = 0;
 	quitGame = false;
@@ -163,8 +192,7 @@ int main() {
 
 	int i;
 	for (i = 0; i < 6; ++i) {
-		minimap[i] = sf2d_create_texture(128, 128, TEXFMT_RGBA8,
-				SF2D_PLACE_RAM);
+		minimap[i] = sf2d_create_texture(128, 128, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 		sf2d_texture_tile32(minimap[i]);
 	}
 	
@@ -223,6 +251,7 @@ int main() {
 		if (quitGame) break;
 
 		if (initGame > 0) setupGame(initGame == 1 ? true : false);
+		if (initBGMap > 0) setupBGMap(initBGMap == 1 ? true : false);
 
 		if (currentMenu == 0) {
 			tick();

@@ -357,12 +357,12 @@ void createUndergroundMap(int w, int h,int depthLevel, u8 * map, u8 * data) {
         
 }
 
-void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
+void createDungeonRoom(int w, int h, bool dragon, u8 * map, u8 * data) {
 	int tries;
 	
 	for(tries=0; tries<100; ++tries) {
-		int x = 5+(rand()%(w-10));
-		int y = 5+(rand()%(h-10));
+		int x = 5+(rand()%(w-10 -10));
+		int y = 5+(rand()%(h-10 -10));
 		int xr;
 		int yr;
 		int wr = 10+(rand()%11);
@@ -371,13 +371,21 @@ void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
 		int yp;
 		int i;
 		
+		//create Dragonroom
+		if(dragon) {
+			wr = 20;
+			hr = 20;
+			x = 5 + (rand()%2)*(w-5*2-wr);
+			y = 5 + (rand()%2)*(h-5*2-hr);
+		}
+		
 		if(x+wr > w-5) wr = (w-5) - x;
 		if(y+hr > h-5) hr = (h-5) - y;
 		
 		//check instersection
 		bool allowed = true;
-		for(xr = x; xr < x+wr; ++xr) {
-			for(yr = y; yr < y+hr; ++yr) {
+		for(xr = x-1; xr < x+wr+1; ++xr) {
+			for(yr = y-1; yr < y+hr+1; ++yr) {
 				i = xr + yr * w;
 				
 				//255 for paths so rooms can overlap paths
@@ -400,15 +408,13 @@ void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
 		}
 		
 		//Create path back to existing stuff
-		xp = x;
-		yp = y;
+		xp = x + wr/2;
+		yp = y + hr/2;
 		i = xp + yp * w;
 		bool checkForFloor = false;
 		bool xFirst = (rand()%2)==0;
 		while((checkForFloor && (map[i]!=TILE_DUNGEON_FLOOR && map[i]!=255)) || (!checkForFloor && (map[i]==TILE_DUNGEON_FLOOR || map[i]==255))) {
 			if(checkForFloor) {
-				//TODO check for dungeon entrance: if(map[i]==TILE_DUNGEON_ENTRANCE) break;
-				
 				//make connection
 				map[i] = 255;
 			}
@@ -434,6 +440,23 @@ void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
 			if(!checkForFloor && (map[i]!=TILE_DUNGEON_FLOOR && map[i]!=255)) checkForFloor = true;
 		}
 		
+		//dekorate dragon room
+		if(dragon) {
+			for(xr = x; xr < x+wr; ++xr) {
+				for(yr = y; yr < y+hr; ++yr) {
+					i = xr + yr * w;
+					
+					if((xr==x+1 || xr==x+wr-2 || yr==y+1 || yr==y+hr-2) && (xr!=x && xr!=x+wr-1 && yr!=y && yr!=y+hr-1)) {
+						map[i] = TILE_MAGIC_BARRIER;
+					}
+				}
+			}
+			
+			//add Dragon Entity
+			addEntityToList(newDragonEntity((x+wr/2) << 4, (y+hr/2) << 4, 5), &eManager);
+			break;
+		}
+		
 		//dekorate room
 		bool lava = (rand()%4)==0;
 		bool pillars = (rand()%4)==0;
@@ -446,6 +469,23 @@ void createDungeonRoom(int w, int h, u8 * map, u8 * data) {
 				} else if(pillars && xr > x && xr < x+wr-1 && yr > y && yr < y+hr-1 && xr%2 == 0 && yr%2 == 0) {
 					map[i] = TILE_DUNGEON_WALL;
 				} else {
+					//add magic pillars for dragon barrier
+					if(xr==x+wr/2 && yr==y+hr/2) {
+						int pcount = 0;
+						int i = 0;
+						for (i = 0; i < eManager.lastSlot[5]; ++i) {
+							Entity * e = &eManager.entities[5][i];
+						
+							if(e->type == ENTITY_MAGIC_PILLAR) {
+								++pcount;
+							}
+						}
+						if(pcount<8) {
+							addEntityToList(newMagicPillarEntity((xr << 4) + 8, (yr << 4) + 8, 5), &eManager);
+						}
+						continue;
+					}
+					
 					if(rand()%50==0) map[i] = TILE_IRONORE + (rand()%3);
 				}
 			}
@@ -471,8 +511,11 @@ void createDungeonMap(int w, int h, u8 * map, u8 * data) {
 		}
 	}
 	
+	//create dragon chamber(only call once and before other rooms)
+	createDungeonRoom(w, h, true, map, data);
+	
 	for(i = 0; i < 40; ++i) {
-		createDungeonRoom(w, h, map, data);
+		createDungeonRoom(w, h, false, map, data);
 	}
 	
 	//replace paths with actual dungeon floor
