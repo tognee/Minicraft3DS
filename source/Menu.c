@@ -1425,21 +1425,21 @@ void renderMenu(int menu,int xscr,int yscr){
 
 }
 
-void menuRenderTilePit(int x,int y,int xt,int yt,u32 color) {
-	render16b(x+8,y+8,xt+48,yt,0,color);
+void menuRenderTilePit(int x,int y,int xt,int yt) {
+	render16(x+8,y+8,xt+48,yt,0);
 	
-	renderb(x,   y,   xt,   yt,  0,color);
-	renderb(x+24,y,   xt+8, yt,  0,color);
-	renderb(x,   y+24,xt,   yt+8,0,color);
-	renderb(x+24,y+24,xt+8, yt+8,0,color);
+	render(x,   y,   xt,   yt,  0);
+	render(x+24,y,   xt+8, yt,  0);
+	render(x,   y+24,xt,   yt+8,0);
+	render(x+24,y+24,xt+8, yt+8,0);
 	
-	renderb(x+8, y,   xt+16,yt,  0,color);
-	renderb(x+16,y,   xt+24,yt,  0,color);
-	renderb(x+8, y+24,xt+16,yt+8,0,color);
-	renderb(x+16,y+24,xt+24,yt+8,0,color);
+	render(x+8, y,   xt+16,yt,  0);
+	render(x+16,y,   xt+24,yt,  0);
+	render(x+8, y+24,xt+16,yt+8,0);
+	render(x+16,y+24,xt+24,yt+8,0);
 	
-	renderb(x,   y+8, xt+32,yt,  0,color);
-	renderb(x,   y+16,xt+32,yt,  0,color);
-	renderb(x+24,y+8, xt+40,yt,  0,color);
-	renderb(x+24,y+16,xt+40,yt,  0,color);
+	render(x,   y+8, xt+32,yt,  0);
+	render(x,   y+16,xt+32,yt,  0);
+	render(x+24,y+8, xt+40,yt,  0);
+	render(x+24,y+16,xt+40,yt,  0);
 }
