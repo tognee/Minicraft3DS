@@ -20,6 +20,11 @@ void playMusic(Sound snd){
     csndPlaySound(10, SOUND_FORMAT_16BIT | SOUND_REPEAT, 44100, 1, 0, snd.buffer, snd.buffer, snd.size);
 }
 
+void stopMusic() {
+	CSND_SetPlayState(8, 0);
+	CSND_SetPlayState(10, 0);
+}
+
 void updateMusic(int lvl, int time) {
 	switch(lvl) {
 	case 0:

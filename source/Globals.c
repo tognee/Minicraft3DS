@@ -385,6 +385,7 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
                 return true;
 				
 				case ENTITY_MAGIC_PILLAR:
+					playSound(snd_monsterHurt);
 					removeEntityFromList(e, e->level, &eManager);
 				return true;
             } break;
@@ -402,6 +403,7 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
                 return true;
 				
 				case ENTITY_MAGIC_PILLAR:
+					playSound(snd_monsterHurt);
 					removeEntityFromList(e, e->level, &eManager);
 				return true;
             } break;
@@ -418,6 +420,7 @@ bool ItemVsEntity(Item* item, Entity* e, int dir){
                 return true;
 				
 				case ENTITY_MAGIC_PILLAR:
+					playSound(snd_monsterHurt);
 					removeEntityFromList(e, e->level, &eManager);
 				return true;
             } break;
@@ -1277,7 +1280,7 @@ void tickEntity(Entity* e){
 			if (e->hurtTime > 0) e->hurtTime--;
 			
 			e->dragon.animTimer++;
-			if(e->dragon.animTimer>=20) {
+			if(e->dragon.animTimer>=4*4) {
 				e->dragon.animTimer = 0;
 			}
 			
@@ -1285,8 +1288,8 @@ void tickEntity(Entity* e){
 			if (e->dragon.attackDelay > 0) {
 			    e->dragon.attackDelay--;
 			    if (e->dragon.attackDelay <= 0) {
-					e->wizard.attackType = rand()%2;
-				    e->wizard.attackTime = 121;
+					e->dragon.attackType = rand()%2;
+				    e->dragon.attackTime = 121;
 				}
 				return;
 			}

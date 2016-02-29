@@ -1133,19 +1133,18 @@ void renderEntity(Entity* e, int x, int y) {
 		renderr(x, y, 200, 152, 0, e->spark.age * 0.0349);
 		break;
 	case ENTITY_DRAGON:
-		//TODO - render dragon(maybe with flying animation)
 		switch (e->dragon.dir) {
 		case 0: // down
-			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 256, 2);
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer/4 * 32), 256, 2);
 			break;
 		case 1: // up
-			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 256, 0);
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer/4 * 32), 256, 0);
 			break;
 		case 2: // left
-			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 288, 1);
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer/4 * 32), 288, 1);
 			break;
 		case 3: // right
-			render32(x - 16, y - 16, 0+(e->dragon.animTimer<10 ? 0 : 64), 288, 0);
+			render32(x - 16, y - 16, 0+(e->dragon.animTimer/4 * 32), 288, 0);
 			break;
 		}
 		break;
@@ -1485,6 +1484,12 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 		break;
 	case ITEM_WIZARD_SUMMON:
 		render(x, y, 152, 160, 0);
+		break;
+	case ITEM_DRAGON_EGG:
+		render(x, y, 160, 160, 0);
+		break;
+	case ITEM_DRAGON_SCALE:
+		render(x, y, 168, 160, 0);
 		break;
 	case TOOL_BUCKET:
 		render(x, y, 200 + countLevel * 8, 144, 0);

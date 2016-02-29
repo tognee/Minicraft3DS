@@ -66,7 +66,6 @@
 #define ITEM_BONE 68
 #define ITEM_DUNGEON_KEY 69
 #define ITEM_WIZARD_SUMMON 70
-//TODO - implement icon
 #define ITEM_DRAGON_EGG 71
 #define ITEM_DRAGON_SCALE 72
 

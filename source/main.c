@@ -296,6 +296,8 @@ int main() {
 
 		sf2d_swapbuffers();
 	}
+	
+	stopMusic();
 
 	freeRecipes();
 
