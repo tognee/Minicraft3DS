@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-char versionText[34] = "Version 1.2.1";
+char versionText[34] = "Version 1.2.2";
 char fpsstr[34];
 u8 currentMenu = 0;
 
