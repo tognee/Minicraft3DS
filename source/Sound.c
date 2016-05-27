@@ -23,6 +23,7 @@ void playMusic(Sound snd){
 void stopMusic() {
 	CSND_SetPlayState(8, 0);
 	CSND_SetPlayState(10, 0);
+    csndExecCmds(true);
 }
 
 void updateMusic(int lvl, int time) {
