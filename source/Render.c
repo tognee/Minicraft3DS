@@ -472,22 +472,39 @@ void renderTile(int i, int d, int x, int y) {
 		checkSurrTiles4(x >> 4, y >> 4, TILE_FLOWER);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_TREE);
 		
-		renderConnectedTile4(x, y, 256, 0);
+        if(currentLevel==1 && season==3) renderConnectedTile4(x, y, 256, 112);
+        else if(currentLevel==1 && season==2) renderConnectedTile4(x, y, 256, 128);
+		else renderConnectedTile4(x, y, 256, 0);
 		break;
 	case TILE_TREE:
 		renderTile(TILE_GRASS, 0, x, y);
 		
 		checkSurrTiles8(x >> 4, y >> 4, TILE_TREE);
 		
-		render(x,   y,   256+((tu && tl && tul) ? 16 : 0), 48, 0);
-		render(x+8, y,   264+((tu && tr && tur) ? 16 : 0), 48, 0);
-		render(x,   y+8, 256+((td && tl && tdl) ? 16 : 0), 56, 0);
-		render(x+8, y+8, 264+((td && tr && tdr) ? 16 : 0), 56, 0);
+        if(season==2) {
+            render(x,   y,   352+((tu && tl && tul) ? 16 : 0), 96, 0);
+            render(x+8, y,   360+((tu && tr && tur) ? 16 : 0), 96, 0);
+            render(x,   y+8, 352+((td && tl && tdl) ? 16 : 0), 104, 0);
+            render(x+8, y+8, 360+((td && tr && tdr) ? 16 : 0), 104, 0);
+        } else if(season==3) {
+            render(x,   y,   352+((tu && tl && tul) ? 16 : 0), 112, 0);
+            render(x+8, y,   360+((tu && tr && tur) ? 16 : 0), 112, 0);
+            render(x,   y+8, 352+((td && tl && tdl) ? 16 : 0), 120, 0);
+            render(x+8, y+8, 360+((td && tr && tdr) ? 16 : 0), 120, 0);
+        } else {
+            render(x,   y,   256+((tu && tl && tul) ? 16 : 0), 48, 0);
+            render(x+8, y,   264+((tu && tr && tur) ? 16 : 0), 48, 0);
+            render(x,   y+8, 256+((td && tl && tdl) ? 16 : 0), 56, 0);
+            render(x+8, y+8, 264+((td && tr && tdr) ? 16 : 0), 56, 0);
+        }
 		
 		break;
 	case TILE_ROCK:
 		checkSurrTiles8(x >> 4, y >> 4, TILE_ROCK);
-		renderConnectedTile8(x, y, 336, 64);
+        if(currentLevel>1)
+            renderConnectedTile8(x, y, 256, 96);
+        else
+            renderConnectedTile8(x, y, 336, 64);
 		break;
 	case TILE_HARDROCK:
 		checkSurrTiles8(x >> 4, y >> 4, TILE_HARDROCK);
@@ -504,15 +521,20 @@ void renderTile(int i, int d, int x, int y) {
 		checkSurrTiles4(x >> 4, y >> 4, TILE_CACTUS);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_SAPLING_CACTUS);
 		
-		renderConnectedTile4(x, y, 320, 0);
+		if(currentLevel==1 && season==3) {
+            renderConnectedTile4(x, y, 256, 112);
+		} else {
+            renderConnectedTile4(x, y, 320, 0);
 		
-		if (d > 0) {
-			render16(x, y, 336, 48, 0);
-		}
+            if (d > 0) {
+                render16(x, y, 336, 48, 0);
+            }
+        }
 		break;
 	case TILE_WATER:
 		checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
 		checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_ICE);
 		
 		renderConnectedTile4(x, y, 384, 0);
 		
@@ -541,7 +563,8 @@ void renderTile(int i, int d, int x, int y) {
 		break;
 	case TILE_FLOWER:
 		renderTile(TILE_GRASS, 0, x, y);
-		render16(x, y, 320, 48, getData(x >> 4, y >> 4));
+		if(currentLevel==1 && season==3) render16(x, y, 320, 112, getData(x >> 4, y >> 4));
+        else render16(x, y, 320, 48, getData(x >> 4, y >> 4));
 		break;
 	case TILE_STAIRS_DOWN:
 		if (currentLevel == 0)
@@ -619,14 +642,14 @@ void renderTile(int i, int d, int x, int y) {
 		renderConnectedTile8(x, y, 384, 32);
 		break;
 	case TILE_DUNGEON_FLOOR:
-		render16(x, y, 464, 32, 0);
+		render16(x, y, 464 + d*16, 32, 0);
 		break;
 	case TILE_DUNGEON_ENTRANCE:
-		render16(x, y, 480 + (currentLevel==5 ? 16 : 0), 32, 0);
+		render16(x, y, 352 + (currentLevel==5 ? 16 : 0), 80, 0);
 		break;
 	case TILE_MAGIC_BARRIER:
 		renderTile(TILE_DUNGEON_FLOOR, 0, x, y);
-		render16(x, y, 320, 64, 0);
+		render16(x, y, 320, 64, getData(x >> 4, y >> 4));
 		
 		//draw remaining pillar count
 		if((player.x - (x+8))*(player.x - (x+8)) + (player.y - (y+8))*(player.y - (y+8)) <= 24*24) {
@@ -650,6 +673,38 @@ void renderTile(int i, int d, int x, int y) {
 			drawSizedTextColor(currentCount, x+4, y+4, 2, dungeonColor[0]);
 		}
 		
+		break;
+    case TILE_BOOKSHELVES:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_BOOKSHELVES);
+		
+		renderConnectedTile4(x, y, 384, 80 + d*16);
+		break;
+    case TILE_WOOD_FLOOR:
+        render16(x, y, 336, 96, 0);
+        break;
+    case TILE_MYCELIUM:
+		checkSurrTiles4(x >> 4, y >> 4, TILE_MYCELIUM);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_MUSHROOM_BROWN);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_MUSHROOM_RED);
+		
+		if(currentLevel==1 && season==3) renderConnectedTile4(x, y, 256, 112);
+		else renderConnectedTile4(x, y, 448, 80);
+		break;
+    case TILE_MUSHROOM_BROWN:
+        renderTile(TILE_MYCELIUM, 0, x, y);
+		render16(x, y, 448 + (d&0x1)*16, 96, 0);
+        break;
+    case TILE_MUSHROOM_RED:
+        renderTile(TILE_MYCELIUM, 0, x, y);
+		render16(x, y, 480 + (d&0x1)*16, 96, 0);
+        break;
+    case TILE_ICE:
+		renderTile(TILE_WATER, 0, x, y);
+		//checkSurrTiles4(x >> 4, y >> 4, TILE_WATER);
+		//checkSurrTiles4(x >> 4, y >> 4, TILE_HOLE);
+		checkSurrTiles4(x >> 4, y >> 4, TILE_ICE);
+		
+		renderConnectedTile4(x, y, 448, 112);
 		break;
 	}
 
@@ -856,6 +911,40 @@ void renderMenuBackground(int xScroll, int yScroll) {
 	resetStencilStuff();
 	
 	renderDayNight();
+}
+
+void renderWeather(int xScroll, int yScroll) {
+    if(currentLevel==1) {
+        if(season==3) {
+            int xp = -128 + ((tickCount>>2) - xScroll*2)%128;
+            int yp = -128 + ((tickCount>>1) - yScroll*2)%128;
+            int xp2 = 0 - ((tickCount>>2) + xScroll*2)%128;
+            int yp2 = -128 + ((tickCount>>1)+64 - yScroll*2)%128;
+            int xt;
+            int yt;
+            for(xt=0; xt<4; ++xt) {
+                for(yt=0; yt<3; ++yt) {
+                    sf2d_draw_texture_part_scale(icons, xp + xt*128, yp + yt*128, 192, 0, 64, 64, 2, 2);
+                    sf2d_draw_texture_part_scale(icons, xp2 + xt*128, yp2 + yt*128, 192, 0, 64, 64, 2, 2);
+                }
+            }
+        }
+        
+        if(rain) {
+            int xp = -((xScroll*2)%128);
+            int yp = -128 + ((tickCount<<2) - yScroll*2)%128;
+            int xp2 = -((xScroll*2+8)%128);
+            int yp2 = -128 + ((tickCount<<1)+64 - yScroll*2)%128;
+            int xt;
+            int yt;
+            for(xt=0; xt<4; ++xt) {
+                for(yt=0; yt<3; ++yt) {
+                    sf2d_draw_texture_part_scale(icons, xp + xt*128, yp + yt*128, 128, 0, 64, 64, 2, 2);
+                    sf2d_draw_texture_part_scale(icons, xp2 + xt*128, yp2 + yt*128, 128, 0, 64, 64, 2, 2);
+                }
+            }
+        }
+    }
 }
 
 void renderDayNight() {
@@ -1197,6 +1286,8 @@ void renderEntity(Entity* e, int x, int y) {
 	case ENTITY_GLOWWORM:
 		render(x-4, y-4, 224, 112, 0);
 		break;
+    case ENTITY_NPC:
+		render16(x - 8, y - 8, (e->npc.type*16) + 0, 64, 0);
 	}
 }
 
@@ -1244,8 +1335,7 @@ void renderItemList(Inventory * inv, int xo, int yo, int x1, int y1,
 	}
 }
 
-void renderRecipes(RecipeManager * r, int xo, int yo, int x1, int y1,
-		int selected) {
+void renderRecipes(RecipeManager * r, int xo, int yo, int x1, int y1, int selected) {
 	int size = r->size;
 	if (size < 1)
 		return;
@@ -1265,16 +1355,16 @@ void renderRecipes(RecipeManager * r, int xo, int yo, int x1, int y1,
 	int i, col;
 	for (i = 0; i < i1; ++i) {
 		int x = (1 + xo) << 4, y = (i + 1 + yo) << 4;
-		renderItemIcon(r->recipes[i + io].itemResult,
-				r->recipes[i + io].itemAmountLevel, x >> 1, y >> 1);
+		renderItemIcon(r->recipes[i + io].itemResult, r->recipes[i + io].itemAmountLevel, x >> 1, y >> 1);
 		if (r->recipes[i + io].canCraft)
 			col = 0xFFFFFFFF;
 		else
 			col = 0xFF7F7F7F;
-		drawTextColor(
-				getBasicItemName(r->recipes[i + io].itemResult,
-						r->recipes[i + io].itemAmountLevel), x + 18, y + 2,
-				col);
+		if(r->recipes[i + io].itemAmountLevel==1) {
+            drawTextColor(getBasicItemName(r->recipes[i + io].itemResult, r->recipes[i + io].itemAmountLevel), x + 18, y + 2, col);
+        } else {
+            drawTextColor(getItemName(r->recipes[i + io].itemResult, r->recipes[i + io].itemAmountLevel), x + 18, y + 2, col);
+        }
 	}
 
 	int yy = selected + 1 - io + yo;
@@ -1317,6 +1407,8 @@ void renderItemWithTextCentered(Item* item, int width, int y) {
 }
 
 void renderItemIcon(int itemID, int countLevel, int x, int y) {
+    int xd;
+    int yd;
 	switch (itemID) {
 	case ITEM_NULL:
 		return;
@@ -1491,11 +1583,31 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 	case ITEM_DRAGON_SCALE:
 		render(x, y, 168, 160, 0);
 		break;
+    case ITEM_BOOKSHELVES:
+		render(x, y, 232, 144, 0);
+		break;
+    case ITEM_MAGIC_DUST:
+        render(x, y, 200, 152, 0);
+		break;
+    case ITEM_COIN:
+        render(x, y, 208, 152, 0);
+		break;
 	case TOOL_BUCKET:
 		render(x, y, 200 + countLevel * 8, 144, 0);
 		break;
 	case TOOL_BOW:
 		render(x, y, 64, 168, 0);
+		break;
+    case TOOL_MAGIC_COMPASS:
+        xd = compassData[currentLevel][0] - (player.x>>4);
+        yd = compassData[currentLevel][1] - (player.y>>4);
+        if(abs(yd)>abs(xd)) {
+            if(yd<0) render(x, y, 112, 168, 0);
+            else render(x, y, 120, 168, 0);
+        } else {
+            if(xd<0) render(x, y, 128, 168, 0);
+            else render(x, y, 136, 168, 0);
+        }
 		break;
 	}
 }

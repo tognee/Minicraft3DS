@@ -23,6 +23,8 @@
 #define ENTITY_DRAGONPROJECTILE 16
 #define ENTITY_MAGIC_PILLAR 17
 
+#define ENTITY_NPC 18
+
 typedef struct Entity Entity;
 
 typedef struct {
@@ -161,6 +163,10 @@ typedef struct {
 } Glowworm;
 
 typedef struct {
+	u8 type;
+} NPC;
+
+typedef struct {
     float xa;
     float ya;
     float za;
@@ -200,6 +206,7 @@ struct Entity {
 		Glowworm glowworm;
 		Dragon dragon;
 		DragonFire dragonFire;
+        NPC npc;
         TextParticleEntity textParticle;
         SmashParticleEntity smashParticle;
     };
@@ -234,6 +241,7 @@ Entity newTextParticleEntity(char * str, u32 color, int xa, int ya, int level);
 Entity newSmashParticleEntity(int xa, int ya, int level);
 Entity newArrowEntity(Entity* parent, int itemID, s8 xa, s8 ya, int level);
 Entity newGlowwormEntity(int x, int y, int level);
+Entity newNPCEntity(int type, int x, int y, int level);
 void addEntityToList(Entity e, EntityManager* em);
 void removeEntityFromList(Entity * e,int level,EntityManager* em);
 

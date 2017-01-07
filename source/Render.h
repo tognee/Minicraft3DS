@@ -31,6 +31,7 @@ void renderConnectedTile4(int x, int y, u32 xTile, u32 yTile);
 void renderConnectedTile8(int x, int y, u32 xTile, u32 yTile);
 void renderBackground(int xScroll, int yScroll);
 void renderMenuBackground(int xScroll, int yScroll); //Renders the darkness
+void renderWeather(int xScroll, int yScroll);
 void renderDayNight();
 void renderButtonIcon(u32 icon, int x, int y, float scale);
 

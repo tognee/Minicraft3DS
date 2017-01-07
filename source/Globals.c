@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-char versionText[34] = "Version 1.2.2";
+char versionText[34] = "Version 1.3.0";
 char fpsstr[34];
 u8 currentMenu = 0;
 
@@ -217,6 +217,7 @@ void tickTouchQuickSelect() {
 }
 
 void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
+    if (TESTGODMODE && e->type==ENTITY_PLAYER) return;
     if (e->hurtTime > 0) return;
 	int xd = player.x - e->x;
 	int yd = player.y - e->y;
@@ -252,7 +253,7 @@ void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
 				}
                 player.p.score += 50 * (e->hostile.lvl + 1);
                 removeEntityFromList(e,e->level,&eManager);
-                trySpawn(3, currentLevel);
+                if(currentLevel != 5) trySpawn(3, currentLevel);
                 return;
             }
        break;
@@ -262,7 +263,7 @@ void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
                 addItemsToWorld(newItem(ITEM_SLIME,1),e->x+8, e->y+8, (rand()%2) + 1);
                 player.p.score += 25 * (e->slime.lvl + 1);
                 removeEntityFromList(e,e->level,&eManager);
-                trySpawn(3, currentLevel);
+                if(currentLevel != 5) trySpawn(3, currentLevel);
                 return;
             }
         break;
@@ -270,7 +271,7 @@ void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
             e->wizard.health -= damage; 
             airWizardHealthDisplay = e->wizard.health;
             if(e->wizard.health < 1){ 
-				addItemsToWorld(newItem(ITEM_DUNGEON_KEY,1),e->x+8, e->y+8, (rand()%2) + 1);
+				addItemsToWorld(newItem(ITEM_MAGIC_DUST,1),e->x+8, e->y+8, (rand()%2) + 2);
                 removeEntityFromList(e,e->level,&eManager);
                 playSound(snd_bossdeath);
                 player.p.score += 1000;
@@ -295,7 +296,7 @@ void hurtEntity(Entity* e, int damage, int dir, u32 hurtColor){
 				}
                 player.p.score += 10;
                 removeEntityFromList(e,e->level,&eManager);
-                trySpawn(3, currentLevel);
+                if(currentLevel != 5) trySpawn(3, currentLevel);
                 return;
             }
 		break;
@@ -546,16 +547,16 @@ void EntityVsEntity(Entity* e1, Entity* e2){
 				damage = 1 + (rand()%3);
 				break;
 			case ITEM_ARROW_STONE: 
-				damage = 2 + (rand()%5);
+				damage = 2 + (rand()%4);
 				break;
 			case ITEM_ARROW_IRON: 
 				damage = 8 + (rand()%9);
 				break;
 			case ITEM_ARROW_GOLD: 
-				damage = 16 + (rand()%17);
+				damage = 16 + (rand()%9);
 				break;
 			case ITEM_ARROW_GEM: 
-				damage = 24 + (rand()%17);
+				damage = 24 + (rand()%9);
 				break;
 			}
 		
@@ -589,6 +590,7 @@ bool EntityBlocksEntity(Entity* e1, Entity* e2){
                 case ENTITY_PLAYER:
 				case ENTITY_PASSIVE:
 				case ENTITY_MAGIC_PILLAR:
+                case ENTITY_NPC:
                     return true;
                 break;
             }
@@ -599,9 +601,12 @@ bool EntityBlocksEntity(Entity* e1, Entity* e2){
 
 bool tileIsSolid(int tile, Entity * e){
     switch(tile){
-        case TILE_TREE: 
         case TILE_ROCK: 
         case TILE_HARDROCK: 
+		case TILE_MAGIC_BARRIER:
+		case TILE_DUNGEON_WALL: 
+            return true;
+        case TILE_TREE: 
         case TILE_CACTUS: 
         case TILE_IRONORE: 
         case TILE_GOLDORE: 
@@ -612,9 +617,10 @@ bool tileIsSolid(int tile, Entity * e){
 		case TILE_IRON_WALL: 
 		case TILE_GOLD_WALL: 
 		case TILE_GEM_WALL: 
-		case TILE_DUNGEON_WALL: 
-		case TILE_MAGIC_BARRIER:
-            return true;
+		case TILE_BOOKSHELVES: 
+        case TILE_MUSHROOM_BROWN:
+        case TILE_MUSHROOM_RED:
+            if(e->type != ENTITY_DRAGON) return true;
 		case TILE_LAVA: 
 		case 255: 
 			if(e->type != ENTITY_ARROW) return true;
@@ -655,6 +661,12 @@ u32 getTileColor(int tile){
 		case TILE_DUNGEON_WALL: return SWAP_UINT32(dungeonColor[0]);
 		case TILE_DUNGEON_FLOOR: return SWAP_UINT32(dungeonColor[1]);
 		case TILE_MAGIC_BARRIER: return SWAP_UINT32(dungeonColor[0]);
+		case TILE_BOOKSHELVES: return SWAP_UINT32(woodColor);
+		case TILE_WOOD_FLOOR: return SWAP_UINT32(woodColor);
+        case TILE_MYCELIUM: return SWAP_UINT32(myceliumColor);
+        case TILE_MUSHROOM_BROWN: return SWAP_UINT32(mushroomColor);
+        case TILE_MUSHROOM_RED: return SWAP_UINT32(mushroomColor);
+        case TILE_ICE: return SWAP_UINT32(iceColor);
 		
         default: return 0x111111FF;
     }
@@ -806,6 +818,11 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 setTile(TILE_GEM_WALL,x,y); --item->countLevel;
                 return 1;
             } 
+            else if(item->id == ITEM_BOOKSHELVES){ 
+                setTile(TILE_BOOKSHELVES,x,y); --item->countLevel;
+                data[currentLevel][x+y*128] = rand()%3;
+                return 1;
+            } 
             else if(item->id == TOOL_SHOVEL && playerUseEnergy(4-item->countLevel)){ 
                 if(rand()%5==0)addEntityToList(newItemEntity(newItem(ITEM_SEEDS,1),(x<<4)+8, (y<<4)+8,currentLevel),&eManager);
                 setTile(TILE_DIRT,x,y); 
@@ -847,6 +864,15 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 setTile(TILE_GEM_WALL,x,y); --item->countLevel;
                 return 1;
             } 
+            else if(item->id == ITEM_BOOKSHELVES){ 
+                setTile(TILE_BOOKSHELVES,x,y); --item->countLevel;
+                data[currentLevel][x+y*128] = rand()%3;
+                return 1;
+            } 
+            else if(item->id == ITEM_WOOD) {
+                setTile(TILE_WOOD_FLOOR,x,y); --item->countLevel;
+                return 1;
+            }
 			else if(item->id == ITEM_SAND){ 
                 setTile(TILE_SAND,x,y); --item->countLevel;
                 return 1;
@@ -942,6 +968,16 @@ s8 itemTileInteract(int tile, Item* item, int x, int y, int px, int py, int dir)
                 playerHurtTile(tile, x, y, (rand()%10) + (item->countLevel) * 5 + 10, player.p.dir);
                 return 1;
             } break;
+        case TILE_BOOKSHELVES:
+            if(item->id == TOOL_AXE && playerUseEnergy(4-item->countLevel)){
+                playerHurtTile(tile, x, y, (rand()%10) + (item->countLevel) * 5 + 10, player.p.dir);
+                return 1;
+            } break;
+        case TILE_WOOD_FLOOR:
+            if(item->id == TOOL_AXE && playerUseEnergy(4-item->countLevel)){
+                addEntityToList(newItemEntity(newItem(ITEM_WOOD,1), (x<<4)+8, (y<<4)+8, currentLevel), &eManager);
+                setTile(TILE_DIRT,x,y); 
+            } break;
     }
     return 0;
 }
@@ -952,7 +988,7 @@ void tickTile(int x, int y){
     
     switch(tile){
         case TILE_SAPLING_TREE:
-            setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_TREE,x,y);}
+            if(season!=3) setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_TREE,x,y);}
             break;
 		case TILE_TREE:
 			if(eManager.lastSlot[currentLevel]<800 && (daytime>18000 || daytime<5000) && rand()%800==0) {
@@ -966,16 +1002,22 @@ void tickTile(int x, int y){
 			}
 			break;
         case TILE_SAPLING_CACTUS:
-            setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_CACTUS,x,y);}
+            if(season!=3) setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_CACTUS,x,y);}
             break;
         case TILE_WHEAT:
-            if(data<100)setData(++data,x,y);
+            if(data<100 && season!=3) setData(++data,x,y);
             break;
         case TILE_WATER:
             if(getTile(x+1,y)==TILE_HOLE) setTile(TILE_WATER,x+1,y);
             if(getTile(x-1,y)==TILE_HOLE) setTile(TILE_WATER,x-1,y);
             if(getTile(x,y+1)==TILE_HOLE) setTile(TILE_WATER,x,y+1);
             if(getTile(x,y-1)==TILE_HOLE) setTile(TILE_WATER,x,y-1);
+            if(currentLevel==1 && season==3 && rand()%12==0) {
+                if(getTile(x+1,y)!=TILE_WATER) setTile(TILE_ICE,x,y);
+                if(getTile(x-1,y)!=TILE_WATER) setTile(TILE_ICE,x,y);
+                if(getTile(x,y+1)!=TILE_WATER) setTile(TILE_ICE,x,y);
+                if(getTile(x,y-1)!=TILE_WATER) setTile(TILE_ICE,x,y);
+            }
             break;
         case TILE_LAVA:
             if(getTile(x+1,y)==TILE_HOLE) setTile(TILE_LAVA,x+1,y);
@@ -1016,7 +1058,13 @@ void tickTile(int x, int y){
 				}
 			}
 			if(data==0) setTile(TILE_DUNGEON_FLOOR,x,y);
+            setData(rand()%2,x,y);
 			break;
+        case TILE_ICE:
+            if(season!=3) {
+                setTile(TILE_WATER,x,y);
+            }
+            break;
     }
     
 }
@@ -1109,7 +1157,7 @@ void tickEntity(Entity* e){
 			if(e->type == ENTITY_SKELETON) {
 				--(e->hostile.randAttackTime);
 				if(e->hostile.randAttackTime <= 0) {
-					e->hostile.randAttackTime = 70 - (e->hostile.lvl * 10);
+					e->hostile.randAttackTime = 80 - (e->hostile.lvl * 5);
 					
 					int aitemID = ITEM_ARROW_WOOD;
 					if(e->hostile.lvl >= 2) aitemID = ITEM_ARROW_STONE;
@@ -1617,6 +1665,8 @@ void initPlayer(){
 }
 
 void playerHurtTile(int tile, int xt, int yt, int damage, int dir){
+    if(TESTGODMODE) damage = 99;
+    
     char hurtText[11];
     switch(tile){
         case TILE_TREE:
@@ -1798,11 +1848,21 @@ void playerHurtTile(int tile, int xt, int yt, int damage, int dir){
                  addItemsToWorld(newItem(ITEM_WALL_GEM,1),(xt<<4)+8,(yt<<4)+8,1);
             }
 			break;
+        case TILE_BOOKSHELVES:
+            sprintf(hurtText, "%d", damage);
+            addEntityToList(newTextParticleEntity(hurtText,0xFF0000FF,xt<<4,yt<<4,currentLevel), &eManager);
+            addEntityToList(newSmashParticleEntity(xt<<4,yt<<4,currentLevel), &eManager);
+
+            if(currentLevel!=5) setTile(TILE_DIRT,xt,yt);
+            else setTile(TILE_DUNGEON_FLOOR,xt,yt);
+            addItemsToWorld(newItem(ITEM_BOOKSHELVES,1),(xt<<4)+8,(yt<<4)+8,1);
+			break;
     }
     
 }
 
 bool playerUseEnergy(int amount){
+    if(TESTGODMODE) return true;
     if(amount > player.p.stamina) return false;
     player.p.stamina -= amount;
     return true;
@@ -1974,24 +2034,28 @@ bool useEntity(Entity* e) {
         switch(e->entityFurniture.itemID){
             case ITEM_WORKBENCH:
                 currentRecipes = &workbenchRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
                 return true;
             case ITEM_FURNACE:
                 currentRecipes = &furnaceRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
                 return true;
             case ITEM_OVEN:
                 currentRecipes = &ovenRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
                 return true;
             case ITEM_ANVIL:
                 currentRecipes = &anvilRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
@@ -2005,17 +2069,22 @@ bool useEntity(Entity* e) {
                 return true;
 			case ITEM_LOOM:
                 currentRecipes = &loomRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
                 return true;
 			case ITEM_ENCHANTER:
                 currentRecipes = &enchanterRecipes;
+                currentCraftTitle = "Crafting";
                 currentMenu = MENU_CRAFTING; 
                 checkCanCraftRecipes(currentRecipes, player.p.inv);
                 sortRecipes(currentRecipes);
                 return true;
         }
+    } else if(e->type == ENTITY_NPC) {
+        openNPCMenu(e->npc.type);
+        return true;
     }
     return false;
 }
@@ -2088,7 +2157,7 @@ void tickPlayer(){
 	
 	if (swimming && player.p.swimTimer % 60 == 0) {
 		if (player.p.stamina > 0) {
-			--player.p.stamina;
+			if(!TESTGODMODE) --player.p.stamina;
 		} else {
 		    hurtEntity(&player,1,-1,0xFFAF00FF);
 		}
@@ -2101,7 +2170,7 @@ void tickPlayer(){
     
     if(k_attack.clicked){
         if (player.p.stamina != 0) {
-			player.p.stamina--;
+			if(!TESTGODMODE) player.p.stamina--;
 			player.p.staminaRecharge = 0;
             playerAttack();
             //addEntityToList(newSlimeEntity(1,200,600,1), &eManager);
@@ -2148,7 +2217,7 @@ void enterDungeon() {
 	
 	//create map
 	currentLevel = 5;
-	createDungeonMap(128, 128, map[5], data[5]);
+	createAndValidateDungeonMap(128, 128, 5, map[5], data[5]);
 	
 	//reset minimap clear state
 	int xd,yd;
@@ -2160,11 +2229,11 @@ void enterDungeon() {
 	initMinimapLevel(5, false);
 	newSeed();
 	
+    player.x = ((128/2) << 4) + 8;
+	player.y = ((128/2) << 4) + 8;
+    
 	//spawn new entities
 	trySpawn(500, 5);
-		
-	player.x = ((128/2) << 4) + 8;
-	player.y = ((128/2) << 4) + 8;
 	
 	updateMusic(currentLevel, daytime);
 }
@@ -2203,6 +2272,9 @@ u32 getMinimapColor(int level, int x, int y) {
 void initMinimapLevel(int level, bool loadUpWorld) {
 	int x;
 	int y;
+    bool calculateCompass;
+    
+    calculateCompass = ((!loadUpWorld) || (compassData[level][2] = 0)) && level<5;
 	
 	//Create Dungeon entrance(not located in mapgen, so it can also be created in old worlds)
 	if(level==4) {
@@ -2248,6 +2320,18 @@ void initMinimapLevel(int level, bool loadUpWorld) {
 						}
 					}
 				}
+            }
+            if(calculateCompass) {
+                //choose one stair down and store for magic compass
+                switch (map[level][x + y * 128]) {
+                case TILE_STAIRS_DOWN:
+                case TILE_DUNGEON_ENTRANCE:
+                    compassData[level][2] = compassData[level][2] + 1;
+                    if((compassData[level][2]==1) || (rand()%(compassData[level][2])==0)) {
+                        compassData[level][0] = x;
+                        compassData[level][1] = y;
+                    }
+                }
 			}
 
 			/* Minimaps */
@@ -2276,6 +2360,8 @@ void reloadColors() {
 	dirtColor[4] = SWAP_UINT32(sf2d_get_pixel(icons, 16, 4)); 
 	
 	grassColor = SWAP_UINT32(sf2d_get_pixel(icons, 17, 0)); 
+    myceliumColor = SWAP_UINT32(sf2d_get_pixel(icons, 17, 1)); 
+    mushroomColor = SWAP_UINT32(sf2d_get_pixel(icons, 17, 2)); 
 
 	sandColor = SWAP_UINT32(sf2d_get_pixel(icons, 18, 0)); 
 	
@@ -2298,4 +2384,7 @@ void reloadColors() {
 	
 	dungeonColor[0] = SWAP_UINT32(sf2d_get_pixel(icons, 24, 0)); 
 	dungeonColor[1] = SWAP_UINT32(sf2d_get_pixel(icons, 24, 1)); 
+    
+    snowColor = SWAP_UINT32(sf2d_get_pixel(icons, 25, 0));
+    iceColor = SWAP_UINT32(sf2d_get_pixel(icons, 25, 1));
 }

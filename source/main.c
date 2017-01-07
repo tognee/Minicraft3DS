@@ -13,6 +13,10 @@
 #include "Menu.h"
 #include "texturepack.h"
 
+// TODO: Dungeon is way to difficult
+//       -> Skeleton arrows are slower, do a little less damage
+//       -> Or instead of less damage, implement a simple armor system
+
 void initMiniMapData() {
 	int i;
 	for(i = 0; i < 128 * 128; ++i) {
@@ -29,11 +33,11 @@ void initMiniMap(bool loadUpWorld) {
 
 void initNewMap() {
 	newSeed();
-	createAndValidateSkyMap(128, 128, map[0], data[0]);
-	createAndValidateTopMap(128, 128, map[1], data[1]);
-	createAndValidateUndergroundMap(128, 128, 1, map[2], data[2]);
-	createAndValidateUndergroundMap(128, 128, 2, map[3], data[3]);
-	createAndValidateUndergroundMap(128, 128, 3, map[4], data[4]);
+	createAndValidateSkyMap(128, 128, 0, map[0], data[0]);
+	createAndValidateTopMap(128, 128, 1, map[1], data[1]);
+	createAndValidateUndergroundMap(128, 128, 1, 2, map[2], data[2]);
+	createAndValidateUndergroundMap(128, 128, 2, 3, map[3], data[3]);
+	createAndValidateUndergroundMap(128, 128, 3, 4, map[4], data[4]);
 }
 
 void setupGame(bool loadUpWorld) {
@@ -48,6 +52,7 @@ void setupGame(bool loadUpWorld) {
 	if (!loadUpWorld) {
 		initNewMap();
 		initPlayer();
+        resetQuests();
 		airWizardHealthDisplay = 2000;
 		int i;
 		for (i = 0; i < 5; ++i) {
@@ -55,8 +60,12 @@ void setupGame(bool loadUpWorld) {
 		}
 		addEntityToList(newAirWizardEntity(630, 820, 0), &eManager);
 		daytime = 6000;
+        day = 0;
+        season = 0;
+        rain = false;
 	} else {
 		initPlayer();
+        resetQuests();
 		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
 	}
 	
@@ -78,7 +87,7 @@ void setupBGMap(bool loadUpWorld) {
 	
 	if(!loadUpWorld) {
 		newSeed();
-		createAndValidateTopMap(128, 128, map[1], data[1]);
+		createAndValidateTopMap(128, 128, 1, map[1], data[1]);
 	} else {
 		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
 	}
@@ -113,6 +122,14 @@ void tick() {
 	//daytime += 20;
 	if(daytime>=24000) {
 		daytime -= 24000;
+        ++day;
+        //TODO: maybe make season length not as hardcoded + make the transition better (fade to black and back maybe?)
+        if(day%7==0) {
+            ++season;
+            if(season==4) season = 0;
+        }
+        rain = false;
+        if(season!=3 && rand()%5==0) rain = true;
 	}
 	if(daytime==6000 && currentLevel==1) {
 		playMusic(music_floor1);
@@ -138,23 +155,18 @@ void tick() {
 	else if (yscr > 1912)
 		yscr = 1912;
 	
-	if(eManager.lastSlot[currentLevel]<80) {
+	if(eManager.lastSlot[currentLevel]<80 && currentLevel != 5) {
 		trySpawn(1, currentLevel);
 	}
 
 	for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
 		Entity * e = &eManager.entities[currentLevel][i];
-		if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SKELETON && e->type != ENTITY_KNIGHT && e->type != ENTITY_SLIME && e->type != ENTITY_PASSIVE && (e->type == ENTITY_GLOWWORM && (daytime>6000 || daytime<18000))) 
+		if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SKELETON && e->type != ENTITY_KNIGHT && e->type != ENTITY_SLIME && e->type != ENTITY_PASSIVE) 
+            || (e->type == ENTITY_GLOWWORM && (daytime>6000 || daytime<18000)) 
 			|| (e->x > player.x - 160 && e->y > player.y - 125 && e->x < player.x + 160 && e->y < player.y + 125))
 			tickEntity(e);
 	}
 
-}
-
-void clearScreen(int* data, u8 fill, int size) {
-	int i;
-	for (i = 0; i < size / 4; ++i)
-		data[i] = 0xFF000000;
 }
 
 char debugText[34];
@@ -243,6 +255,7 @@ int main() {
 
 	tickCount = 0;
 	initRecipes();
+    initQuests();
 	while (aptMainLoop()) {
 		++tickCount;
 		hidScanInput();
@@ -266,6 +279,7 @@ int main() {
 			renderBackground(xscr, yscr);
 			renderEntities(player.x, player.y, &eManager);
 			renderPlayer();
+            renderWeather(xscr, yscr);
 			
 			resetStencilStuff();
 			
@@ -299,6 +313,7 @@ int main() {
 	
 	stopMusic();
 
+    freeQuests();
 	freeRecipes();
 
 	freeLightBakes();

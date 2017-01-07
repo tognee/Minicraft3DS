@@ -1,27 +1,5 @@
 #include "SaveLoad.h"
 
-s16 calculateImportantEntites(EntityManager * eManager, int level){
-    int i;
-    s16 count = 0;
-    for(i = 0; i < eManager->lastSlot[level]; ++i){
-        switch(eManager->entities[level][i].type){
-            case ENTITY_AIRWIZARD:
-            case ENTITY_SLIME:
-            case ENTITY_ZOMBIE:
-			case ENTITY_SKELETON:
-			case ENTITY_KNIGHT:
-            case ENTITY_ITEM:
-            case ENTITY_FURNITURE:
-			case ENTITY_PASSIVE:
-			case ENTITY_GLOWWORM:
-			case ENTITY_DRAGON:
-                count++;
-                break;
-        }
-    }
-    return count;
-}
-
 bool entityIsImportant(Entity * e){
     switch(e->type){
         case ENTITY_AIRWIZARD:
@@ -34,10 +12,22 @@ bool entityIsImportant(Entity * e){
 		case ENTITY_PASSIVE:
 		case ENTITY_GLOWWORM:
 		case ENTITY_DRAGON:
+        case ENTITY_NPC:
             return true;
         default:
             return false;
     }
+}
+
+s16 calculateImportantEntites(EntityManager * eManager, int level){
+    int i;
+    s16 count = 0;
+    for(i = 0; i < eManager->lastSlot[level]; ++i){
+        if(entityIsImportant(&eManager->entities[level][i])){
+            count++;
+        }
+    }
+    return count;
 }
 
 void saveCurrentWorld(char * filename, EntityManager * eManager, Entity * player, u8 * map, u8 * mapData){
@@ -107,6 +97,9 @@ void saveCurrentWorld(char * filename, EntityManager * eManager, Entity * player
 				case ENTITY_DRAGON:
                     fwrite(&eManager->entities[i][j].dragon.health, sizeof(s16), 1, file);
                     break;
+                case ENTITY_NPC:
+                    fwrite(&eManager->entities[i][j].npc.type, sizeof(u8), 1, file);
+                    break;
             }
         }
     }
@@ -119,6 +112,25 @@ void saveCurrentWorld(char * filename, EntityManager * eManager, Entity * player
 	fwrite(&daytime, sizeof(u16), 1, file);
 	
 	fwrite(minimapData, sizeof(u8), 128*128, file); // Minimap, visibility data 16KB
+    
+    //Quest Data
+    fwrite(&questManager.size, sizeof(int), 1, file);
+    for(i = 0; i < questManager.size; ++i) {
+        fwrite(&(questManager.questlines[i].currentQuest), sizeof(int), 1, file);
+        fwrite(&(questManager.questlines[i].currentQuestDone), sizeof(bool), 1, file);
+    }
+    
+    //Compass Data
+    for(i=0; i<6; ++i) {
+        fwrite(&(compassData[i][0]), sizeof(u8), 1, file); //x of choosen stair
+        fwrite(&(compassData[i][1]), sizeof(u8), 1, file); //y of choosen stair
+        fwrite(&(compassData[i][2]), sizeof(u8), 1, file); //count
+    }
+    
+    //Day/season Data
+    fwrite(&day, sizeof(int), 1, file);
+	fwrite(&season, sizeof(u8), 1, file);
+    fwrite(&rain, sizeof(bool), 1, file);
     
     fclose(file);
 }
@@ -335,6 +347,16 @@ int loadWorld(char * filename, EntityManager * eManager, Entity * player, u8 * m
                             eManager->entities[i][j].yr = 8;
                             eManager->entities[i][j].canPass = true;
                             break;
+                        case ENTITY_NPC:
+                            fread(&eManager->entities[i][j].npc.type, sizeof(u8), 1, file);
+                            eManager->entities[i][j].level = i;
+                            eManager->entities[i][j].hurtTime = 0;
+                            eManager->entities[i][j].xKnockback = 0;
+                            eManager->entities[i][j].yKnockback = 0;
+                            eManager->entities[i][j].xr = 4;
+                            eManager->entities[i][j].yr = 3;
+                            eManager->entities[i][j].canPass = false;
+                            break;
                     }
                 }
             }
@@ -347,6 +369,40 @@ int loadWorld(char * filename, EntityManager * eManager, Entity * player, u8 * m
 			fread(&daytime, sizeof(u16), 1, file);
 			
 			fread(minimapData, sizeof(u8), 128*128, file);
+            
+            //Quest Data
+            int qsize = 0;
+            fread(&qsize, sizeof(int), 1, file);
+            for(i = 0; i < qsize; ++i) {
+                fread(&(questManager.questlines[i].currentQuest), sizeof(int), 1, file);
+                fread(&(questManager.questlines[i].currentQuestDone), sizeof(bool), 1, file);
+            }
+            //fill missing questlines with "no progress done"
+            for(i = qsize; i < questManager.size; ++i) {
+                questManager.questlines[i].currentQuest = 0;
+                questManager.questlines[i].currentQuestDone = false;
+            }
+            
+            //Compass Data
+            //reset incase it is missing in the save
+            for(i=0; i<6; ++i) {
+                compassData[i][0] = 0; //x of choosen stair
+                compassData[i][1] = 0; //y of choosen stair
+                compassData[i][2] = 0; //count
+            }
+            for(i=0; i<6; ++i) {
+                fread(&(compassData[i][0]), sizeof(u8), 1, file); //x of choosen stair
+                fread(&(compassData[i][1]), sizeof(u8), 1, file); //y of choosen stair
+                fread(&(compassData[i][2]), sizeof(u8), 1, file); //count
+            }
+            
+            //Day/season Data
+            day = 0;
+            season = 0;
+            rain = false;
+            fread(&day, sizeof(int), 1, file);
+            fread(&season, sizeof(u8), 1, file);
+            fread(&rain, sizeof(bool), 1, file);
 			
             fclose(file);
             return 0;

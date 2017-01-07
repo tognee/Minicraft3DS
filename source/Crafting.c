@@ -104,7 +104,7 @@ void initRecipes(){
 	workbenchRecipes.recipes[20] = defineRecipe(ITEM_WALL_WOOD,1,1,ITEM_WOOD,4);
 	workbenchRecipes.recipes[21] = defineRecipe(ITEM_WALL_STONE,1,1,ITEM_STONE,4);
 
-    anvilRecipes.size = 16;
+    anvilRecipes.size = 17;
     anvilRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (anvilRecipes.size));
     anvilRecipes.recipes[0] = defineRecipe(TOOL_SWORD,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
     anvilRecipes.recipes[1] = defineRecipe(TOOL_AXE,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
@@ -122,6 +122,7 @@ void initRecipes(){
 	anvilRecipes.recipes[13] = defineRecipe(ITEM_ENCHANTER,1,3,ITEM_WOOD,10,ITEM_GOLDINGOT,10,ITEM_GEM,20);
 	anvilRecipes.recipes[14] = defineRecipe(ITEM_WALL_IRON,1,1,ITEM_IRONINGOT,2);
 	anvilRecipes.recipes[15] = defineRecipe(ITEM_WALL_GOLD,1,1,ITEM_GOLDINGOT,2);
+	anvilRecipes.recipes[16] = defineRecipe(ITEM_COIN,3,1,ITEM_IRONINGOT,1);
        	
     furnaceRecipes.size = 3;
     furnaceRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (furnaceRecipes.size));
@@ -139,7 +140,7 @@ void initRecipes(){
     loomRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (loomRecipes.size));
     loomRecipes.recipes[0] = defineRecipe(ITEM_STRING,1,1,ITEM_WOOL,1);
 	
-	enchanterRecipes.size = 8;
+	enchanterRecipes.size = 7;
     enchanterRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (enchanterRecipes.size));
 	enchanterRecipes.recipes[0] = defineRecipe(TOOL_SWORD,4,2,ITEM_WOOD,5,ITEM_GEM,50);
     enchanterRecipes.recipes[1] = defineRecipe(TOOL_AXE,4,2,ITEM_WOOD,5,ITEM_GEM,50);
@@ -148,7 +149,6 @@ void initRecipes(){
     enchanterRecipes.recipes[4] = defineRecipe(TOOL_SHOVEL,4,2,ITEM_WOOD,5,ITEM_GEM,50);
 	enchanterRecipes.recipes[5] = defineRecipe(ITEM_ARROW_GEM,1,3,ITEM_WOOD,1,ITEM_GEM,3,ITEM_STRING,1);
 	enchanterRecipes.recipes[6] = defineRecipe(ITEM_WALL_GEM,1,1,ITEM_GEM,10);
-	enchanterRecipes.recipes[7] = defineRecipe(ITEM_WIZARD_SUMMON,1,4,ITEM_CLOUD,100,ITEM_IRONINGOT,10,ITEM_BONE,10,ITEM_LEATHER,10);
 	
 }
 

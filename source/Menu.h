@@ -2,6 +2,7 @@
 
 #include "MenuTutorial.h"
 #include "texturepack.h"
+#include "Quests.h"
 
 void initMenus();
 

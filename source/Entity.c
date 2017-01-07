@@ -346,6 +346,22 @@ Entity newGlowwormEntity(int x, int y, int level){
     return e;
 }
 
+Entity newNPCEntity(int type, int x, int y, int level){
+	Entity e;
+    e.type = ENTITY_NPC;
+    e.level = level;
+    e.x = x;
+    e.y = y;
+    e.hurtTime = 0;
+    e.xKnockback = 0;
+    e.yKnockback = 0;
+    e.npc.type = type;
+    e.xr = 4;
+    e.yr = 3;
+    e.canPass = false;
+    return e;
+}
+
 void addEntityToList(Entity e, EntityManager* em){
     e.slotNum = em->lastSlot[e.level];
     em->entities[e.level][em->lastSlot[e.level]] = e;

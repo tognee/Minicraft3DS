@@ -29,6 +29,8 @@ RecipeManager anvilRecipes;
 RecipeManager loomRecipes;
 RecipeManager enchanterRecipes;
 
+Recipe defineRecipe(int item, int amountOrLevel, int numArgs, ...);
+
 void checkCanCraftRecipes(RecipeManager * rm, Inventory * inv);
 void sortRecipes(RecipeManager * rm);
 bool craftItem(RecipeManager * rm, Recipe* r, Inventory* inv);

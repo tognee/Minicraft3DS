@@ -3,6 +3,7 @@
 #include "SaveLoad.h"
 #include "Input.h"
 #include "MapGen.h"
+#include "Quests.h"
 
 #include "icons2_png.h"
 #include "Font_png.h"
@@ -26,6 +27,13 @@
 #define MENU_SETTINGS_REBIND 12
 #define MENU_SETTINGS_TP 13
 #define MENU_DUNGEON 14
+#define MENU_NPC 15
+
+#define NPC_GIRL 0
+#define NPC_PRIEST 1
+#define NPC_FARMER 2
+#define NPC_LIBRARIAN 3
+#define NPC_DWARF 4
 
 #define TILE_NULL 255
 #define TILE_GRASS 0
@@ -60,8 +68,17 @@
 #define TILE_DUNGEON_FLOOR 28
 #define TILE_DUNGEON_ENTRANCE 29
 #define TILE_MAGIC_BARRIER 30
+#define TILE_BOOKSHELVES 31
+#define TILE_WOOD_FLOOR 32
+#define TILE_MYCELIUM 33
+#define TILE_MUSHROOM_BROWN 34
+#define TILE_MUSHROOM_RED 35
+#define TILE_ICE 36
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
+
+//TODO: Dont forget to change back
+#define TESTGODMODE true
 
 bool screenShot;
 int loadedtp;
@@ -86,6 +103,7 @@ sf2d_texture * minimap[6];
 u8 map[6][128*128];
 u8 data[6][128*128];
 u8 minimapData[128*128];
+u8 compassData[6][3];
 
 u32 dirtColor[5];
 u32 grassColor;
@@ -98,6 +116,10 @@ u32 ironColor;
 u32 goldColor;
 u32 gemColor;
 u32 dungeonColor[2];
+u32 myceliumColor;
+u32 mushroomColor;
+u32 snowColor;
+u32 iceColor;
 
 char currentFileName[256];
 extern u8 currentMenu;
@@ -110,11 +132,15 @@ s16 awX, awY;
 u32 tickCount;
 RecipeManager* currentRecipes;
 Entity* curChestEntity;
+char* currentCraftTitle;
 s16 curInvSel;
 bool quitGame;
 s8 currentSelection;
 
 u16 daytime;
+int day;
+u8 season;
+bool rain;
 
 void tickTile(int x, int y);
 bool tileIsSolid(int tile, Entity * e);

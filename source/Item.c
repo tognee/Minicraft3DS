@@ -183,6 +183,9 @@ char* getItemName(int itemID, int countLevel){
 		case ITEM_WIZARD_SUMMON: sprintf(currentName,"%d Wizard Summon", countLevel); return currentName;
 		case ITEM_DRAGON_EGG: sprintf(currentName,"%d Dragon Egg", countLevel); return currentName;
 		case ITEM_DRAGON_SCALE: sprintf(currentName,"%d Dragon Scale", countLevel); return currentName;
+		case ITEM_BOOKSHELVES: sprintf(currentName,"%d Bookshelves", countLevel); return currentName;
+        case ITEM_MAGIC_DUST: sprintf(currentName,"%d Magic Dust", countLevel); return currentName;
+        case ITEM_COIN: sprintf(currentName,"%d Coins", countLevel); return currentName;
 		case TOOL_BUCKET:
 			switch(countLevel){
                 case 1: return "Water Bucket";
@@ -190,6 +193,7 @@ char* getItemName(int itemID, int countLevel){
                 default: return "Empty Bucket";
             }
 		case TOOL_BOW: return "Bow";
+        case TOOL_MAGIC_COMPASS: return "Magic Compass";
         default: return ""; // null
     }
 }
@@ -287,8 +291,11 @@ char* getBasicItemName(int itemID, int countLevel){
 		case ITEM_BONE: return "Bone";
 		case ITEM_DUNGEON_KEY: return "Dungeon Key";
 		case ITEM_WIZARD_SUMMON: return "Wizard Summon";
-		case ITEM_DRAGON_EGG: return "%d Dragon Egg";
-		case ITEM_DRAGON_SCALE: return "%d Dragon Scale";
+		case ITEM_DRAGON_EGG: return "Dragon Egg";
+		case ITEM_DRAGON_SCALE: return "Dragon Scale";
+		case ITEM_BOOKSHELVES: return "Bookshelves";
+        case ITEM_MAGIC_DUST: return "Magic Dust";
+        case ITEM_COIN: return "Coin";
 		case TOOL_BUCKET:
 			switch(countLevel){
                 case 1: return "Water Bucket";
@@ -296,6 +303,7 @@ char* getBasicItemName(int itemID, int countLevel){
                 default: return "Empty Bucket";
             }
 		case TOOL_BOW: return "Bow";
+        case TOOL_MAGIC_COMPASS: return "Magic Compass";
         default: return ""; // null
     }
     

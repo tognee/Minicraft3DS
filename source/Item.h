@@ -68,9 +68,13 @@
 #define ITEM_WIZARD_SUMMON 70
 #define ITEM_DRAGON_EGG 71
 #define ITEM_DRAGON_SCALE 72
+#define ITEM_BOOKSHELVES 73
+#define ITEM_MAGIC_DUST 74
+#define ITEM_COIN 75
 
 #define TOOL_BUCKET 101
 #define TOOL_BOW 102
+#define TOOL_MAGIC_COMPASS 103
 
 typedef struct Inventory Inventory;
 

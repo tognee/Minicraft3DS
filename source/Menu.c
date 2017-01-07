@@ -531,7 +531,9 @@ void tickMenu(int menu){
 						}
 						
 						enterDungeon();
-					}
+					} else if(TESTGODMODE) {
+                        enterDungeon();
+                    }
 				} else {
 					leaveDungeon();
 				}
@@ -754,6 +756,9 @@ void tickMenu(int menu){
                 }
             }
             
+        break;
+        case MENU_NPC:
+            tickNPCMenu();
         break;
     }
     
@@ -1158,8 +1163,8 @@ void renderMenu(int menu,int xscr,int yscr){
 				drawTextColor("Cost",248+1,78+1,0xFF000000);
 				drawTextColor("Cost",248,78,0xFF6FE2E2);
                 renderFrame(1,1,14,14,0xFFFF1010);
-				drawTextColor("Crafting",24+1,14+1,0xFF000000);
-				drawTextColor("Crafting",24,14,0xFF6FE2E2);
+				drawTextColor(currentCraftTitle,24+1,14+1,0xFF000000);
+				drawTextColor(currentCraftTitle,24,14,0xFF6FE2E2);
                 renderRecipes(currentRecipes, 1, 1, 14, 14, curInvSel);
                 
                 Recipe* rec = &currentRecipes->recipes[curInvSel];
@@ -1420,7 +1425,20 @@ void renderMenu(int menu,int xscr,int yscr){
                         break;
                 }
 		    sf2d_end_frame();
-            break;
+        break;
+        case MENU_NPC:
+		    sf2d_start_frame(GFX_TOP, GFX_LEFT);
+                if(currentLevel == 0){ 
+                    sf2d_draw_texture_part_scale(minimap[1],(-xscr/3)-256,(-yscr/3)-32,0,0,128,128,12.5,7.5);
+                    sf2d_draw_rectangle(0,0,400,240, 0xAFDFDFDF);
+                }
+	            offsetX = xscr;offsetY = yscr;
+		            renderMenuBackground(xscr,yscr);
+		        offsetX = 0;offsetY = 0;
+	            
+		        renderNPCMenu(xscr, yscr);
+		    sf2d_end_frame();
+        break;
     }
 
 }
