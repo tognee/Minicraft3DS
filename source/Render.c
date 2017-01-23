@@ -276,8 +276,8 @@ void bakeLights() {
 	playerLightBake = sf2d_create_texture(64, 64, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 	lanternLightBake = sf2d_create_texture(128, 128, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 	
-	glowwormLightBake = sf2d_create_texture(16, 16, TEXFMT_RGBA8, SF2D_PLACE_RAM);
-	glowwormBigLightBake = sf2d_create_texture(32, 32, TEXFMT_RGBA8, SF2D_PLACE_RAM);
+	glowwormLightBake = sf2d_create_texture(32, 32, TEXFMT_RGBA8, SF2D_PLACE_RAM);
+	glowwormBigLightBake = sf2d_create_texture(64, 64, TEXFMT_RGBA8, SF2D_PLACE_RAM);
 
 	bakeLight(playerLightBake, 32, 32, 32);
 	bakeLight(lanternLightBake, 64, 64, 64);
@@ -296,11 +296,11 @@ void freeLightBakes() {
 
 void renderLightsToStencil(bool force, bool invert, bool rplayer) {
 	if (force || (currentLevel > 1 && currentLevel != 5)) {
-		GPU_SetDepthTestAndWriteMask(true, GPU_NEVER, 0);
-		GPU_SetStencilTest(true, GPU_NEVER, 1, 0xFF, 0xFF);
-		GPU_SetStencilOp(GPU_STENCIL_REPLACE, GPU_STENCIL_KEEP,
-				GPU_STENCIL_KEEP);
-		GPU_SetAlphaTest(true, GPU_GREATER, 0);
+		C3D_DepthTest(true, GPU_NEVER, 0);
+		C3D_StencilTest(true, GPU_NEVER, 1, 0xFF, 0xFF);
+		C3D_StencilOp(GPU_STENCIL_REPLACE, GPU_STENCIL_KEEP, GPU_STENCIL_KEEP);
+		C3D_AlphaTest(true, GPU_GREATER, 0);
+		
 
         if(player.p.activeItem->id == ITEM_LANTERN) renderLight(player.x, player.y, lanternLightBake);
         else if(rplayer) renderLight(player.x, player.y, playerLightBake);
@@ -313,8 +313,8 @@ void renderLightsToStencil(bool force, bool invert, bool rplayer) {
 					renderLight(e.x, e.y, lanternLightBake);
 			} else if(e.type == ENTITY_GLOWWORM && e.x > player.x - 160 && e.y > player.y - 125 && e.x < player.x + 160 && e.y < player.y + 125) { //TODO could be made smaller becuase of smaller light radius
 				if(rand()%10==0) continue;
-				else if(rand()%100==0) renderLight(e.x+4, e.y-4, glowwormBigLightBake);
-				else renderLight(e.x, e.y, glowwormLightBake);
+				else if(rand()%100==0) renderLight(e.x+20, e.y-20, glowwormBigLightBake);
+				else renderLight(e.x+8, e.y-8, glowwormLightBake);
 			}
 		}
 		
@@ -335,22 +335,22 @@ void renderLightsToStencil(bool force, bool invert, bool rplayer) {
 			}
 		}
 		
-		
-		GPU_SetDepthTestAndWriteMask(true, GPU_GEQUAL, GPU_WRITE_ALL);
+
+		C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
 		if(invert) {
-			GPU_SetStencilTest(true, GPU_EQUAL, 0, 0xFF, 0x0);
+			C3D_StencilTest(true, GPU_EQUAL, 0, 0xFF, 0x0);
 		} else {
-			GPU_SetStencilTest(true, GPU_EQUAL, 1, 0xFF, 0x0);
+			C3D_StencilTest(true, GPU_EQUAL, 1, 0xFF, 0x0);
 		}
-		GPU_SetAlphaTest(false, GPU_ALWAYS, 0x00);
-		GPU_SetStencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_REPLACE);
+		C3D_AlphaTest(false, GPU_ALWAYS, 0x00);
+		C3D_StencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_REPLACE);
 	}
 }
 
 void resetStencilStuff() {
 	//if (currentLevel > 1) {
-		GPU_SetStencilTest(false, GPU_ALWAYS, 0x00, 0xFF, 0x00);
-		GPU_SetStencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_KEEP);
+		C3D_StencilTest(false, GPU_ALWAYS, 0x00, 0xFF, 0x00);
+		C3D_StencilOp(GPU_STENCIL_KEEP, GPU_STENCIL_KEEP, GPU_STENCIL_KEEP);
 	//}
 }
 

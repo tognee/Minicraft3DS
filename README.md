@@ -5,6 +5,8 @@ Dependencies:
 
 ctrulib by smea: https://github.com/smealum/ctrulib
 
+citro3d by fincs: https://github.com/fincs/citro3d
+
 sf2dlib by xerpi: https://github.com/xerpi/sf2dlib
 
 sfillib by xerpi: https://github.com/xerpi/sfillib

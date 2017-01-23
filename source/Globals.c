@@ -988,7 +988,10 @@ void tickTile(int x, int y){
     
     switch(tile){
         case TILE_SAPLING_TREE:
-            if(season!=3) setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_TREE,x,y);}
+            if(season!=3) {
+				setData(++data,x,y); 
+				if(data>100){setData(0,x,y); setTile(TILE_TREE,x,y);}
+			}
             break;
 		case TILE_TREE:
 			if(eManager.lastSlot[currentLevel]<800 && (daytime>18000 || daytime<5000) && rand()%800==0) {
@@ -1002,7 +1005,10 @@ void tickTile(int x, int y){
 			}
 			break;
         case TILE_SAPLING_CACTUS:
-            if(season!=3) setData(++data,x,y); if(data>100){setData(0,x,y); setTile(TILE_CACTUS,x,y);}
+            if(season!=3) {
+				setData(++data,x,y); 
+				if(data>100){setData(0,x,y); setTile(TILE_CACTUS,x,y);}
+			}
             break;
         case TILE_WHEAT:
             if(data<100 && season!=3) setData(++data,x,y);
