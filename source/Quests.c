@@ -124,7 +124,7 @@ void openNPCMenu(int npc) {
         currentTalk2 = "or stupid to be walking";
         currentTalk3 = "around in this dungeon.";
         currentTalk4 = "";
-        currentTalk5 = "Who can I help you?";
+        currentTalk5 = "How can I help you?";
     break;
     case NPC_DWARF:
         if(questManager.questlines[1].currentQuest<=1) {

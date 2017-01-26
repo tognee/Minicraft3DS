@@ -12,6 +12,7 @@
 #include "MapGen.h"
 #include "Menu.h"
 #include "texturepack.h"
+#include "Network.h"
 
 // TODO: Dungeon is way to difficult
 //       -> Skeleton arrows are slower, do a little less damage
@@ -182,9 +183,10 @@ int main() {
         osSetSpeedupEnable(shouldSpeedup);
 		fclose(file);
 	}
-    
-	sf2d_init();
+    sf2d_init();
 	csndInit();
+	networkInit();
+	
 	noItem = newItem(ITEM_NULL, 0);
 	
 	initMenus();
@@ -325,6 +327,7 @@ int main() {
 	sf2d_free_texture(minimap[4]);
 	sf2d_free_texture(minimap[5]);
 	freeSounds();
+	networkExit();
 	csndExit();
     cfguExit();
 	sf2d_fini();
