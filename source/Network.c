@@ -1,5 +1,6 @@
 #include "Network.h"
 
+#include "PacketHandler.h"
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
@@ -186,10 +187,7 @@ void networkRecieve() {
 		if(actualSize) {
 			networkPacket *packet = (networkPacket*) networkBuffer;
 			
-			//TODO: Differenciate the packets and process them
-			if(packet->analyze.type==0) {
-				
-			}
+			processPacket(packet, packet->analyze.type);
 		}
 	}
 } 

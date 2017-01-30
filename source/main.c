@@ -41,7 +41,7 @@ void initNewMap() {
 	createAndValidateUndergroundMap(128, 128, 3, 4, map[4], data[4]);
 }
 
-void setupGame(bool loadUpWorld) {
+void setupGame(bool loadUpWorld, bool remote) {
 	currentLevel = 1;
 
 	// Reset entity manager.
@@ -50,29 +50,41 @@ void setupGame(bool loadUpWorld) {
 
 	initMiniMapData();
 	
-	if (!loadUpWorld) {
-		initNewMap();
-		initPlayer();
-        resetQuests();
-		airWizardHealthDisplay = 2000;
-		int i;
-		for (i = 0; i < 5; ++i) {
-			trySpawn(500, i);
-		}
-		addEntityToList(newAirWizardEntity(630, 820, 0), &eManager);
-		daytime = 6000;
-        day = 0;
-        season = 0;
-        rain = false;
-	} else {
-		initPlayer();
-        resetQuests();
-		loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
-	}
-	
-	updateMusic(currentLevel, daytime);
+    if(!remote) {
+        if (!loadUpWorld) {
+            initNewMap();
+            initPlayer();
+            resetQuests();
+            airWizardHealthDisplay = 2000;
+            int i;
+            for (i = 0; i < 5; ++i) {
+                trySpawn(500, i);
+            }
+            addEntityToList(newAirWizardEntity(630, 820, 0), &eManager);
+            daytime = 6000;
+            day = 0;
+            season = 0;
+            rain = false;
+        } else {
+            initPlayer();
+            resetQuests();
+            loadWorld(currentFileName, &eManager, &player, (u8*) map, (u8*) data);
+        }
+        
+        updateMusic(currentLevel, daytime);
 
-	initMiniMap(loadUpWorld);
+        initMiniMap(loadUpWorld);
+    } else {
+        //TODO: Can Packets get dropped - if yes, should resending be handled by network functions (so I dont need to do it everywhere)
+        networkPacket packet = {
+            .requestMapData = {
+                .type = PACKET_REQUEST_MAPDATA,
+                .level = 1
+            }
+        };
+        networkSend(&packet, sizeof(packetRequestMapData));
+    }
+    
 	shouldRenderMap = false;
 	mScrollX = 0;
 	mScrollY = 0;
@@ -102,72 +114,74 @@ void setupBGMap(bool loadUpWorld) {
 
 int xscr = 0, yscr = 0;
 void tick() {
-	if (player.p.isDead) {
-		if (player.p.endTimer < 1) {
-			currentMenu = MENU_LOSE;
-		}
-		--player.p.endTimer;
-		return;
-	} else if (player.p.hasWon) {
-		if (player.p.endTimer < 1) {
-			currentMenu = MENU_WIN;
-		}
-		--player.p.endTimer;
-		return;
-	}
-	
-	tickTouchMap();
-	tickTouchQuickSelect();
-
-	++daytime;
-	//daytime += 20;
-	if(daytime>=24000) {
-		daytime -= 24000;
-        ++day;
-        //TODO: maybe make season length not as hardcoded + make the transition better (fade to black and back maybe?)
-        if(day%7==0) {
-            ++season;
-            if(season==4) season = 0;
+    //TODO: Some stuff DOES need to happen even on client side
+    if(!isRemote) {
+        if (player.p.isDead) {
+            if (player.p.endTimer < 1) {
+                currentMenu = MENU_LOSE;
+            }
+            --player.p.endTimer;
+            return;
+        } else if (player.p.hasWon) {
+            if (player.p.endTimer < 1) {
+                currentMenu = MENU_WIN;
+            }
+            --player.p.endTimer;
+            return;
         }
-        rain = false;
-        if(season!=3 && rand()%5==0) rain = true;
-	}
-	if(daytime==6000 && currentLevel==1) {
-		playMusic(music_floor1);
-	} else if(daytime==19000 && currentLevel==1) {
-		playMusic(music_floor1_night);
-	}
-	
-	int i;
-	for (i = 0; i < 324; ++i) {
-		int xx = rand() & 127;
-		int yy = rand() & 127;
-		tickTile(xx, yy);
-	}
-	tickPlayer();
-	xscr = player.x - 100;
-	yscr = player.y - 56;
-	if (xscr < 16)
-		xscr = 16;
-	else if (xscr > 1832)
-		xscr = 1832;
-	if (yscr < 16)
-		yscr = 16;
-	else if (yscr > 1912)
-		yscr = 1912;
-	
-	if(eManager.lastSlot[currentLevel]<80 && currentLevel != 5) {
-		trySpawn(1, currentLevel);
-	}
+        
+        tickTouchMap();
+        tickTouchQuickSelect();
 
-	for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
-		Entity * e = &eManager.entities[currentLevel][i];
-		if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SKELETON && e->type != ENTITY_KNIGHT && e->type != ENTITY_SLIME && e->type != ENTITY_PASSIVE) 
-            || (e->type == ENTITY_GLOWWORM && (daytime>6000 || daytime<18000)) 
-			|| (e->x > player.x - 160 && e->y > player.y - 125 && e->x < player.x + 160 && e->y < player.y + 125))
-			tickEntity(e);
-	}
+        ++daytime;
+        //daytime += 20;
+        if(daytime>=24000) {
+            daytime -= 24000;
+            ++day;
+            //TODO: maybe make season length not as hardcoded + make the transition better (fade to black and back maybe?)
+            if(day%7==0) {
+                ++season;
+                if(season==4) season = 0;
+            }
+            rain = false;
+            if(season!=3 && rand()%5==0) rain = true;
+        }
+        if(daytime==6000 && currentLevel==1) {
+            playMusic(music_floor1);
+        } else if(daytime==19000 && currentLevel==1) {
+            playMusic(music_floor1_night);
+        }
+        
+        int i;
+        for (i = 0; i < 324; ++i) {
+            int xx = rand() & 127;
+            int yy = rand() & 127;
+            tickTile(xx, yy);
+        }
+        tickPlayer();
+        xscr = player.x - 100;
+        yscr = player.y - 56;
+        if (xscr < 16)
+            xscr = 16;
+        else if (xscr > 1832)
+            xscr = 1832;
+        if (yscr < 16)
+            yscr = 16;
+        else if (yscr > 1912)
+            yscr = 1912;
+        
+        if(eManager.lastSlot[currentLevel]<80 && currentLevel != 5) {
+            trySpawn(1, currentLevel);
+        }
 
+        for (i = 0; i < eManager.lastSlot[currentLevel]; ++i) {
+            Entity * e = &eManager.entities[currentLevel][i];
+            if ((e->type != ENTITY_ZOMBIE && e->type != ENTITY_SKELETON && e->type != ENTITY_KNIGHT && e->type != ENTITY_SLIME && e->type != ENTITY_PASSIVE) 
+                || (e->type == ENTITY_GLOWWORM && (daytime>6000 || daytime<18000)) 
+                || (e->x > player.x - 160 && e->y > player.y - 125 && e->x < player.x + 160 && e->y < player.y + 125))
+                tickEntity(e);
+        }
+    }
 }
 
 char debugText[34];
@@ -265,9 +279,11 @@ int main() {
 
 		if (quitGame) break;
 
-		if (initGame > 0) setupGame(initGame == 1 ? true : false);
+		if (initGame > 0) setupGame(initGame == 1 ? true : false, isRemote);
 		if (initBGMap > 0) setupBGMap(initBGMap == 1 ? true : false);
 
+        networkRecieve();
+        
 		if (currentMenu == 0) {
 			tick();
 			sf2d_start_frame(GFX_TOP, GFX_LEFT);

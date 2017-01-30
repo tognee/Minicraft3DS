@@ -28,6 +28,7 @@
 #define MENU_SETTINGS_TP 13
 #define MENU_DUNGEON 14
 #define MENU_NPC 15
+#define MENU_MULTIPLAYER 16
 
 #define NPC_GIRL 0
 #define NPC_PRIEST 1
@@ -136,6 +137,7 @@ char* currentCraftTitle;
 s16 curInvSel;
 bool quitGame;
 s8 currentSelection;
+bool isRemote;
 
 u16 daytime;
 int day;
