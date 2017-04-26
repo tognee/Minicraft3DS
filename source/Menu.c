@@ -1483,7 +1483,7 @@ void renderMenu(int menu,int xscr,int yscr){
                     char * text = malloc((50+8+1) * sizeof(char));
                     memset(text, 0, (50+8+1) * sizeof(char));
                     networkGetScanName(text, i);
-                    strcpy(text, "'s World");
+                    strcat(text, "'s World");
                     
                     if(i != currentSelection) color &= 0xFF7F7F7F; // Darken color.
                     

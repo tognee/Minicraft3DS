@@ -151,19 +151,28 @@ bool networkConnected() {
 	return isConnected;
 } 
 
+bool networkIsServer() {
+	return isServer;
+}
+
 
 
 void networkSend(networkPacket *packet, size_t size) {
 	if(udsRunning && isConnected) {
 		//Server broadcasts to all clients but clients only send info to server
-		u16 dest;
 		if(isServer) {
-			dest = UDS_BROADCAST_NETWORKNODEID;
+			networkSendTo(packet, size, UDS_BROADCAST_NETWORKNODEID);
 		} else {
-			dest = UDS_HOST_NETWORKNODEID;
+			networkSendTo(packet, size, UDS_HOST_NETWORKNODEID);
 		}
+	}
+}
+
+//TODO: I somehow need to implement a relieable protocol on top of uds
+void networkSendTo(networkPacket *packet, size_t size, u16 reciever) {
+	if(udsRunning && isConnected) {
 		
-		Result ret = udsSendTo(dest, NETWORK_CHANNEL, UDS_SENDFLAG_Default, packet, size);
+		Result ret = udsSendTo(reciever, NETWORK_CHANNEL, UDS_SENDFLAG_Default, packet, size);
 		if(UDS_CHECK_SENDTO_FATALERROR(ret)) {
 			//TODO: what do?
 		}
@@ -187,7 +196,7 @@ void networkRecieve() {
 		if(actualSize) {
 			networkPacket *packet = (networkPacket*) networkBuffer;
 			
-			processPacket(packet, packet->analyze.type);
+			processPacket(packet, packet->analyze.type, sourceNetworkNodeID);
 		}
 	}
 } 

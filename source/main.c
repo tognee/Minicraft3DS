@@ -18,6 +18,13 @@
 //       -> Skeleton arrows are slower, do a little less damage
 //       -> Or instead of less damage, implement a simple armor system
 
+//TODO: Multiplayer should use normal drawing code -> so remove this first test again
+float tmxscr = 400;
+float tmyscr = 400;
+float tmenuxa = 0.25;
+float tmenuya = 0.25;
+
+
 void initMiniMapData() {
 	int i;
 	for(i = 0; i < 128 * 128; ++i) {
@@ -75,6 +82,12 @@ void setupGame(bool loadUpWorld, bool remote) {
 
         initMiniMap(loadUpWorld);
     } else {
+		//reset level data so no old data can somehow remain
+		memset(map, 0, 128*128*5 * sizeof(u8));
+		memset(data, 0, 128*128*5 * sizeof(u8));
+		
+		currentLevel = 1;
+		
         //TODO: Can Packets get dropped - if yes, should resending be handled by network functions (so I dont need to do it everywhere)
         networkPacket packet = {
             .requestMapData = {
@@ -286,41 +299,83 @@ int main() {
         
 		if (currentMenu == 0) {
 			tick();
-			sf2d_start_frame(GFX_TOP, GFX_LEFT);
+			//TODO: Multiplayer should use normal drawing code -> so remove this first test again
+			if(!isRemote) {
+				sf2d_start_frame(GFX_TOP, GFX_LEFT);
 
-			offsetX = xscr;
-			offsetY = yscr;
-			sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //RGBA8(12, 12, 12, 255)); //You might think "real" black would be better, but it actually looks better that way
-			
-			renderLightsToStencil(false, false, true);
+				offsetX = xscr;
+				offsetY = yscr;
+				sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //RGBA8(12, 12, 12, 255)); //You might think "real" black would be better, but it actually looks better that way
+				
+				renderLightsToStencil(false, false, true);
 
-			renderBackground(xscr, yscr);
-			renderEntities(player.x, player.y, &eManager);
-			renderPlayer();
-            renderWeather(xscr, yscr);
-			
-			resetStencilStuff();
-			
-			renderDayNight();
-			
-			offsetX = 0;
-			offsetY = 0;
-			
-			if(shouldRenderDebug){
-			    sprintf(fpsstr, " FPS: %.0f, X:%d, Y:%d, E:%d", sf2d_get_fps(), player.x, player.y, eManager.lastSlot[currentLevel]);
-			    drawText(fpsstr, 2, 225);
-            }
-			
-			sf2d_end_frame();
+				renderBackground(xscr, yscr);
+				renderEntities(player.x, player.y, &eManager);
+				renderPlayer();
+				renderWeather(xscr, yscr);
+				
+				resetStencilStuff();
+				
+				renderDayNight();
+				
+				offsetX = 0;
+				offsetY = 0;
+				
+				if(shouldRenderDebug){
+					sprintf(fpsstr, " FPS: %.0f, X:%d, Y:%d, E:%d", sf2d_get_fps(), player.x, player.y, eManager.lastSlot[currentLevel]);
+					drawText(fpsstr, 2, 225);
+				}
+				
+				sf2d_end_frame();
 
-            sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-                if(!shouldRenderMap){
-                    sf2d_draw_texture(bottombg, 0, 0);
-                    renderGui();
-                } else {
-                    renderZoomedMap();
-                }
-            sf2d_end_frame();
+				sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
+					if(!shouldRenderMap){
+						sf2d_draw_texture(bottombg, 0, 0);
+						renderGui();
+					} else {
+						renderZoomedMap();
+					}
+				sf2d_end_frame();
+			//TODO: Multiplayer should use normal drawing code -> so remove this first test again
+			} else {
+				//TODO: Temporary way of getting back to the menu
+				if (k_pause.clicked){
+					sf2d_set_clear_color(0xFF);
+                    currentSelection = 0;
+                    currentMenu = MENU_TITLE;
+                    
+                    networkDisconnect();
+					
+					playMusic(music_menu);
+				}
+				
+				tmxscr += tmenuxa;
+				tmyscr += tmenuya;
+				
+				if (tmxscr < 16) {
+					tmxscr = 16;
+					tmenuxa = -tmenuxa;
+				} else if (tmxscr > 1832) {
+					tmxscr = 1832;
+					tmenuxa = -tmenuxa;
+				}
+				if (tmyscr < 16) {
+					tmyscr = 16;
+					tmenuya = -tmenuya;
+				} else if (tmyscr > 1792) {
+					tmyscr = 1792;
+					tmenuya = -tmenuya;
+				}
+				
+				sf2d_start_frame(GFX_TOP, GFX_LEFT);
+					offsetX = (int) tmxscr; offsetY = (int) tmyscr;
+						renderBackground((int) tmxscr, (int) tmyscr);
+					offsetX = 0; offsetY = 0;
+				sf2d_end_frame();
+
+				sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
+				sf2d_end_frame();
+			}
 		} else {
 			tickMenu(currentMenu);
 			renderMenu(currentMenu, xscr, yscr);

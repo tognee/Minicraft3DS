@@ -56,6 +56,8 @@ bool networkConnect(int pos);
 void networkDisconnect();
 
 bool networkConnected();
+bool networkIsServer();
 
 void networkSend(networkPacket *packet, size_t size); //TODO: Should this be a pointer? Calling function needs to cleanup itself
+void networkSendTo(networkPacket *packet, size_t size, u16 reciever); //TODO: Should this be a pointer? Calling function needs to cleanup itself
 void networkRecieve(); //TODO: Should recieve actually handle all the packets or just return them?
