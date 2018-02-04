@@ -141,6 +141,7 @@ void hurtEntity(Entity *e, int damage, int dir, u32 hurtColor, Entity *damager){
                 playSoundPositioned(snd_bossdeath, e->level, e->x, e->y);
                 e->p.endTimer = 60;
                 e->p.isDead = true;
+                e->hurtTime = 10;
                 return;
             }
        break;

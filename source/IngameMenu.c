@@ -96,15 +96,19 @@ void ingameMenuTick(PlayerData *pd, int menu) {
         case MENU_WIN:
             if (pd->inputs.k_accept.clicked){ 
 	            pd->ingameMenu = MENU_NONE;
+                pd->entity.p.hasWon = false;
             }
         break;
         case MENU_LOSE:
             if (pd->inputs.k_accept.clicked){ 
                 pd->ingameMenu = MENU_NONE;
+                pd->entity.p.isDead = false;
+                pd->entity.p.health = 10;
                 pd->entity.level = 1;
                 playerSpawn(pd);
 	            //TODO: This canceled to main menu, but what should I do in multiplayer?
             }
+            pd->entity.hurtTime = 10;
         break;
         
         case MENU_CONTAINER:
@@ -186,6 +190,7 @@ void ingameMenuTick(PlayerData *pd, int menu) {
             wrap = wrap - 1;
             
             pd->entity.p.health = 10;
+            pd->entity.hurtTime = 10;
             
             //head
             if(pd->ingameMenuSelection==0) {

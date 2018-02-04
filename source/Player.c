@@ -352,6 +352,8 @@ bool playerUse(PlayerData *pd) {
 }
 
 void tickPlayer(PlayerData *pd, bool inmenu) {
+    if (pd->entity.p.isDead) return;
+    
     //invincibility time
     if (pd->entity.hurtTime > 0) pd->entity.hurtTime--;
     
