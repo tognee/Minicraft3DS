@@ -21,6 +21,8 @@ udsBindContext networkBindCtx;
 
 udsConnectionStatus networkStatus;
 
+u16 networkConnectedMask;
+
 //new code
 //structure in buffer is u16(seqID),u16(size),size(data), ...
 void *networkSendBuffer;
@@ -57,7 +59,15 @@ void networkThreadMain(void *arg) {
 }
 
 void networkUpdateStatus() {
-    udsGetConnectionStatus(&networkStatus);
+    /*for(int i=0; i<10; i++) {
+        Result ret = udsGetConnectionStatus(&networkStatus);
+        if(!R_FAILED(ret)) {
+            return;
+        }
+    }*/
+    if(udsWaitConnectionStatusEvent(false, false)) {
+        udsGetConnectionStatus(&networkStatus);
+    }
 }
 
 void networkHandleRecieve() {
@@ -101,8 +111,12 @@ void networkHandleRecieve() {
                         networkSeqRecvLast[sourceNetworkNodeID] = seqID;
                         ackToSend = seqID;
                         
-                        //handle data
-                        processPacket(readPointer, size);
+                        //handle data - TODO: WARNING: Do not send sizeof(u16) packets or else they will get confused with this one
+                        if(size==sizeof(u16)) {
+                            networkConnectedMask = *((u16*) readPointer);
+                        } else {
+                            processPacket(readPointer, size);
+                        }
                     } else if(seqID<=nextID-1) {
                         ackToSend = nextID-1;
                     }
@@ -143,12 +157,27 @@ void networkHandleSend() {
         
         //send frame
         if(currentSize>0) {
-            //send frame
-            Result ret = udsSendTo(UDS_BROADCAST_NETWORKNODEID, NETWORK_CHANNEL, UDS_SENDFLAG_Default, networkSendBuffer+networkSendBufferStartPos, currentSize);
-            if(UDS_CHECK_SENDTO_FATALERROR(ret)) {
-                //TODO: what do?
-            } else if(R_FAILED(ret)) {
-                //TODO: what do?
+            //TODO: Once we have our own custom mask, no longer broadcast, but send directly because bcast doesn't always reach everyone?
+            if(networkConnectedMask==0) {
+                //send frame
+                    Result ret = udsSendTo(UDS_BROADCAST_NETWORKNODEID, NETWORK_CHANNEL, UDS_SENDFLAG_Default, networkSendBuffer+networkSendBufferStartPos, currentSize);
+                    if(UDS_CHECK_SENDTO_FATALERROR(ret)) {
+                        //TODO: what do?
+                    } else if(R_FAILED(ret)) {
+                        //TODO: what do?
+                    }
+            } else {
+                for(int i=1; i<=UDS_MAXNODES; i++) {
+                    if(i!=networkGetLocalNodeID()/* && networkIsNodeConnected(i)*/ && networkConnectedMask & (1 << (i-1))) {
+                        //send frame
+                        Result ret = udsSendTo(i, NETWORK_CHANNEL, UDS_SENDFLAG_Default, networkSendBuffer+networkSendBufferStartPos, currentSize);
+                        if(UDS_CHECK_SENDTO_FATALERROR(ret)) {
+                            //TODO: what do?
+                        } else if(R_FAILED(ret)) {
+                            //TODO: what do?
+                        }
+                    }
+                }
             }
         }
         
@@ -160,7 +189,7 @@ void clearSendAckedBuffer() {
     //find last ack recieved from all com partners
     u16 ackID = 0;
     for(int i=1; i<=UDS_MAXNODES; i++) {
-        if(i!=networkGetLocalNodeID() && networkIsNodeConnected(i)) {
+        if(i!=networkGetLocalNodeID()/* && networkIsNodeConnected(i)*/ && networkConnectedMask & (1 << (i-1))) {
             if(networkSeqSendConf[i]==0) {
                 ackID = 0;
                 return;
@@ -235,6 +264,7 @@ void networkInit() {
 		scannedNetworks = NULL;
 		isConnected = false;
 		isServer = false;
+        networkConnectedMask = 0;
 
         networkWriteBuffer = malloc(NETWORK_MAXDATASIZE);
         if(networkWriteBuffer==NULL) {
@@ -331,9 +361,11 @@ bool networkHost() {
 			return false;
 		} else {
             if(udsWaitConnectionStatusEvent(false, false)) {}
+            udsGetConnectionStatus(&networkStatus);
             udsSetNewConnectionsBlocked(false, true, false);
 			isConnected = true;
 			isServer = true;
+            networkConnectedMask = 0;
 			return true;
 		}
 	}
@@ -392,8 +424,10 @@ bool networkConnect(int pos) {
 			return false;
 		} else {
             if(udsWaitConnectionStatusEvent(false, false)) {}
+            udsGetConnectionStatus(&networkStatus);
 			isConnected = true;
 			isServer = false;
+            networkConnectedMask = 0;
 			return true;
 		}
 	}
@@ -403,18 +437,9 @@ bool networkConnect(int pos) {
 void networkDisconnect() {
 	//For clients this just means disconnect, for the server it means destroy the network
 	if(udsRunning && isConnected) {
-		//TODO
-		if(isServer) {
-			//TODO: Clients need to cleanup too, how can I tell they got disconnected
-			udsDestroyNetwork();
-		} else {
-			udsDisconnectNetwork();
-		}
-		udsUnbind(&networkBindCtx);
-		
 		isConnected = false;
-		isServer = false;
         
+        LightLock_Lock(&sendBufferLock);
         //reset send buffer
         networkSendBufferStartPos = 0;
         networkSendBufferEndPos = 0;
@@ -426,9 +451,37 @@ void networkDisconnect() {
             networkSeqSendConf[i] = 0;
             networkSeqRecvLast[i] = 0;
         }
+        LightLock_Unlock(&sendBufferLock);
+        
+        //With new changes citra now crashes HOST with "cannot be a router if we are not a host" when exiting game with more than 2 people
+        svcSleepThread(220000 * 1000); //HACK: prevent citra crash (>20*networkthreadsleep) (wait unti no more stuff gets send)
+        
+        //TODO
+		if(isServer) {
+			//TODO: Clients need to cleanup too, how can I tell they got disconnected
+			udsDestroyNetwork();
+		} else {
+			udsDisconnectNetwork();
+		}
+		udsUnbind(&networkBindCtx);
+		
+		isServer = false;
 	}
 }
 
+
+void networkStart() {
+    //TODO: This sends the node_bitmask from server to everyone else, because it is uncorrect on some clients?
+    if(udsRunning && isConnected && isServer) {
+        void *buffer = networkWriteBuffer;
+        
+        *((u16*) buffer) = networkStatus.node_bitmask;
+        networkConnectedMask = networkStatus.node_bitmask;
+        
+        networkSend(networkWriteBuffer, sizeof(u16));
+        networkSendWaitFlush();
+    }
+}
 
 
 bool networkConnected() {

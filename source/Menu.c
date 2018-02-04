@@ -587,6 +587,7 @@ void tickMenu(int menu){
                         }
                     break;
                     case 2:
+                        networkScan();
                         currentMenu = MENU_MULTIPLAYER_JOIN;
                         currentSelection = 0;
                         menuScanTimer = 0;

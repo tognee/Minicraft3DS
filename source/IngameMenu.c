@@ -101,6 +101,7 @@ void ingameMenuTick(PlayerData *pd, int menu) {
         case MENU_LOSE:
             if (pd->inputs.k_accept.clicked){ 
                 pd->ingameMenu = MENU_NONE;
+                pd->entity.level = 1;
                 playerSpawn(pd);
 	            //TODO: This canceled to main menu, but what should I do in multiplayer?
             }

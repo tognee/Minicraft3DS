@@ -30,6 +30,8 @@ bool networkGetScanName(char *name, int pos);
 bool networkConnect(int pos);
 void networkDisconnect();
 
+void networkStart();
+
 void networkUpdateStatus();
 bool networkConnected();
 

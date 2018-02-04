@@ -38,6 +38,8 @@ void setupGameServer() {
     
     networkHostStopConnections();
     
+    networkStart();
+    
     //send start info (seed)
     size = writeStartPacket(networkWriteBuffer, rand());
     networkSend(networkWriteBuffer, size);
