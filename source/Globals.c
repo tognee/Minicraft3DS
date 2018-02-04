@@ -2,7 +2,7 @@
 
 #include "Synchronizer.h"
 
-char versionText[34] = "Version 1.5.0";
+char versionText[34] = "Version 1.5.1";
 char fpsstr[34];
 u8 currentMenu = 0;
 
