@@ -1,15 +1,15 @@
 # Minicraft3DS
-3DS Homebrew port of Notch's ludum dare game "Minicraft"
-Current Version: Version 1.5.1
+3DS Homebrew port of Notch's ludum dare game "Minicraft"  
+Current Version: Version 1.5.1  
 
 
 ----------
 
 **Download:**
 
-If you just want to download the game prebuilt check the releases tab in Github:
-https://github.com/andre111/Minicraft3DS/releases
-For building the game yourself look below.
+If you just want to download the game prebuilt check the releases tab in Github:  
+https://github.com/andre111/Minicraft3DS/releases  
+For building the game yourself look below.  
 
 
 ----------
@@ -19,11 +19,11 @@ For building the game yourself look below.
 
 For building and installing the dependencies look below.
 
-ctrulib by smea: https://github.com/smealum/ctrulib
-citro3d by fincs: https://github.com/fincs/citro3d
-sf2dlib by xerpi: https://github.com/xerpi/sf2dlib
-sfillib by xerpi: https://github.com/xerpi/sfillib
-zlib: http://www.zlib.net/
+ctrulib by smea: https://github.com/smealum/ctrulib  
+citro3d by fincs: https://github.com/fincs/citro3d  
+sf2dlib by xerpi: https://github.com/xerpi/sf2dlib  
+sfillib by xerpi: https://github.com/xerpi/sfillib  
+zlib: http://www.zlib.net/  
 
 
 ----------
@@ -31,38 +31,39 @@ zlib: http://www.zlib.net/
 
 **Building:**
 
-1. Install devkitARM by devkitPro
-		- On Windows download https://sourceforge.net/projects/devkitpro/files/Automated%20Installer/
-		- And install atleast Minimal System and devkitARM
-		- This includes make, ctrulib and citro3d
-2. Install zlib, libjpeg-turbo and libpng
-		- Download 3DS-Portlibs: https://github.com/devkitPro/3ds_portlibs
-		- Run these commands:
+**1. Install devkitARM by devkitPro**
+- On Windows download https://sourceforge.net/projects/devkitpro/files/Automated%20Installer/
+- And install atleast Minimal System and devkitARM
+- This includes make, ctrulib and citro3d
+
+**2. Install zlib, libjpeg-turbo and libpng**
+- Download 3DS-Portlibs: https://github.com/devkitPro/3ds_portlibs
+- Run these commands:
 		
 ```
-    make zlib
-    make install-zlib
-    make libjpeg-turbo
-    make libpng
-    make install
+	make zlib
+	make install-zlib
+	make libjpeg-turbo
+	make libpng
+	make install
 ```
 
-3. Install sf2dlib
-		- Download https://github.com/xerpi/sf2dlib
-		- In the libsf2d directory run these commands:
+**3. Install sf2dlib**
+- Download https://github.com/xerpi/sf2dlib
+- In the libsf2d directory run these commands:
 ```
 	make
 	make install
 ```
-4. Install sfillib
-		- Download https://github.com/xerpi/sfillib
-		- In the libsfil directory run these commands:
+**4. Install sfillib**
+- Download https://github.com/xerpi/sfillib
+- In the libsfil directory run these commands:
 ```
 	make
 	make install
 ```
 
-5. You can now build Minicraft3DS 3dsx and elf files by running make
+**5. You can now build Minicraft3DS 3dsx and elf files by running make**
 
 
 ----------
