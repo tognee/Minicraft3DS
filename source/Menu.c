@@ -1224,24 +1224,17 @@ void renderMenu(int menu,int xscr,int yscr){
                 sf2d_draw_rectangle(0, 0, 400, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
                 
                 networkUpdateStatus();
-                drawText("Connected Players",98,8);
-                lastj = 0;
-                for(i = 0; i<networkGetNodeCount(); i++) {
+                drawText("Connected to",(400-12*12)/2,1*26+32);
+                if(networkIsNodeConnected(1)) {
+                    char * text = malloc((50+8+1) * sizeof(char));
+                    memset(text, 0, (50+8+1) * sizeof(char));
+                    networkGetNodeName(1, text);
                     
-                    for(j = lastj+1; j <= UDS_MAXNODES; j++) {
-                        if(networkIsNodeConnected(j)) {
-                            char * text = malloc((50+8+1) * sizeof(char));
-                            memset(text, 0, (50+8+1) * sizeof(char));
-                            networkGetNodeName(j, text);
-                            
-                            drawText(text,(400-(strlen(text)*12))/2,i*26+32);
-                            
-                            free(text);
-                            lastj = j;
-                            break;
-                        }
-                    }
+                    drawText(text,(400-(strlen(text)*12))/2,2*26+32);
+                    
+                    free(text);
                 }
+                drawText("Waiting for host to start",(400-25*12)/2,3*26+32);
             sf2d_end_frame();
             sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
                 sf2d_draw_rectangle(0, 0, 320, 240, 0xFF0C0C0C); //You might think "real" black would be better, but it actually looks better that way
