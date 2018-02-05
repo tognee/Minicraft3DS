@@ -10,6 +10,11 @@
 #include "SaveLoad.h"
 #include "Network.h"
 
+#define STALL_TIME 120
+
+int stallCounter;
+bool stallAreYouSure;
+
 //generates stairs up and creates compass data
 void generatePass2() {
     int level, x, y;
@@ -120,6 +125,8 @@ void startGame(bool load, char *filename) {
     for(int i=0; i<playerCount; i++) {
         initMiniMap(players+i);
     }
+    
+    stallCounter = 0;
 }
 
 void syncedTick() {
@@ -194,7 +201,7 @@ void syncedTick() {
     
     //for every active level
     for(level = 0; level < 6; level++) {
-        if(level==5 && !dungeonActive()) return;
+        if(level==5 && !dungeonActive()) continue;
         
         bool hasPlayer = false;
         for(i=0; i<playerCount; i++) {
@@ -224,10 +231,47 @@ void syncedTick() {
             }
         }
     }
+    
+    stallCounter = 0;
 }
 
 void tickGame() {
     synchronizerTick(&syncedTick);
+    
+    
+    if(synchronizerIsRunning()) {
+        stallCounter++;
+        //game stalled -> most likely a player disconnected -> present option to exit game
+        if(stallCounter>=STALL_TIME) {
+            if(stallCounter==STALL_TIME) stallAreYouSure = false;
+            
+            //scan local inputs, because synchronizer only updates them when not stalled
+            hidScanInput();
+            tickKeys(&localInputs, hidKeysHeld(), hidKeysDown());
+            
+            if (localInputs.k_accept.clicked) { 
+                if(stallAreYouSure) {
+                    //create backup save
+                    if(playerLocalID==0) {
+                        char backupSaveFileName[256+32];
+                        backupSaveFileName[0] = '\0';
+                        
+                        strncat(backupSaveFileName, currentFileName, strlen(currentFileName)-4);
+                        strcat(backupSaveFileName, ".exit.msv");
+                        
+                        saveWorld(backupSaveFileName, &eManager, &worldData, players, playerCount);
+                    }
+                    
+                    exitGame();
+                } else {
+                    stallAreYouSure = true;
+                }
+            }
+            if (localInputs.k_decline.clicked) { 
+                stallAreYouSure = false;
+            }
+        }
+    }
 }
 
 //for rendering -> move to a better place
@@ -278,6 +322,36 @@ void renderGame() {
         ingameMenuRender(getLocalPlayer(), getLocalPlayer()->ingameMenu);
     }
     
+    //game stalled -> most likely a player disconnected -> present option to exit game
+    if(stallCounter>STALL_TIME) {
+        renderFrame(1,1,24,14,0xFF1010AF);
+        drawText("Waiting for a long time", (400 - (23 * 12))/2, 32);
+        
+        char text[50];
+        sprintf(text, "Last response %is ago", stallCounter/60);
+        drawText(text, (400 - (strlen(text) * 12))/2, 64);
+
+        if(playerLocalID==0) {
+            drawText("Press   to leave the game", (400 - (25 * 12))/2, 160);
+            renderButtonIcon(localInputs.k_accept.input & -localInputs.k_accept.input, 120, 157, 1);
+            
+            drawText("A backup save will be created", (400 - (29 * 12))/2, 192);
+        } else {
+            drawText("Press   to leave the game", (400 - (25 * 12))/2, 192);
+            renderButtonIcon(localInputs.k_accept.input & -localInputs.k_accept.input, 120, 189, 1);
+        }
+        
+        if(stallAreYouSure){
+            renderFrame(6,5,19,10,0xFF10108F);
+            
+            drawText("Are you sure?",122,96);
+            drawText("   Yes", 164, 117);
+            renderButtonIcon(localInputs.k_accept.input & -localInputs.k_accept.input, 166, 114, 1);
+            drawText("   No", 170, 133);
+            renderButtonIcon(localInputs.k_decline.input & -localInputs.k_decline.input, 166, 130, 1);
+        }
+    }
+    
     sf2d_end_frame();
 
     sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
@@ -290,3 +364,13 @@ void renderGame() {
     sf2d_end_frame();
 }
 
+void exitGame() {
+    networkDisconnect();
+    synchronizerReset();
+    
+    sf2d_set_clear_color(0xFF);
+    currentSelection = 0;
+    currentMenu = MENU_TITLE;
+    
+    playMusic(&music_menu);
+}

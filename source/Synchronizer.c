@@ -217,6 +217,10 @@ void synchronizerReset() {
     synchronizerCurrentTicks = 0;
 }
 
+bool synchronizerIsRunning() {
+    return synchronizerRunning;
+}
+
 // helpers for random numbers
 #define PI 3.141592654
 double gaussrand(bool reset)

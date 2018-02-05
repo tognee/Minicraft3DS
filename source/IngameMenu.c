@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "Menu.h"
+#include "Ingame.h"
 #include "Player.h"
 #include "SaveLoad.h"
 #include "Synchronizer.h"
@@ -47,14 +48,7 @@ void ingameMenuTick(PlayerData *pd, int menu) {
                     pd->ingameMenuAreYouSure = false;
                     pd->ingameMenuAreYouSureSave = false;
                     
-                    networkDisconnect();
-                    synchronizerReset();
-                    
-                    sf2d_set_clear_color(0xFF);
-                    currentSelection = 0;
-                    currentMenu = MENU_TITLE;
-					
-					playMusic(&music_menu);
+                    exitGame();
                 } else if (pd->inputs.k_decline.clicked){
                     pd->ingameMenuAreYouSure = false;
                     pd->ingameMenuAreYouSureSave = false;

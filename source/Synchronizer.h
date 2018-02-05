@@ -12,6 +12,7 @@ void synchronizerSetPlayerUID(int playerID, u32 uid);
 void synchronizerSendIfReady();
 void synchronizerSetPlayerReady(int playerID);
 bool synchronizerAllReady();
+bool synchronizerIsRunning();
 
 void synchronizerStart();
 

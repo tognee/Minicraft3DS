@@ -1166,7 +1166,7 @@ void renderMenu(int menu,int xscr,int yscr){
                             memset(text, 0, (50+8+1) * sizeof(char));
                             networkGetNodeName(j, text);
                             
-                            drawText(text,(400-(strlen(text)*12))/2,i*32+32);
+                            drawText(text,(400-(strlen(text)*12))/2,i*26+32);
                             
                             free(text);
                             lastj = j;
@@ -1234,7 +1234,7 @@ void renderMenu(int menu,int xscr,int yscr){
                             memset(text, 0, (50+8+1) * sizeof(char));
                             networkGetNodeName(j, text);
                             
-                            drawText(text,(400-(strlen(text)*12))/2,i*32+32);
+                            drawText(text,(400-(strlen(text)*12))/2,i*26+32);
                             
                             free(text);
                             lastj = j;
