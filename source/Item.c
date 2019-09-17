@@ -200,6 +200,20 @@ char* getItemName(int itemID, int countLevel) {
 			}
 		case TOOL_BOW: return "Bow";
 		case TOOL_MAGIC_COMPASS: return "Magic Compass";
+		case TOOL_CLAYMORE:
+			switch(countLevel){
+				case 1: return "Rock Claymore";
+				case 2: return "Iron Claymore";
+				case 3: return "Gold Claymore";
+				case 4: return "Gem Claymore";
+				default: return "Wood Claymore";
+			}
+		case ITEM_TORCH: return "Torch";
+		case ITEM_BED: return "Bed";
+		case ITEM_FISHING_ROD: return "Fishing Rod";
+		case ITEM_SHEARS: return "Shears";
+		case ITEM_FISH_RAW: sprintf(currentName,"%d Fish", countLevel); return currentName;
+		case ITEM_FISH_COOKED: sprintf(currentName,"%d Cooked Fish", countLevel); return currentName;
 		default: return ""; // null
 	}
 }
@@ -316,6 +330,20 @@ char* getBasicItemName(int itemID, int countLevel) {
 			}
 		case TOOL_BOW: return "Bow";
 		case TOOL_MAGIC_COMPASS: return "Magic Compass";
+		case TOOL_CLAYMORE:
+			switch(countLevel){
+				case 1: return "Rock Claymore";
+				case 2: return "Iron Claymore";
+				case 3: return "Gold Claymore";
+				case 4: return "Gem Claymore";
+				default: return "Wood Claymore";
+			}
+		case ITEM_TORCH: return "Torch";
+		case ITEM_BED: return "Bed";
+		case ITEM_FISHING_ROD: return "Fishing Rod";
+		case ITEM_SHEARS: return "Shears";
+		case ITEM_FISH_RAW: return "Fish";
+		case ITEM_FISH_COOKED: return "Cooked Fish";
 		default: return ""; // null
 	}
 

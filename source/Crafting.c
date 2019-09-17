@@ -89,11 +89,12 @@ Recipe defineRecipe(int item, int amountOrLevel, int numArgs, ...){
 void initRecipes(){
 	curPlace = 0;
 
-	inHeadRecipes.size = 1;
+	inHeadRecipes.size = 2;
 	inHeadRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (inHeadRecipes.size));
 	inHeadRecipes.recipes[0] = defineRecipe(ITEM_WORKBENCH,1,1,ITEM_WOOD,10);
+	inHeadRecipes.recipes[1] = defineRecipe(ITEM_TORCH,1,2,ITEM_WOOD,1,ITEM_COAL,1);
 
-	workbenchRecipes.size = 22;
+	workbenchRecipes.size = 24;
 	workbenchRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (workbenchRecipes.size));
 	workbenchRecipes.recipes[0] = defineRecipe(ITEM_WORKBENCH,1,1,ITEM_WOOD,10);
 	workbenchRecipes.recipes[1] = defineRecipe(ITEM_FURNACE,1,1,ITEM_STONE,20);
@@ -117,8 +118,10 @@ void initRecipes(){
 	workbenchRecipes.recipes[19] = defineRecipe(ITEM_ARROW_STONE,1,3,ITEM_WOOD,1,ITEM_STONE,1,ITEM_STRING,1);
 	workbenchRecipes.recipes[20] = defineRecipe(ITEM_WALL_WOOD,1,1,ITEM_WOOD,4);
 	workbenchRecipes.recipes[21] = defineRecipe(ITEM_WALL_STONE,1,1,ITEM_STONE,4);
+	workbenchRecipes.recipes[22] = defineRecipe(ITEM_FISHING_ROD,1,2,ITEM_WOOD,10,ITEM_STRING,3);
+	workbenchRecipes.recipes[23] = defineRecipe(ITEM_TORCH,1,2,ITEM_WOOD,1,ITEM_COAL,1);
 
-	anvilRecipes.size = 18;
+	anvilRecipes.size = 19;
 	anvilRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (anvilRecipes.size));
 	anvilRecipes.recipes[0] = defineRecipe(TOOL_SWORD,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
 	anvilRecipes.recipes[1] = defineRecipe(TOOL_AXE,2,2,ITEM_WOOD,5,ITEM_IRONINGOT,5);
@@ -138,6 +141,7 @@ void initRecipes(){
 	anvilRecipes.recipes[15] = defineRecipe(ITEM_WALL_GOLD,1,1,ITEM_GOLDINGOT,2);
 	anvilRecipes.recipes[16] = defineRecipe(ITEM_COIN,3,1,ITEM_IRONINGOT,1);
 	anvilRecipes.recipes[17] = defineRecipe(ITEM_POTION_MAKER,1,3,ITEM_IRONINGOT,5,ITEM_GOLDINGOT,25,ITEM_GEM,5);
+	anvilRecipes.recipes[18] = defineRecipe(ITEM_SHEARS,1,1,ITEM_IRONINGOT,2);
 
 	furnaceRecipes.size = 3;
 	furnaceRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (furnaceRecipes.size));
@@ -145,15 +149,17 @@ void initRecipes(){
 	furnaceRecipes.recipes[1] = defineRecipe(ITEM_GOLDINGOT,1,2,ITEM_GOLDORE,4,ITEM_COAL,1);
 	furnaceRecipes.recipes[2] = defineRecipe(ITEM_GLASS,1,2,ITEM_SAND,4,ITEM_COAL,1);
 
-	ovenRecipes.size = 3;
+	ovenRecipes.size = 4;
 	ovenRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (ovenRecipes.size));
 	ovenRecipes.recipes[0] = defineRecipe(ITEM_BREAD,1,1,ITEM_WHEAT,4);
 	ovenRecipes.recipes[1] = defineRecipe(ITEM_PORK_COOKED,1,2,ITEM_PORK_RAW,1,ITEM_COAL,1);
 	ovenRecipes.recipes[2] = defineRecipe(ITEM_BEEF_COOKED,1,2,ITEM_BEEF_RAW,1,ITEM_COAL,1);
+	ovenRecipes.recipes[3] = defineRecipe(ITEM_FISH_COOKED,1,2,ITEM_FISH_RAW,1,ITEM_COAL,1);
 
-	loomRecipes.size = 1;
+	loomRecipes.size = 2;
 	loomRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (loomRecipes.size));
 	loomRecipes.recipes[0] = defineRecipe(ITEM_STRING,1,1,ITEM_WOOL,1);
+	loomRecipes.recipes[1] = defineRecipe(ITEM_BED,1,2,ITEM_WOOD,5,ITEM_WOOL,3);
 
 	enchanterRecipes.size = 8;
 	enchanterRecipes.recipes = (Recipe*)malloc(sizeof(Recipe) * (enchanterRecipes.size));

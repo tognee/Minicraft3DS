@@ -1698,5 +1698,26 @@ void renderItemIcon(int itemID, int countLevel, int x, int y) {
 			else render(x, y, 136, 168, 0);
 		}
 		break;
+	case TOOL_CLAYMORE:
+		render(x, y, countLevel * 8, 176, 0);
+		break;
+	case ITEM_TORCH:
+		render(x, y, 168, 168, 0);
+		break;
+	case ITEM_BED:
+		render(x, y, 176, 168, 0);
+		break;
+	case ITEM_SHEARS:
+		render(x, y, 40, 176, 0);
+		break;
+	case ITEM_FISHING_ROD:
+		render(x, y, 48, 176, 0);
+		break;
+	case ITEM_FISH_RAW:
+		render(x, y, 56, 176, 0);
+		break;
+	case ITEM_FISH_COOKED:
+		render(x, y, 64, 176, 0);
+		break;
 	}
 }
