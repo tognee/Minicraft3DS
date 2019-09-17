@@ -36,8 +36,8 @@ INCLUDES	:=	include
 ROMFS       :=  romfs
 
 APP_TITLE	:= Minicraft 3DS
-APP_DESCRIPTION	:= Minicraft was originally created by Markus "Notch" Perrson. Ported to the 3DS by Davideesk.
-APP_AUTHOR	:= Davideesk/andre111/ElijahZAwesome
+APP_DESCRIPTION	:= Originally created by Notch.
+APP_AUTHOR	:= Davideesk/andre111/ElijahZAwesome/tognee
 
 #---------------------------------------------------------------------------------
 # options for code generation
