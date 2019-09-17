@@ -7,7 +7,7 @@ Current Version: Version 1.6.1
 **Download:**
 
 If you just want to download the game prebuilt check the releases tab in Github:  
-https://github.com/ElijahZAwesome/Minicraft3DS/releases  
+//TODO  
 For building the game yourself look below.  
 
 
@@ -38,7 +38,7 @@ zlib: http://www.zlib.net/
 **2. Install zlib, libjpeg-turbo and libpng**
 - Download 3DS-Portlibs: https://github.com/devkitPro/3ds_portlibs
 - Run these commands:
-		
+
 ```
 	make zlib
 	make install-zlib
@@ -68,11 +68,11 @@ zlib: http://www.zlib.net/
 ----------
 
 
-You can do anything with the source code (besides sell it) as long as you give proper credit to the right people. 
+You can do anything with the source code (besides sell it) as long as you give proper credit to the right people.
 If you are going to make a mod of this version, be sure to give credit to Markus "Notch" Perrson because he did create the original game after all.
 
 # Misc
 
 This source code is subject to a lot of change for better optimization/cleanliness.
 
-Forum thread: https://gbatemp.net/threads/release-new-minicraft3ds-fork-v1-4.494947/
+Forum thread: //TODO
