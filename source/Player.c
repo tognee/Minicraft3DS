@@ -61,9 +61,8 @@ void playerInitInventory(PlayerData *pd) {
 	pd->inventory.lastSlot = 0;
 	pd->activeItem = &noItem;
 
-	addItemToInventory(newItem(ITEM_POWGLOVE,0), &(pd->inventory));
-
 	if(shouldRenderDebug && playerCount < 2) {
+		addItemToInventory(newItem(ITEM_POWGLOVE,0), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_WORKBENCH,0), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_GOLD_APPLE,1), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_STRENGTH_POTION,1), &(pd->inventory));
