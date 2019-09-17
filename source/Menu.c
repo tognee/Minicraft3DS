@@ -376,8 +376,8 @@ void tickMenu(int menu){
 						keyProp[3] = KEY_DRIGHT | KEY_CPAD_RIGHT | KEY_CSTICK_RIGHT;
 						keyProp[4] = KEY_A;
 						keyProp[5] = KEY_B;
-						keyProp[6] = KEY_Y;
-						keyProp[7] = KEY_X ;
+						keyProp[6] = KEY_X;
+						keyProp[7] = KEY_Y ;
 						keyProp[8] = KEY_START;
 						keyProp[9] = KEY_A;
 						keyProp[10] = KEY_B;

@@ -165,8 +165,8 @@ int main() {
 	localInputs.k_right.input = KEY_DRIGHT | KEY_CPAD_RIGHT | KEY_CSTICK_RIGHT;
 	localInputs.k_attack.input = KEY_A;
 	localInputs.k_pickup.input = KEY_B;
-	localInputs.k_use.input = KEY_Y;
-	localInputs.k_menu.input = KEY_X ;
+	localInputs.k_use.input = KEY_X;
+	localInputs.k_menu.input = KEY_Y ;
 	localInputs.k_pause.input = KEY_START;
 	localInputs.k_accept.input = KEY_A;
 	localInputs.k_decline.input = KEY_B;

@@ -21,7 +21,7 @@ typedef struct _recipeManager {
 	Recipe * recipes;
 } RecipeManager;
 
-
+RecipeManager inHeadRecipes;
 RecipeManager workbenchRecipes;
 RecipeManager furnaceRecipes;
 RecipeManager ovenRecipes;

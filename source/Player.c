@@ -61,10 +61,10 @@ void playerInitInventory(PlayerData *pd) {
 	pd->inventory.lastSlot = 0;
 	pd->activeItem = &noItem;
 
-	addItemToInventory(newItem(ITEM_WORKBENCH,0), &(pd->inventory));
 	addItemToInventory(newItem(ITEM_POWGLOVE,0), &(pd->inventory));
 
 	if(shouldRenderDebug && playerCount < 2) {
+		addItemToInventory(newItem(ITEM_WORKBENCH,0), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_GOLD_APPLE,1), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_STRENGTH_POTION,1), &(pd->inventory));
 		addItemToInventory(newItem(ITEM_REGEN_POTION,1), &(pd->inventory));
@@ -503,6 +503,81 @@ void tickPlayer(PlayerData *pd, bool inmenu) {
 				pd->entity.p.staminaRecharge = 0;
 
 				playerAttack(pd);
+			}
+		}
+
+		//picking up furniture
+		if(pd->inputs.k_pickup.clicked){
+			if (pd->entity.p.isCarrying){
+				if (pd->entity.p.stamina != 0) {
+					if(!shouldRenderDebug) pd->entity.p.stamina--;
+					pd->entity.p.staminaRecharge = 0;
+					playerAttack(pd);
+				}
+			}else{
+				int yo = -2;
+				int range = 12;
+				// see if entity near player
+				int x0, y0, x1, y1 = 0;
+				switch(pd->entity.p.dir){
+					case 0:
+						x0 = pd->entity.x - 8;
+						y0 = pd->entity.y + 4 + yo;
+						x1 = pd->entity.x + 8;
+						y1 = pd->entity.y + range + yo;
+					break;
+					case 1:
+						x0 = pd->entity.x - 8;
+						y0 = pd->entity.y - range + yo;
+						x1 = pd->entity.x + 8;
+						y1 = pd->entity.y - 4 + yo;
+					break;
+					case 2:
+						x0 = pd->entity.x - range;
+						y0 = pd->entity.y - 8 + yo;
+						x1 = pd->entity.x - 4;
+						y1 = pd->entity.y + 8 + yo;
+					break;
+					case 3:
+						x0 = pd->entity.x + 4;
+						y0 = pd->entity.y - 8 + yo;
+						x1 = pd->entity.x + range;
+						y1 = pd->entity.y + 8 + yo;
+					break;
+				}
+				Entity * es[eManager.lastSlot[pd->entity.level]];
+				int eSize = getEntities(es, pd->entity.level, x0, y0, x1, y1);
+				int i;
+				for (i = 0; i < eSize; ++i) {
+					Entity * ent = es[i];
+					if (ent != &(pd->entity)){
+						if(ent->type == ENTITY_FURNITURE){
+							//Important: close all crafting windows using this furniture (only applies to chest) or else they will write invalid memory
+							for(int i=0; i<playerCount; i++) {
+								if(players[i].curChestEntity==ent) {
+									players[i].ingameMenu = MENU_NONE;
+								}
+							}
+
+							Item nItem = newItem(ent->entityFurniture.itemID,0);
+							if(ent->entityFurniture.itemID == ITEM_CHEST) nItem.chestPtr = ent->entityFurniture.inv;
+							pushItemToInventoryFront(nItem, &(pd->inventory));
+
+							removeEntityFromList(ent, ent->level, &eManager);
+							pd->activeItem = &(pd->inventory.items[0]);
+							pd->entity.p.isCarrying = true;
+						}
+					}
+				}
+			}
+		}
+
+		// in head crafting
+		if(pd->inputs.k_use.clicked){
+			pd->ingameMenuInvSel = 0;
+			if(!playerUse(pd)){
+				pd->currentCraftTitle = "Crafting";
+				openCraftingMenu(pd, &inHeadRecipes, "Crafting");
 			}
 		}
 

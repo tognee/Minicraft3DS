@@ -56,7 +56,7 @@ void ingameMenuTick(PlayerData *pd, int menu) {
 			}
 		break;
 		case MENU_INVENTORY:
-			if (pd->inputs.k_menu.clicked || pd->inputs.k_decline.clicked){
+			if (pd->inputs.k_menu.clicked || pd->inputs.k_use.clicked || pd->inputs.k_decline.clicked){
 				pd->ingameMenu = MENU_NONE;
 				pd->activeItem = &noItem;
 				pd->entity.p.isCarrying = false;
@@ -75,7 +75,7 @@ void ingameMenuTick(PlayerData *pd, int menu) {
 		break;
 
 		case MENU_CRAFTING:
-			if (pd->inputs.k_menu.clicked || pd->inputs.k_decline.clicked) pd->ingameMenu = MENU_NONE;
+			if (pd->inputs.k_menu.clicked || pd->inputs.k_use.clicked || pd->inputs.k_decline.clicked) pd->ingameMenu = MENU_NONE;
 			if (pd->inputs.k_accept.clicked){
 				if(craftItem(&(pd->currentRecipes), &(pd->currentRecipes.recipes[pd->ingameMenuInvSel]), &(pd->inventory))){
 					playSoundPositioned(snd_craft, pd->entity.level, pd->entity.x, pd->entity.y);
@@ -313,7 +313,7 @@ void ingameMenuRender(PlayerData *pd, int menu) {
 					int ttlCst = rec->costs[i].costAmount;
 					int col = 0xFFFFFFFF; if(amnt<ttlCst) col = 0xFF7F7F7F;
 					renderItemIcon(rec->costs[i].costItem,1,128,48+(i*8));
-					sprintf(craftText,"%d/%d",amnt,ttlCst);
+					sprintf(craftText,"%d/%d",ttlCst,amnt);
 					drawTextColor(craftText,274,96+(i*18),col);
 				}
 			}
