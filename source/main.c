@@ -163,8 +163,10 @@ int main() {
 	localInputs.k_down.input = KEY_DDOWN | KEY_CPAD_DOWN | KEY_CSTICK_DOWN;
 	localInputs.k_left.input = KEY_DLEFT | KEY_CPAD_LEFT | KEY_CSTICK_LEFT;
 	localInputs.k_right.input = KEY_DRIGHT | KEY_CPAD_RIGHT | KEY_CSTICK_RIGHT;
-	localInputs.k_attack.input = KEY_A | KEY_B;
-	localInputs.k_menu.input = KEY_X | KEY_Y;
+	localInputs.k_attack.input = KEY_A;
+	localInputs.k_pickup.input = KEY_B;
+	localInputs.k_use.input = KEY_Y;
+	localInputs.k_menu.input = KEY_X ;
 	localInputs.k_pause.input = KEY_START;
 	localInputs.k_accept.input = KEY_A;
 	localInputs.k_decline.input = KEY_B;
@@ -179,6 +181,8 @@ int main() {
 		fread(&(localInputs.k_left.input), sizeof(int), 1, file);
 		fread(&(localInputs.k_right.input), sizeof(int), 1, file);
 		fread(&(localInputs.k_attack.input), sizeof(int), 1, file);
+		fread(&(localInputs.k_pickup.input), sizeof(int), 1, file);
+		fread(&(localInputs.k_use.input), sizeof(int), 1, file);
 		fread(&(localInputs.k_menu.input), sizeof(int), 1, file);
 		fread(&(localInputs.k_pause.input), sizeof(int), 1, file);
 		fread(&(localInputs.k_accept.input), sizeof(int), 1, file);

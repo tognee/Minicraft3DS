@@ -15,6 +15,8 @@ typedef struct {
 	Key k_left;
 	Key k_right;
 	Key k_attack;
+	Key k_pickup;
+	Key k_use;
 	Key k_menu;
 	Key k_pause;
 	Key k_accept;

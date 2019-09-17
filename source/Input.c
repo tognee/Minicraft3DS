@@ -13,6 +13,8 @@ void tickKeys(Inputs *inputs, u32 held, u32 down){
 	toggleKey(&(inputs->k_right), held & localInputs.k_right.input, down & localInputs.k_right.input);
 	toggleKey(&(inputs->k_pause), held & localInputs.k_pause.input, down & localInputs.k_pause.input);
 	toggleKey(&(inputs->k_attack), held & localInputs.k_attack.input, down & localInputs.k_attack.input);
+	toggleKey(&(inputs->k_pickup), held & localInputs.k_pickup.input, down & localInputs.k_pickup.input);
+	toggleKey(&(inputs->k_use), held & localInputs.k_use.input, down & localInputs.k_use.input);
 	toggleKey(&(inputs->k_menu), held & localInputs.k_menu.input, down & localInputs.k_menu.input);
 	toggleKey(&(inputs->k_accept), held & localInputs.k_accept.input, down & localInputs.k_accept.input);
 	toggleKey(&(inputs->k_decline), held & localInputs.k_decline.input, down & localInputs.k_decline.input);
@@ -31,6 +33,8 @@ void resetKeys(Inputs *inputs) {
 	toggleKey(&(inputs->k_right), false, false);
 	toggleKey(&(inputs->k_pause), false, false);
 	toggleKey(&(inputs->k_attack), false, false);
+	toggleKey(&(inputs->k_pickup), false, false);
+	toggleKey(&(inputs->k_use), false, false);
 	toggleKey(&(inputs->k_menu), false, false);
 	toggleKey(&(inputs->k_accept), false, false);
 	toggleKey(&(inputs->k_decline), false, false);
@@ -46,6 +50,8 @@ void resetClicked(Inputs *inputs) {
 	inputs->k_right.clicked = false;
 	inputs->k_pause.clicked = false;
 	inputs->k_attack.clicked = false;
+	inputs->k_pickup.clicked = false;
+	inputs->k_use.clicked = false;
 	inputs->k_menu.clicked = false;
 	inputs->k_accept.clicked = false;
 	inputs->k_decline.clicked = false;

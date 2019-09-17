@@ -16,7 +16,7 @@ int keys[] = {
 	KEY_L,KEY_R,KEY_ZL,KEY_ZR,
 	KEY_START,KEY_SELECT
 };
-int keyProp[12] = {[0 ... 11] = 0};
+int keyProp[14] = {[0 ... 13] = 0};
 bool areYouSure = false;
 bool areYouSureSave = false;
 bool bindOpt = false;
@@ -218,46 +218,49 @@ void doTouchButton(){
 
 void switchGameBut(bool left, int buttonID){
 	int id;
-	for(id = 0; id < 7; ++id){
+	for(id = 0; id < 13; ++id){
+		if(id > 8 && id < 12) continue;
 		if(keyProp[id] & buttonID){
 			keyProp[id] ^= buttonID; // Toggle buttonID bit
 			if(left){
-				int id2 = id -1;
+				int id2 = id - 1;
+				if (id2 == 11) id2 = 8;
 				if (id2 < 0) return;
 				keyProp[id2] ^= buttonID;
 			} else {
 				int id2 = id+1;
-				if (id2 > 6) return;
+				if (id2 == 9) id2 = 12;
+				if (id2 > 13) return;
 				keyProp[id2] ^= buttonID;
 			}
 			return;
 		}
 	}
-	if(left) keyProp[6] ^= buttonID;
+	if(left) keyProp[13] ^= buttonID;
 	else keyProp[0] ^= buttonID;
 
 }
 void switchMenuBut(bool left, int buttonID){
 	int id;
-	for(id = 0; id < 12; ++id){
-		if(id > 3 && id < 7) continue;
+	for(id = 0; id < 13; ++id){
+		if(id > 3 && id < 9) continue;
 		if(keyProp[id] & buttonID){
 			keyProp[id] ^= buttonID; // Toggle buttonID bit
 			if(left){
 				int id2 = id - 1;
-				if (id2 == 6) id2 = 3;
+				if (id2 == 8) id2 = 3;
 				if (id2 < 0) return;
 				keyProp[id2] ^= buttonID;
 			} else {
 				int id2 = id+1;
-				if (id2 == 4) id2 = 7;
-				if (id2 > 11) return;
+				if (id2 == 4) id2 = 9;
+				if (id2 > 13) return;
 				keyProp[id2] ^= buttonID;
 			}
 			return;
 		}
 	}
-	if(left) keyProp[11] ^= buttonID;
+	if(left) keyProp[13] ^= buttonID;
 	else keyProp[0] ^= buttonID;
 }
 
@@ -274,6 +277,8 @@ s8 checkPropButtons(){
 	if(keyProp[9] == 0) return 9;
 	if(keyProp[10] == 0) return 10;
 	if(keyProp[11] == 0) return 11;
+	if(keyProp[12] == 0) return 12;
+	if(keyProp[13] == 0) return 13;
 	return -1;
 }
 
@@ -340,16 +345,18 @@ void tickMenu(int menu){
 							localInputs.k_left.input = keyProp[2];
 							localInputs.k_right.input = keyProp[3];
 							localInputs.k_attack.input = keyProp[4];
-							localInputs.k_menu.input = keyProp[5];
-							localInputs.k_pause.input = keyProp[6];
-							localInputs.k_accept.input = keyProp[7];
-							localInputs.k_decline.input = keyProp[8];
-							localInputs.k_delete.input = keyProp[9];
-							localInputs.k_menuNext.input = keyProp[10];
-							localInputs.k_menuPrev.input = keyProp[11];
+							localInputs.k_pickup.input = keyProp[5];
+							localInputs.k_use.input = keyProp[6];
+							localInputs.k_menu.input = keyProp[7];
+							localInputs.k_pause.input = keyProp[8];
+							localInputs.k_accept.input = keyProp[9];
+							localInputs.k_decline.input = keyProp[10];
+							localInputs.k_delete.input = keyProp[11];
+							localInputs.k_menuNext.input = keyProp[12];
+							localInputs.k_menuPrev.input = keyProp[13];
 
 							FILE *fs=fopen("btnSave.bin","wb");
-							fwrite(keyProp,sizeof(int),12,fs);
+							fwrite(keyProp,sizeof(keyProp),1,fs);
 							fclose(fs);
 
 							currentSelection = 0;
@@ -367,14 +374,16 @@ void tickMenu(int menu){
 						keyProp[1] = KEY_DDOWN | KEY_CPAD_DOWN | KEY_CSTICK_DOWN;
 						keyProp[2] = KEY_DLEFT | KEY_CPAD_LEFT | KEY_CSTICK_LEFT;
 						keyProp[3] = KEY_DRIGHT | KEY_CPAD_RIGHT | KEY_CSTICK_RIGHT;
-						keyProp[4] = KEY_A | KEY_B;
-						keyProp[5] = KEY_X | KEY_Y;
-						keyProp[6] = KEY_START;
-						keyProp[7] = KEY_A;
-						keyProp[8] = KEY_B;
-						keyProp[9] = KEY_X;
-						keyProp[10] = KEY_R | KEY_ZR;
-						keyProp[11] = KEY_L | KEY_ZL;
+						keyProp[4] = KEY_A;
+						keyProp[5] = KEY_B;
+						keyProp[6] = KEY_Y;
+						keyProp[7] = KEY_X ;
+						keyProp[8] = KEY_START;
+						keyProp[9] = KEY_A;
+						keyProp[10] = KEY_B;
+						keyProp[11] = KEY_X;
+						keyProp[12] = KEY_R | KEY_ZR;
+						keyProp[13] = KEY_L | KEY_ZL;
 						bindOpt = false;
 						errorBut = -1;
 						break;
@@ -524,13 +533,15 @@ void tickMenu(int menu){
 						keyProp[2] = localInputs.k_left.input;
 						keyProp[3] = localInputs.k_right.input;
 						keyProp[4] = localInputs.k_attack.input;
-						keyProp[5] = localInputs.k_menu.input;
-						keyProp[6] = localInputs.k_pause.input;
-						keyProp[7] = localInputs.k_accept.input;
-						keyProp[8] = localInputs.k_decline.input;
-						keyProp[9] = localInputs.k_delete.input;
-						keyProp[10] = localInputs.k_menuNext.input;
-						keyProp[11] = localInputs.k_menuPrev.input;
+						keyProp[5] = localInputs.k_pickup.input;
+						keyProp[6] = localInputs.k_use.input;
+						keyProp[7] = localInputs.k_menu.input;
+						keyProp[8] = localInputs.k_pause.input;
+						keyProp[9] = localInputs.k_accept.input;
+						keyProp[10] = localInputs.k_decline.input;
+						keyProp[11] = localInputs.k_delete.input;
+						keyProp[12] = localInputs.k_menuNext.input;
+						keyProp[13] = localInputs.k_menuPrev.input;
 						left = true;
 						selBut = false;
 						bindOpt = false;
@@ -716,8 +727,12 @@ char * getButtonFunctionGame(int key){
 	if(keyProp[2] & key) return "Move left";
 	if(keyProp[3] & key) return "Move right";
 	if(keyProp[4] & key) return "Attack";
-	if(keyProp[5] & key) return "Toggle Menu";
-	if(keyProp[6] & key) return "Pause";
+	if(keyProp[5] & key) return "Pick up";
+	if(keyProp[6] & key) return "Use";
+	if(keyProp[7] & key) return "Toggle Menu";
+	if(keyProp[8] & key) return "Pause";
+	if(keyProp[12] & key) return "Next";
+	if(keyProp[13] & key) return "Previous";
 	return "Nothing";
 }
 char * getButtonFunctionMenu(int key){
@@ -725,11 +740,11 @@ char * getButtonFunctionMenu(int key){
 	if(keyProp[1] & key) return "Down";
 	if(keyProp[2] & key) return "Left";
 	if(keyProp[3] & key) return "Right";
-	if(keyProp[7] & key) return "Accept";
-	if(keyProp[8] & key) return "Decline";
-	if(keyProp[9] & key) return "Delete";
-	if(keyProp[10] & key) return "Next";
-	if(keyProp[11] & key) return "Previous";
+	if(keyProp[9] & key) return "Accept";
+	if(keyProp[10] & key) return "Decline";
+	if(keyProp[11] & key) return "Delete";
+	if(keyProp[12] & key) return "Next";
+	if(keyProp[13] & key) return "Previous";
 	return "Nothing";
 }
 
@@ -954,7 +969,7 @@ void renderMenu(int menu,int xscr,int yscr){
 					drawText("Press   to return", 98, 190);
 					renderButtonIcon(localInputs.k_decline.input & -localInputs.k_decline.input, 168, 188, 1);
 
-					if(errorBut >= 0 && errorBut < 12){
+					if(errorBut >= 0 && errorBut < 14){
 						char errorText[30];
 						switch(errorBut){
 							case 0: sprintf(errorText, "Error: Missing 'Move up'"); break;
@@ -962,13 +977,15 @@ void renderMenu(int menu,int xscr,int yscr){
 							case 2: sprintf(errorText, "Error: Missing 'Move right'"); break;
 							case 3: sprintf(errorText, "Error: Missing 'Move left'"); break;
 							case 4: sprintf(errorText, "Error: Missing 'Attack'"); break;
-							case 5: sprintf(errorText, "Error: Missing 'Toggle Menu'"); break;
-							case 6: sprintf(errorText, "Error: Missing 'Pause'"); break;
-							case 7: sprintf(errorText, "Error: Missing 'Accept'"); break;
-							case 8: sprintf(errorText, "Error: Missing 'Decline'"); break;
-							case 9: sprintf(errorText, "Error: Missing 'Delete'"); break;
-							case 10: sprintf(errorText, "Error: Missing 'Next'"); break;
-							case 11: sprintf(errorText, "Error: Missing 'Previous'"); break;
+							case 5: sprintf(errorText, "Error: Missing 'Pick up'"); break;
+							case 6: sprintf(errorText, "Error: Missing 'Use'"); break;
+							case 7: sprintf(errorText, "Error: Missing 'Toggle Menu'"); break;
+							case 8: sprintf(errorText, "Error: Missing 'Pause'"); break;
+							case 9: sprintf(errorText, "Error: Missing 'Accept'"); break;
+							case 10: sprintf(errorText, "Error: Missing 'Decline'"); break;
+							case 11: sprintf(errorText, "Error: Missing 'Delete'"); break;
+							case 12: sprintf(errorText, "Error: Missing 'Next'"); break;
+							case 13: sprintf(errorText, "Error: Missing 'Previous'"); break;
 						}
 						drawTextColor(errorText,(400 - (strlen(errorText) * 12))/2,50,0xFF0000FF);
 					}

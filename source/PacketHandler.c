@@ -233,6 +233,8 @@ size_t writeInputPacket(void *buffer, Inputs *inputs, u8 playerID, u32 turnNumbe
 	buffer = writeBool(buffer, &size, inputs->k_left.down); buffer = writeBool(buffer, &size, inputs->k_left.clicked);
 	buffer = writeBool(buffer, &size, inputs->k_right.down); buffer = writeBool(buffer, &size, inputs->k_right.clicked);
 	buffer = writeBool(buffer, &size, inputs->k_attack.down); buffer = writeBool(buffer, &size, inputs->k_attack.clicked);
+	buffer = writeBool(buffer, &size, inputs->k_pickup.down); buffer = writeBool(buffer, &size, inputs->k_pickup.clicked);
+	buffer = writeBool(buffer, &size, inputs->k_use.down); buffer = writeBool(buffer, &size, inputs->k_use.clicked);
 	buffer = writeBool(buffer, &size, inputs->k_menu.down); buffer = writeBool(buffer, &size, inputs->k_menu.clicked);
 	buffer = writeBool(buffer, &size, inputs->k_pause.down); buffer = writeBool(buffer, &size, inputs->k_pause.clicked);
 	buffer = writeBool(buffer, &size, inputs->k_accept.down); buffer = writeBool(buffer, &size, inputs->k_accept.clicked);
@@ -259,6 +261,10 @@ bool readInputPacketData(void *buffer, size_t size, Inputs *inputs) {
 	buffer = readBool(buffer, &size, &(inputs->k_right.down)); buffer = readBool(buffer, &size, &(inputs->k_right.clicked));
 	if(size<=0) return false;
 	buffer = readBool(buffer, &size, &(inputs->k_attack.down)); buffer = readBool(buffer, &size, &(inputs->k_attack.clicked));
+	if(size<=0) return false;
+	buffer = readBool(buffer, &size, &(inputs->k_pickup.down)); buffer = readBool(buffer, &size, &(inputs->k_pickup.clicked));
+	if(size<=0) return false;
+	buffer = readBool(buffer, &size, &(inputs->k_use.down)); buffer = readBool(buffer, &size, &(inputs->k_use.clicked));
 	if(size<=0) return false;
 	buffer = readBool(buffer, &size, &(inputs->k_menu.down)); buffer = readBool(buffer, &size, &(inputs->k_menu.clicked));
 	if(size<=0) return false;
