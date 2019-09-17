@@ -6,8 +6,8 @@
 
 
 typedef struct {
-    u32 size;
-    u8 * buffer;
+	u32 size;
+	u8 * buffer;
 } Sound;
 
 void loadSound(Sound * snd, char * filename);

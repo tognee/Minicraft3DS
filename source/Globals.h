@@ -7,7 +7,7 @@
 #include "MapGen.h"
 #include "Quests.h"
 
-#include "icons2_png.h"
+#include "icons_png.h"
 #include "player_png.h"
 #include "Font_png.h"
 #include "bottombg_png.h"
@@ -142,15 +142,15 @@ bool quitGame;
 s8 currentSelection;
 
 typedef struct _worldData {
-    u8 map[6][128*128];
-    u8 data[6][128*128];
-    
-    u16 daytime;
-    int day;
-    u8 season;
-    bool rain;
-    
-    u8 compassData[6][3];
+	u8 map[6][128*128];
+	u8 data[6][128*128];
+
+	u16 daytime;
+	int day;
+	u8 season;
+	bool rain;
+
+	u8 compassData[6][3];
 } WorldData;
 
 WorldData worldData;

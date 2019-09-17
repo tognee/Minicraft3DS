@@ -1,7 +1,7 @@
 #pragma once
 
 #include <3ds.h>
-#include <string.h> 
+#include <string.h>
 #include <sf2d.h>
 #include <dirent.h>
 #include <ctype.h>

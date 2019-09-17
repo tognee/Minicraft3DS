@@ -30,89 +30,89 @@ typedef struct Entity Entity;
 typedef struct _plrd PlayerData; //in order to not include Player.h and cause all sorts of problems
 
 typedef struct {
-    s8 ax;
-    s8 ay;
-    u8 dir;
-    s8 health;
-    s8 stamina;
-    s8 staminaRecharge;
-    s8 staminaRechargeDelay;
-    s8 attackTimer;
-    u8 spawnTrigger;
-    bool isDead;
-    bool hasWon;
-    bool hasWonSaved;
-    s8 endTimer;
-    s16 walkDist;
-    bool isCarrying;
-    bool isSwimming;
-    int swimTimer;
+	s8 ax;
+	s8 ay;
+	u8 dir;
+	s8 health;
+	s8 stamina;
+	s8 staminaRecharge;
+	s8 staminaRechargeDelay;
+	s8 attackTimer;
+	u8 spawnTrigger;
+	bool isDead;
+	bool hasWon;
+	bool hasWonSaved;
+	s8 endTimer;
+	s16 walkDist;
+	bool isCarrying;
+	bool isSwimming;
+	int swimTimer;
 	int regenTimer;
 	int strengthTimer;
 	int swimBreathTimer;
 	int speedTimer;
 	int score;
-    PlayerData *data;
+	PlayerData *data;
 } Player;
 
 
 typedef struct {
-    float xa;
-    float ya;
-    float za;
-    float xx;
-    float yy;
-    float zz;
-    s16 age;
-    Item item;
+	float xa;
+	float ya;
+	float za;
+	float xx;
+	float yy;
+	float zz;
+	s16 age;
+	Item item;
 } EntityItem;
 
 typedef struct {
-    s16 itemID;
-    bool active;
-    s8 r; // light radius for lantern.
-    Inventory* inv; // Points to chest inventory.
+	s16 itemID;
+	bool active;
+	s8 r; // light radius for lantern.
+	Inventory* inv; // Points to chest inventory.
 } EntityFurniture;
 
 typedef struct {
 	u8 mtype;
 	s8 xa;
-    s8 ya;
+	s8 ya;
 	s16 health;
-    s8 dir;
-    s8 randWalkTime;
-    s8 walkDist;
+	s8 dir;
+	s8 randWalkTime;
+	s8 walkDist;
 } PassiveMob;
 
 typedef struct {
-    s8 xa;
-    s8 ya;
-    s16 health;
-    s8 dir;
-    s8 lvl;
-    s8 randWalkTime;
-    s8 walkDist;
+	s8 xa;
+	s8 ya;
+	s16 health;
+	s8 dir;
+	s8 lvl;
+	s8 randWalkTime;
+	s8 walkDist;
 	s8 randAttackTime;
-    u32 color;
+	u32 color;
 } HostileMob;
 
 typedef struct {
-    s8 xa;
-    s8 ya;
-    s16 health;
-    s8 lvl;
-    s8 dir;
-    s8 jumpTime;
-    u32 color;
+	s8 xa;
+	s8 ya;
+	s16 health;
+	s8 lvl;
+	s8 dir;
+	s8 jumpTime;
+	u32 color;
 } Slime;
 
 typedef struct {
-    s8 xa;
-    s8 ya;
-    s16 health;
-    s8 randWalkTime;
-    s8 walkDist;
-    s8 dir;
+	s8 xa;
+	s8 ya;
+	s16 health;
+	s8 randWalkTime;
+	s8 walkDist;
+	s8 dir;
 	int attackDelay;
 	int attackTime;
 	int attackType;
@@ -120,12 +120,12 @@ typedef struct {
 } AirWizard;
 
 typedef struct {
-    Entity* parent;
-    s16 age;
-    float xa;
-    float ya;
-    float xx;
-    float yy;
+	Entity* parent;
+	s16 age;
+	float xa;
+	float ya;
+	float xx;
+	float yy;
 } Spark;
 
 typedef struct {
@@ -137,12 +137,12 @@ typedef struct {
 } Arrow;
 
 typedef struct {
-    s8 xa;
-    s8 ya;
-    s16 health;
-    s8 randWalkTime;
-    s8 walkDist;
-    s8 dir;
+	s8 xa;
+	s8 ya;
+	s16 health;
+	s8 randWalkTime;
+	s8 walkDist;
+	s8 dir;
 	int attackDelay;
 	int attackTime;
 	int attackType;
@@ -150,19 +150,19 @@ typedef struct {
 } Dragon;
 
 typedef struct {
-    Entity* parent;
+	Entity* parent;
 	u8 type;
-    s16 age;
-    float xa;
-    float ya;
-    float xx;
-    float yy;
+	s16 age;
+	float xa;
+	float ya;
+	float xx;
+	float yy;
 } DragonFire;
 
 typedef struct {
-    s8 xa;
-    s8 ya;
-    s8 randWalkTime;
+	s8 xa;
+	s8 ya;
+	s8 randWalkTime;
 	s8 waitTime;
 } Glowworm;
 
@@ -171,56 +171,56 @@ typedef struct {
 } NPC;
 
 typedef struct {
-    float xa;
-    float ya;
-    float za;
-    float xx;
-    float yy;
-    float zz;
-    s16 age;
-    char* text;
-    int color;
+	float xa;
+	float ya;
+	float za;
+	float xx;
+	float yy;
+	float zz;
+	s16 age;
+	char* text;
+	int color;
 } TextParticleEntity;
 
 typedef struct {
-    s16 age;
+	s16 age;
 } SmashParticleEntity;
 
 struct Entity {
-    s16 x;
-    s16 y;
-    s8 xKnockback,yKnockback;
-    u8 xr,yr;
-    u8 type;
-    u8 level;
-    s8 hurtTime;
-    s16 slotNum; // Read-only. Do not mess with this.
-    bool canPass;
-    bool canSwim;
-    union {
-        Player p;
-        EntityItem entityItem;
-        EntityFurniture entityFurniture;
+	s16 x;
+	s16 y;
+	s8 xKnockback,yKnockback;
+	u8 xr,yr;
+	u8 type;
+	u8 level;
+	s8 hurtTime;
+	s16 slotNum; // Read-only. Do not mess with this.
+	bool canPass;
+	bool canSwim;
+	union {
+		Player p;
+		EntityItem entityItem;
+		EntityFurniture entityFurniture;
 		PassiveMob passive;
-        HostileMob hostile;
-        Slime slime;
-        AirWizard wizard;
-        Spark spark;
+		HostileMob hostile;
+		Slime slime;
+		AirWizard wizard;
+		Spark spark;
 		Arrow arrow;
 		Glowworm glowworm;
 		Dragon dragon;
 		DragonFire dragonFire;
-        NPC npc;
-        TextParticleEntity textParticle;
-        SmashParticleEntity smashParticle;
-    };
+		NPC npc;
+		TextParticleEntity textParticle;
+		SmashParticleEntity smashParticle;
+	};
 };
 
 typedef struct {
-    Entity entities[6][1000];
-    s16 lastSlot[6];
-    Inventory invs[300];
-    s16 nextInv;
+	Entity entities[6][1000];
+	s16 lastSlot[6];
+	Inventory invs[300];
+	s16 nextInv;
 } EntityManager;
 
 EntityManager eManager;
@@ -246,6 +246,3 @@ Entity newGlowwormEntity(int x, int y, int level);
 Entity newNPCEntity(int type, int x, int y, int level);
 void addEntityToList(Entity e, EntityManager* em);
 void removeEntityFromList(Entity * e,int level,EntityManager* em);
-
-
-

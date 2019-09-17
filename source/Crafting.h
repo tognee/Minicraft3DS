@@ -3,22 +3,22 @@
 #include "Item.h"
 
 typedef struct _recipecost {
-    int costItem;
-    int costAmount;
+	int costItem;
+	int costAmount;
 } Cost;
 
 typedef struct _recipe {
-    bool canCraft;
-    int itemResult;
-    int itemAmountLevel;
-    s8 numOfCosts;
-    Cost costs[6]; // Up to 6 items for costs
-    u8 order; // Used for stable sorting.
+	bool canCraft;
+	int itemResult;
+	int itemAmountLevel;
+	s8 numOfCosts;
+	Cost costs[6]; // Up to 6 items for costs
+	u8 order; // Used for stable sorting.
 } Recipe;
 
 typedef struct _recipeManager {
-    int size;
-    Recipe * recipes;
+	int size;
+	Recipe * recipes;
 } RecipeManager;
 
 

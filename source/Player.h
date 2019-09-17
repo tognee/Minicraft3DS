@@ -16,64 +16,64 @@
 
 
 typedef struct _plrsp {
-    bool choosen;
-    
-    u8 legs;
-    u8 body;
-    u8 arms;
-    u8 head;
-    u8 eyes;
+	bool choosen;
+
+	u8 legs;
+	u8 body;
+	u8 arms;
+	u8 head;
+	u8 eyes;
 } PlayerSprite;
 
 typedef struct _plrd {
-    //for identification in save data and sync game start
-    u32 id;
-    bool idSet;
-    bool ready;
-    
-    //input/multiplayer/synchronization
-    Inputs inputs;
-    Inputs nextInputs[MAX_INPUT_BUFFER];
-    bool nextTurnReady[MAX_INPUT_BUFFER];
-    
-    //
-    bool isSpawned;
-    u8 minimapData[128*128];
-    
+	//for identification in save data and sync game start
+	u32 id;
+	bool idSet;
+	bool ready;
+
+	//input/multiplayer/synchronization
+	Inputs inputs;
+	Inputs nextInputs[MAX_INPUT_BUFFER];
+	bool nextTurnReady[MAX_INPUT_BUFFER];
+
+	//
+	bool isSpawned;
+	u8 minimapData[128*128];
+
 	int score;
-    QuestlineManager questManager;
-    
-    Entity entity;
-    Inventory inventory;
-    Item *activeItem;
-    
-    PlayerSprite sprite;
-    
-    //menu data
-    u8 ingameMenu;
-    s8 ingameMenuSelection;
-    s16 ingameMenuInvSel;
-    s16 ingameMenuInvSelOther;
-    bool ingameMenuAreYouSure;
-    bool ingameMenuAreYouSureSave;
-    s16 ingameMenuTimer;
-    NPC_MenuData npcMenuData;
-    
-    RecipeManager currentRecipes;
-    char *currentCraftTitle;
-    Entity *curChestEntity;
-    s8 curChestEntityR;
-    
-    bool mapShouldRender;
-    u8 mapZoomLevel;
-    s16 mapScrollX;
-    s16 mapScrollY;
-    char mapText[32];
-    
-    s16 touchLastX;
-    s16 touchLastY;
-    bool touchIsDraggingMap;
-    bool touchIsChangingSize;
+	QuestlineManager questManager;
+
+	Entity entity;
+	Inventory inventory;
+	Item *activeItem;
+
+	PlayerSprite sprite;
+
+	//menu data
+	u8 ingameMenu;
+	s8 ingameMenuSelection;
+	s16 ingameMenuInvSel;
+	s16 ingameMenuInvSelOther;
+	bool ingameMenuAreYouSure;
+	bool ingameMenuAreYouSureSave;
+	s16 ingameMenuTimer;
+	NPC_MenuData npcMenuData;
+
+	RecipeManager currentRecipes;
+	char *currentCraftTitle;
+	Entity *curChestEntity;
+	s8 curChestEntityR;
+
+	bool mapShouldRender;
+	u8 mapZoomLevel;
+	s16 mapScrollX;
+	s16 mapScrollY;
+	char mapText[32];
+
+	s16 touchLastX;
+	s16 touchLastY;
+	bool touchIsDraggingMap;
+	bool touchIsChangingSize;
 } PlayerData;
 
 PlayerData players[MAX_PLAYERS];

@@ -1,7 +1,7 @@
 #pragma once
 #include <3ds.h>
 #include <sf2d.h>
-#include <string.h> 
+#include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include "Globals.h"
